@@ -88,7 +88,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     )
 
     private companion object {
-        const val TAG = "FFThermal"
+        const val TAG = "Kelvinscope"
         const val ACTION_USB_PERMISSION = "com.fluxfilament.thermalcam.USB_PERMISSION"
         const val MAX_LOG_LINES = 400
         const val PREFS = "flir-one-viewer"
@@ -437,7 +437,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             registerReceiver(usbReceiver, filter)
         }
 
-        onLog("F&F Thermal - live view")
+        onLog("Kelvinscope - live view")
         findFlirDevice()?.let { requestPermissionOrStart(it) }
             ?: onLog(
                 "Camera not attached. Plug in the FLIR One and re-open the app, or it " +

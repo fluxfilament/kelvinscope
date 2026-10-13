@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ff-thermal"
+rootProject.name = "kelvinscope"
 include(":app")

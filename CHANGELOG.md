@@ -1,10 +1,18 @@
 # Changelog
 
-All notable changes to F&F Thermal. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
-[Semantic Versioning](https://semver.org/).
+All notable changes to Kelvinscope, called F&F Thermal up to 0.1.0. The
+format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+### Changed
+- The app is now called Kelvinscope: "F&F" and "F+F" are other companies'
+  trademarks for software and measuring instruments. The package name and
+  the signing key stay the same, so it installs over 0.1.0 and keeps its
+  settings and calibration.
+- Snapshots go to `Pictures/Kelvinscope`. Those taken before stay in
+  `Pictures/FFThermal`.
 
 ## [0.1.0] - 2026-10-07
 
@@ -53,5 +61,5 @@ First public release.
   never been run.
 - No gallery yet: snapshots are opened from the phone's own gallery.
 
-[Unreleased]: https://github.com/fluxfilament/ff-thermal/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/fluxfilament/ff-thermal/releases/tag/v0.1.0
+[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/fluxfilament/kelvinscope/releases/tag/v0.1.0

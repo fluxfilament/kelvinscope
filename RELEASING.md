@@ -1,4 +1,4 @@
-# Releasing F&F Thermal
+# Releasing Kelvinscope
 
 ## The signing key
 
@@ -40,9 +40,11 @@ password, it stops with "missing required property storePassword" rather
 than ship something unsigned.
 
 The release key was created on 2026-10-07: RSA 4096, alias `ff-thermal`,
-certificate `CN=F&F Thermal, O=fluxfilament`, valid until 2054. A copy of
-the key file and its password is kept in the maintainer's password
-manager. Every published APK must carry this certificate:
+certificate `CN=F&F Thermal, O=fluxfilament`, valid until 2054. The
+certificate keeps the app's name from before 0.1.1: a new one would mean a
+new key, and every user reinstalling. A copy of the key file and its
+password is kept in the maintainer's password manager. Every published
+APK must carry this certificate:
 
 ```
 SHA-256: bc:aa:c2:08:f5:cf:ae:b6:2a:ae:e9:a5:dc:65:f0:2d:2c:dc:2e:e7:45:c6:98:4e:fd:64:a1:74:d3:5a:93:db
@@ -73,7 +75,7 @@ to be uninstalled first, and its settings go with it.
 5. **Tag.**
 
    ```
-   git tag -a v0.1.0 -m "F&F Thermal 0.1.0"
+   git tag -a v0.1.0 -m "Kelvinscope 0.1.0"
    git push origin v0.1.0
    ```
 
@@ -81,8 +83,8 @@ to be uninstalled first, and its settings go with it.
    with the changelog section as the notes:
 
    ```
-   cp app/build/outputs/apk/release/app-release.apk ff-thermal-0.1.0.apk
-   gh release create v0.1.0 ff-thermal-0.1.0.apk --title "F&F Thermal 0.1.0" --notes-file notes.md
+   cp app/build/outputs/apk/release/app-release.apk kelvinscope-0.1.0.apk
+   gh release create v0.1.0 kelvinscope-0.1.0.apk --title "Kelvinscope 0.1.0" --notes-file notes.md
    ```
 
 ## F-Droid, later

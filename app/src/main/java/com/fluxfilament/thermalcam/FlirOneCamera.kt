@@ -67,7 +67,7 @@ class FlirOneCamera(
     )
 
     private companion object {
-        const val TAG = "FFThermal"
+        const val TAG = "Kelvinscope"
 
         /** Upstream's comment on this one is emphatic: don't change it. */
         const val FRAME_READ_TIMEOUT_MS = 100

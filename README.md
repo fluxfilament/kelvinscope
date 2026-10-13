@@ -1,6 +1,6 @@
-# F&F Thermal — for FLIR ONE
+# Kelvinscope — for FLIR ONE
 
-[![CI](https://github.com/fluxfilament/ff-thermal/actions/workflows/ci.yml/badge.svg)](https://github.com/fluxfilament/ff-thermal/actions/workflows/ci.yml)
+[![CI](https://github.com/fluxfilament/kelvinscope/actions/workflows/ci.yml/badge.svg)](https://github.com/fluxfilament/kelvinscope/actions/workflows/ci.yml)
 
 Open-source Android app for the **FLIR ONE for Android** thermal camera
 (gen 3, USB-C). It talks to the camera directly over USB, without FLIR's
@@ -23,9 +23,9 @@ camera the app works with.
   scale bar under the picture.
 - **Visible-light overlay** from the camera's second lens: off, 35 %,
   60 % or visible only, with field-of-view and alignment adjustment.
-- **Snapshots.** Each press saves a card to `Pictures/FFThermal` with the
+- **Snapshots.** Each press saves a card to `Pictures/Kelvinscope` with the
   picture, spots, scale and settings on it. The bare sensor picture,
-  nothing drawn over, goes to `Pictures/FFThermal/raw` under the same
+  nothing drawn over, goes to `Pictures/Kelvinscope/raw` under the same
   name.
 - **Calibration.** Import your camera's own constants from a JPEG saved
   by the official app, then correct readings against melting ice,

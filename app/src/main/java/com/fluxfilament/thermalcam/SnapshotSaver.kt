@@ -43,7 +43,7 @@ import java.util.Locale
  */
 object SnapshotSaver {
 
-    private const val ALBUM = "FFThermal"
+    private const val ALBUM = "Kelvinscope"
 
     /** Where the untouched sensor picture goes, beside the album rather than in it. */
     private const val RAW = "raw"

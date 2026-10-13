@@ -6,7 +6,7 @@
 <resources>
     <!-- Which language numbers and dates are formatted for: the one these strings are in. -->
     <string name="number_locale" translatable="false">ru</string>
-    <string name="app_name">F&amp;F Thermal</string>
+    <string name="app_name">Kelvinscope</string>
     <string name="thermal_view_description">Живой тепловой кадр</string>
 
     <!-- live screen -->
