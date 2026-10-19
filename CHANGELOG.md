@@ -6,6 +6,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-19
+
 ### Changed
 - The app is now called Kelvinscope: "F&F" and "F+F" are other companies'
   trademarks for software and measuring instruments. The package name and
@@ -61,5 +63,6 @@ First public release.
   never been run.
 - No gallery yet: snapshots are opened from the phone's own gallery.
 
-[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/fluxfilament/kelvinscope/releases/tag/v0.1.0
