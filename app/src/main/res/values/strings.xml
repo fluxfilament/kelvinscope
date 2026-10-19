@@ -20,6 +20,8 @@
     <string name="geometry_unknown">GEOMETRY UNKNOWN</string>
     <string name="align_label">Align %1$s</string>
     <string name="align_description">Layer alignment by distance</string>
+    <string name="mix_label">Mix %1$d %%</string>
+    <string name="mix_description">Share of the visible layer</string>
     <string name="scale_min">MIN</string>
     <string name="scale_max">MAX</string>
     <string name="scale_low_description">Lower end of the scale</string>
@@ -38,8 +40,7 @@
 
     <!-- blend modes, as they appear under the tool icon -->
     <string name="blend_thermal">IR</string>
-    <string name="blend_mix35">IR 35</string>
-    <string name="blend_mix60">IR 60</string>
+    <string name="blend_mix">IR %1$d</string>
     <string name="blend_visible">VIS</string>
 
     <!-- scale sheet -->
@@ -67,7 +68,7 @@
     <string name="section_alignment">Camera alignment</string>
     <string name="row_fov">Field of view (FOV)</string>
     <string name="fov_summary">%1$s · default 0.77</string>
-    <string name="align_note">Layer offset by distance (Align) is on the main screen, in the blend modes.</string>
+    <string name="align_note">Layer offset by distance (Align) is set next to the field of view, and on the main screen while the overlay is on.</string>
     <string name="section_calibration">Calibration</string>
     <string name="row_calibration">Calibration</string>
     <string name="stamp_wip">[IN PROGRESS]</string>
@@ -108,7 +109,7 @@
     <string name="fov_reset">Reset</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">default 0.77</string>
-    <string name="fov_note">Move it until an edge of the object lines up on both sides of the line.</string>
+    <string name="fov_note">Drag the line onto an edge of the object, then move FOV and Align until the edge lines up on both sides of it.</string>
     <string name="fov_tag_thermal">IR</string>
     <string name="fov_tag_visible">VISIBLE</string>
     <string name="fov_split_description">Camera comparison divider</string>
@@ -190,8 +191,7 @@
          there; a card is read on its own, months later, by someone who was not
          holding the camera. -->
     <string name="card_blend_thermal">IR ONLY</string>
-    <string name="card_blend_mix35">IR + VIS 35 %</string>
-    <string name="card_blend_mix60">IR + VIS 60 %</string>
+    <string name="card_blend_mix">IR + VIS %1$d %%</string>
     <string name="card_blend_visible">VISIBLE ONLY</string>
     <!-- On a card, beside the palette: the colours are pinned to a window the user
          set, not to the scene. Without it the same colour means something different

@@ -24,7 +24,8 @@ import android.graphics.Paint
 import android.graphics.Rect
 
 /**
- * How much of the visible-light image to mix over the thermal one.
+ * How much of the visible-light image to mix over the thermal one, in percent: 0 is
+ * the thermal picture alone, 100 the visible one alone.
  *
  * This is alpha blending, not FLIR's MSX. MSX is a specific patented technique -
  * embossing edges from the visible image into the thermal one without disturbing
@@ -32,14 +33,34 @@ import android.graphics.Rect
  * is nobody's property; it also visibly dilutes the thermal data, which is the
  * honest trade being made here and the reason the mix is adjustable rather than
  * fixed on.
+ *
+ * A percentage rather than a handful of fixed steps: 0.1.x offered 35 % and 60 %,
+ * and the right share depends on the scene - a busy background wants less of the
+ * visible layer than a bare wall does.
  */
-enum class BlendMode(val label: String, val visibleAlpha: Int) {
-    THERMAL("Thermal", 0),
-    MIX_35("Mix 35%", 89),
-    MIX_60("Mix 60%", 153),
-    VISIBLE("Visible", 255);
+@JvmInline
+value class Blend private constructor(val visiblePercent: Int) {
 
-    fun next(): BlendMode = entries[(ordinal + 1) % entries.size]
+    val isThermal: Boolean get() = visiblePercent == 0
+    val isVisibleOnly: Boolean get() = visiblePercent == 100
+
+    /** The visible layer's paint alpha, rounded to the nearest of 0..255. */
+    val visibleAlpha: Int get() = (visiblePercent * 255 + 50) / 100
+
+    companion object {
+        val THERMAL = Blend(0)
+
+        /** The share the slider starts at before it has ever been moved. */
+        const val DEFAULT_MIX = 35
+
+        /**
+         * The slider's lower end. Turning the overlay off is the button's job, so the
+         * slider never reaches 0, where it would look on and show nothing.
+         */
+        const val MIN_MIX = 5
+
+        fun of(visiblePercent: Int) = Blend(visiblePercent.coerceIn(0, 100))
+    }
 }
 
 /**
@@ -100,8 +121,8 @@ class Compositor {
      * Draws [thermal] and the frame's visible image into one bitmap, or returns null
      * if the visible frame is unusable and the caller should fall back to thermal.
      */
-    fun compose(frame: ThermalFrame, thermal: Bitmap, mode: BlendMode): Bitmap? {
-        if (mode == BlendMode.THERMAL) return null
+    fun compose(frame: ThermalFrame, thermal: Bitmap, blend: Blend): Bitmap? {
+        if (blend.isThermal) return null
         val jpeg = frame.jpeg ?: return null
         val vis = decode(jpeg) ?: return null
 
@@ -113,10 +134,8 @@ class Compositor {
         paint.alpha = 255
         canvas.drawBitmap(thermal, null, Rect(0, 0, out.width, out.height), paint)
 
-        if (mode.visibleAlpha > 0) {
-            paint.alpha = mode.visibleAlpha
-            canvas.drawBitmap(vis, placeVisible(vis, out.width, out.height), paint)
-        }
+        paint.alpha = blend.visibleAlpha
+        canvas.drawBitmap(vis, placeVisible(vis, out.width, out.height), paint)
         return out
     }
 

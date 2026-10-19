@@ -185,6 +185,38 @@
         android:max="120"
         android:min="40" />
 
+    <!-- The same Align as on the main screen, kept in step with it. Setting a camera
+         up for the first time means finding both at once, against the same edge. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp">
+
+        <TextView
+            android:id="@+id/fovAlignLabel"
+            style="@style/Ff.Mono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:maxLines="1"
+            android:letterSpacing="0.06"
+            android:textColor="@color/ff_muted"
+            android:textSize="11sp" />
+
+        <SeekBar
+            android:id="@+id/fovAlignSeek"
+            style="@style/Ff.Seek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/align_description"
+            android:max="200" />
+    </LinearLayout>
+
     <TextView
         style="@style/Ff.Note"
         android:layout_width="match_parent"

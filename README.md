@@ -21,8 +21,9 @@ camera the app works with.
 - **Emissivity** from 0.10 to 1.00.
 - **Temperature range:** automatic, or a fixed window in °C, with a
   scale bar under the picture.
-- **Visible-light overlay** from the camera's second lens: off, 35 %,
-  60 % or visible only, with field-of-view and alignment adjustment.
+- **Visible-light overlay** from the camera's second lens, mixed in at any
+  share from 5 % to visible only, with field-of-view and alignment
+  adjustment.
 - **Snapshots.** Each press saves a card to `Pictures/Kelvinscope` with the
   picture, spots, scale and settings on it. The bare sensor picture,
   nothing drawn over, goes to `Pictures/Kelvinscope/raw` under the same

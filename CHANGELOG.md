@@ -6,6 +6,21 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-19
+
+### Added
+- A Mix slider under the toolbar sets how much of the visible layer goes
+  into the overlay, from 5 to 100 %, and is remembered between runs
+  ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+- Align is also on the Field of view screen, next to FOV and kept in step
+  with the one on the main screen, so a camera can be set up against one
+  edge in one place ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+
+### Changed
+- The overlay button only turns the visible layer on and off, at the share
+  the slider was last left at. It used to step through 35 %, 60 % and
+  visible only. Snapshot cards name the exact share.
+
 ## [0.1.1] - 2026-10-19
 
 ### Changed
@@ -63,6 +78,7 @@ First public release.
   never been run.
 - No gallery yet: snapshots are opened from the phone's own gallery.
 
-[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/fluxfilament/kelvinscope/releases/tag/v0.1.0

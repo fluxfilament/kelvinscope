@@ -19,6 +19,8 @@
     <string name="geometry_unknown">ГЕОМЕТРИЯ НЕИЗВЕСТНА</string>
     <string name="align_label">Align %1$s</string>
     <string name="align_description">Совмещение слоёв по расстоянию</string>
+    <string name="mix_label">Mix %1$d %%</string>
+    <string name="mix_description">Доля видимого слоя</string>
     <string name="scale_min">MIN</string>
     <string name="scale_max">MAX</string>
     <string name="scale_low_description">Нижняя граница шкалы</string>
@@ -37,8 +39,7 @@
 
     <!-- blend modes, as they appear under the tool icon -->
     <string name="blend_thermal">ИК</string>
-    <string name="blend_mix35">ИК 35</string>
-    <string name="blend_mix60">ИК 60</string>
+    <string name="blend_mix">ИК %1$d</string>
     <string name="blend_visible">ВИД</string>
 
     <!-- scale sheet -->
@@ -66,7 +67,7 @@
     <string name="section_alignment">Совмещение камер</string>
     <string name="row_fov">Поле зрения (FOV)</string>
     <string name="fov_summary">%1$s · по умолчанию 0,77</string>
-    <string name="align_note">Сдвиг слоёв по расстоянию (Align) — на главном экране, в режимах наложения.</string>
+    <string name="align_note">Сдвиг слоёв по расстоянию (Align) — рядом с полем зрения и на главном экране, пока включено наложение.</string>
     <string name="section_calibration">Калибровка</string>
     <string name="row_calibration">Калибровка</string>
     <string name="stamp_wip">[В РАБОТЕ]</string>
@@ -107,7 +108,7 @@
     <string name="fov_reset">Сброс</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">по умолчанию 0,77</string>
-    <string name="fov_note">Двигайте, пока край предмета не сойдётся по обе стороны линии.</string>
+    <string name="fov_note">Поставьте линию на край предмета и двигайте FOV и Align, пока край не сойдётся по обе стороны линии.</string>
     <string name="fov_tag_thermal">ИК</string>
     <string name="fov_tag_visible">ВИДИМАЯ</string>
     <string name="fov_split_description">Граница сравнения камер</string>
@@ -189,8 +190,7 @@
          there; a card is read on its own, months later, by someone who was not
          holding the camera. -->
     <string name="card_blend_thermal">ТОЛЬКО ИК</string>
-    <string name="card_blend_mix35">ИК + ВИД 35 %</string>
-    <string name="card_blend_mix60">ИК + ВИД 60 %</string>
+    <string name="card_blend_mix">ИК + ВИД %1$d %%</string>
     <string name="card_blend_visible">ТОЛЬКО ВИД</string>
     <!-- On a card, beside the palette: the colours are pinned to a window the user
          set, not to the scene. Without it the same colour means something different

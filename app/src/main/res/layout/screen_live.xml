@@ -52,10 +52,44 @@
             android:src="@drawable/ic_settings" />
     </LinearLayout>
 
-    <!-- Only while the visible layer is mixed in: off, it would be a slider that
-         changes nothing. Distance is the one alignment that moves with the subject,
-         which is why it stays on the main screen while the field of view went into
-         settings. -->
+    <!-- Both rows only while the visible layer is mixed in: off, they would be
+         sliders that change nothing. How much of the visible layer goes in depends on
+         the scene, and distance is the one alignment that moves with the subject,
+         which is why these two stay on the main screen while the field of view went
+         into settings. -->
+    <LinearLayout
+        android:id="@+id/mixRow"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/mixLabel"
+            style="@style/Ff.Mono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:maxLines="1"
+            android:letterSpacing="0.06"
+            android:textColor="@color/ff_muted"
+            android:textSize="11sp" />
+
+        <SeekBar
+            android:id="@+id/mixSeek"
+            style="@style/Ff.Seek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/mix_description"
+            android:max="100"
+            android:min="5" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/alignRow"
         android:layout_width="match_parent"

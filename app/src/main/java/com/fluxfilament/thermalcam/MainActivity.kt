@@ -95,6 +95,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_EMISSIVITY = "emissivity"
         const val PREF_FOV_RATIO = "fovRatio"
         const val PREF_PARALLAX = "parallax"
+        const val PREF_BLEND_MIX = "blendMix"
         const val PREF_ROTATION = "rotation"
         const val INTERFACE_TURN_MS = 250L
         const val PREF_SPOTS = "spots"
@@ -175,6 +176,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var geometryView: TextView
     private lateinit var thermalView: ThermalView
     private lateinit var flashView: View
+    private lateinit var mixRow: View
+    private lateinit var mixLabel: TextView
+    private lateinit var mixSeek: SeekBar
     private lateinit var alignRow: View
     private lateinit var alignLabel: TextView
     private lateinit var alignSeek: SeekBar
@@ -222,6 +226,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var cropRect: View
     private lateinit var fovValue: TextView
     private lateinit var fovSeek: SeekBar
+    private lateinit var fovAlignLabel: TextView
+    private lateinit var fovAlignSeek: SeekBar
 
     // calibration and log screens
     private lateinit var screenCalibration: View
@@ -264,7 +270,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private var sheetTarget: SheetTarget? = null
 
     /** Mixing the visible layer costs a JPEG decode per frame, so it starts off. */
-    private var blendMode = BlendMode.THERMAL
+    private var blend = Blend.THERMAL
+
+    /** The share the overlay comes back at when it is turned on; remembered. */
+    private var mixPercent = Blend.DEFAULT_MIX
 
     /**
      * Mirrored by default: plugged into the phone the camera points back at whoever
@@ -454,6 +463,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         geometryView = findViewById(R.id.geometryView)
         thermalView = findViewById(R.id.thermalView)
         flashView = findViewById(R.id.flashView)
+        mixRow = findViewById(R.id.mixRow)
+        mixLabel = findViewById(R.id.mixLabel)
+        mixSeek = findViewById(R.id.mixSeek)
         alignRow = findViewById(R.id.alignRow)
         alignLabel = findViewById(R.id.alignLabel)
         alignSeek = findViewById(R.id.alignSeek)
@@ -498,6 +510,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         cropRect = findViewById(R.id.cropRect)
         fovValue = findViewById(R.id.fovValue)
         fovSeek = findViewById(R.id.fovSeek)
+        fovAlignLabel = findViewById(R.id.fovAlignLabel)
+        fovAlignSeek = findViewById(R.id.fovAlignSeek)
 
         screenCalibration = findViewById(R.id.screenCalibration)
         calibrationSummary = findViewById(R.id.calibrationSummary)
@@ -661,7 +675,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun setUpLiveScreen() {
         findViewById<View>(R.id.shutterButton).setOnClickListener { saveSnapshot() }
-        blendTool.setOnClickListener { cycleBlend() }
+        blendTool.setOnClickListener { toggleOverlay() }
         mirrorTool.setOnClickListener { toggleMirror() }
         spotMinusButton.setOnClickListener { if (spotMeter.remove()) updateSpotCount() }
         spotPlusButton.setOnClickListener { if (spotMeter.add()) updateSpotCount() }
@@ -747,23 +761,29 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         return renderer.autoRange
     }
 
-    private fun cycleBlend() {
-        blendMode = blendMode.next()
+    /**
+     * The button only turns the overlay on and off; how much of the visible layer goes
+     * in is the slider's business. Cycling through fixed shares on the button, as 0.1.x
+     * did, stopped making sense once the share could be anything: after a drag nobody
+     * could tell where the next tap would land.
+     */
+    private fun toggleOverlay() {
+        blend = if (blend.isThermal) Blend.of(mixPercent) else Blend.THERMAL
         updateBlendTool()
     }
 
     private fun updateBlendTool() {
-        val on = blendMode != BlendMode.THERMAL
-        blendLabel.setText(
-            when (blendMode) {
-                BlendMode.THERMAL -> R.string.blend_thermal
-                BlendMode.MIX_35 -> R.string.blend_mix35
-                BlendMode.MIX_60 -> R.string.blend_mix60
-                BlendMode.VISIBLE -> R.string.blend_visible
-            }
-        )
+        val on = !blend.isThermal
+        blendLabel.text = when {
+            !on -> getString(R.string.blend_thermal)
+            blend.isVisibleOnly -> getString(R.string.blend_visible)
+            else -> getString(R.string.blend_mix, blend.visiblePercent)
+        }
+        mixLabel.text = getString(R.string.mix_label, mixPercent)
         tintTool(blendTool, blendIcon, blendLabel, on)
-        alignRow.visibility = if (on) View.VISIBLE else View.GONE
+        val rows = if (on) View.VISIBLE else View.GONE
+        mixRow.visibility = rows
+        alignRow.visibility = rows
     }
 
     private fun toggleMirror() {
@@ -1259,16 +1279,38 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         compositor.fovRatio = prefs.getFloat(PREF_FOV_RATIO, Compositor.DEFAULT_FOV_RATIO)
         compositor.parallax = prefs.getFloat(PREF_PARALLAX, Compositor.DEFAULT_PARALLAX)
         fovSeek.progress = (compositor.fovRatio * 100).roundToInt()
-        alignSeek.progress = ((compositor.parallax / ALIGN_RANGE + 1f) * 100f).roundToInt()
+        alignSeek.progress = alignProgress()
+        fovAlignSeek.progress = alignProgress()
         updateFovLabels()
 
         fovSeek.setOnSeekBarChangeListener(seekListener({ progress ->
             compositor.fovRatio = progress / 100f
         }, { prefs.edit().putFloat(PREF_FOV_RATIO, compositor.fovRatio).apply() }))
 
-        alignSeek.setOnSeekBarChangeListener(seekListener({ progress ->
-            compositor.parallax = (progress / 100f - 1f) * ALIGN_RANGE
-        }, { prefs.edit().putFloat(PREF_PARALLAX, compositor.parallax).apply() }))
+        // The same Align on two screens: on the main one to follow the subject's
+        // distance, and beside the field of view, because the first time a camera is
+        // set up the two have to be found together.
+        for (seek in listOf(alignSeek, fovAlignSeek)) {
+            seek.setOnSeekBarChangeListener(seekListener({ progress ->
+                compositor.parallax = (progress / 100f - 1f) * ALIGN_RANGE
+            }, { prefs.edit().putFloat(PREF_PARALLAX, compositor.parallax).apply() }))
+        }
+
+        mixPercent = prefs.getInt(PREF_BLEND_MIX, Blend.DEFAULT_MIX).coerceIn(Blend.MIN_MIX, 100)
+        mixSeek.progress = mixPercent
+        mixSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: SeekBar, progress: Int, fromUser: Boolean) {
+                mixPercent = progress
+                if (!blend.isThermal) blend = Blend.of(progress)
+                updateBlendTool()
+            }
+
+            override fun onStartTrackingTouch(bar: SeekBar) = Unit
+
+            override fun onStopTrackingTouch(bar: SeekBar) {
+                prefs.edit().putInt(PREF_BLEND_MIX, mixPercent).apply()
+            }
+        })
 
         findViewById<View>(R.id.fovReset).setOnClickListener {
             fovSeek.progress = (Compositor.DEFAULT_FOV_RATIO * 100).roundToInt()
@@ -1292,10 +1334,19 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun updateFovLabels() {
         fovValue.text = dec(compositor.fovRatio.toDouble(), 2)
-        alignLabel.text = getString(R.string.align_label, signed(compositor.parallax.toDouble()))
+        val align = getString(R.string.align_label, signed(compositor.parallax.toDouble()))
+        alignLabel.text = align
+        fovAlignLabel.text = align
+        // Whichever of the two Align sliders moved, the other follows. Setting a
+        // slider to the position it already has does nothing, so this does not loop.
+        alignSeek.progress = alignProgress()
+        fovAlignSeek.progress = alignProgress()
         placeCropRect()
         refreshSummaries()
     }
+
+    private fun alignProgress(): Int =
+        ((compositor.parallax / ALIGN_RANGE + 1f) * 100f).roundToInt()
 
     private fun refreshFovScreen() {
         // Both screens share one crop, so the preview has to start from the live ones.
@@ -1479,7 +1530,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // comparison screen draws the two layers itself, and the rest show neither.
         val showing = screen
         val bitmap = if (showing == Screen.LIVE) {
-            compositor.compose(frame, thermal, blendMode) ?: thermal
+            compositor.compose(frame, thermal, blend) ?: thermal
         } else {
             thermal
         }
@@ -1572,7 +1623,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val thermal = renderer.snapshot(frame)
         snapshotCompositor.fovRatio = compositor.fovRatio
         snapshotCompositor.parallax = compositor.parallax
-        val composed = snapshotCompositor.compose(frame, thermal, blendMode) ?: thermal
+        // Read once, so the picture and the card's label cannot disagree if the
+        // slider moves in between.
+        val blend = blend
+        val composed = snapshotCompositor.compose(frame, thermal, blend) ?: thermal
 
         val card = SnapshotCard.render(
             this,
@@ -1585,7 +1639,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 window = currentWindow(),
                 planck = planck,
                 geometry = geometry,
-                blend = blendMode,
+                blend = blend,
                 rangeFixed = rangeFixed,
                 takenAt = takenAt,
             ),

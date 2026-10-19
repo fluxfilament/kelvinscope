@@ -47,7 +47,7 @@ class CardScene(
     val window: ContrastRange?,
     val planck: Planck,
     val geometry: SledInfo?,
-    val blend: BlendMode,
+    val blend: Blend,
     val rangeFixed: Boolean,
     val takenAt: Date,
 )
@@ -281,14 +281,11 @@ object SnapshotCard {
         tokens += context.getString(
             R.string.emissivity_chip, String.format(locale, "%.2f", scene.planck.emissivity),
         )
-        tokens += context.getString(
-            when (scene.blend) {
-                BlendMode.THERMAL -> R.string.card_blend_thermal
-                BlendMode.MIX_35 -> R.string.card_blend_mix35
-                BlendMode.MIX_60 -> R.string.card_blend_mix60
-                BlendMode.VISIBLE -> R.string.card_blend_visible
-            },
-        )
+        tokens += when {
+            scene.blend.isThermal -> context.getString(R.string.card_blend_thermal)
+            scene.blend.isVisibleOnly -> context.getString(R.string.card_blend_visible)
+            else -> context.getString(R.string.card_blend_mix, scene.blend.visiblePercent)
+        }
         if (!scene.planck.correction.isIdentity) {
             tokens += context.getString(R.string.card_correction, scene.planck.correction.label(locale))
         }
