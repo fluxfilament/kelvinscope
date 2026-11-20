@@ -135,6 +135,18 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/thermal_view_description" />
 
+        <!-- Why the picture is empty: not plugged in, no USB access, or no frames yet. -->
+        <TextView
+            android:id="@+id/emptyHint"
+            style="@style/Ff.Note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:visibility="gone" />
+
         <!-- Shutter feedback. A saved frame is otherwise indistinguishable from a
              missed tap until the toast arrives. -->
         <View

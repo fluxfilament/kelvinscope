@@ -50,6 +50,8 @@ class CardScene(
     val blend: Blend,
     val rangeFixed: Boolean,
     val takenAt: Date,
+    /** Max/Min markers, when they were on screen; empty otherwise. */
+    val extremes: List<ExtremeLabel> = emptyList(),
 )
 
 /**
@@ -169,6 +171,12 @@ object SnapshotCard {
         val margin = 5f * unit
         val bounds = RectF(margin, margin, pictureW - margin, pictureH - margin)
         val point = FloatArray(2)
+        for (mark in scene.extremes) {
+            point[0] = mark.u * src.width
+            point[1] = mark.v * src.height
+            matrix.mapPoints(point)
+            glyphs.drawExtreme(canvas, point[0], point[1], mark.hot, mark.text, bounds)
+        }
         for (spot in scene.spots) {
             point[0] = spot.u * src.width
             point[1] = spot.v * src.height

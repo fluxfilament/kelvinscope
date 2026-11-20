@@ -1612,11 +1612,6 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
-    /**
-     * Reads each spot off the frame. Done on the camera thread with the frame in
-     * hand, so the numbers on screen belong to the picture under them rather than to
-     * whatever frame happened to be current when the UI got round to drawing.
-     */
     private fun refreshExtremesSummary() {
         extremesSummary.text = getString(if (showExtremes) R.string.extremes_on else R.string.extremes_off)
     }
@@ -1630,6 +1625,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         )
     }
 
+    /**
+     * Reads each spot off the frame. Done on the camera thread with the frame in
+     * hand, so the numbers on screen belong to the picture under them rather than to
+     * whatever frame happened to be current when the UI got round to drawing.
+     */
     private fun spotLabels(frame: ThermalFrame): List<SpotLabel> {
         val calibration = planck
         return spotMeter.positions().mapIndexed { index, spot ->
@@ -1687,6 +1687,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 blend = blend,
                 rangeFixed = rangeFixed,
                 takenAt = takenAt,
+                extremes = if (showExtremes) extremeLabels(frame) else emptyList(),
             ),
         )
         // The thermal layer alone, not the composed one: the original is there to be
