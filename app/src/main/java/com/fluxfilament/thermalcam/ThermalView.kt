@@ -31,6 +31,19 @@ import kotlin.math.hypot
 /** One spot as the view needs it: where it sits, its number, and what it reads. */
 class SpotLabel(val u: Float, val v: Float, val number: Int, val text: String)
 
+/**
+ * The measuring line: its ends, the readings to print beside it, and the profile
+ * along it in degrees for the graph.
+ */
+class LineLabel(
+    val start: Spot,
+    val end: Spot,
+    val text: String,
+    val profileC: FloatArray,
+    val maxText: String,
+    val minText: String,
+)
+
 /** A measurement area with its readings, one line per figure. */
 class AreaLabel(val area: Area, val number: Int, val text: String)
 
@@ -59,6 +72,12 @@ class ThermalView @JvmOverloads constructor(
 
     /** Measurement areas, drawn under everything else on the picture. */
     var areas: List<AreaLabel> = emptyList()
+
+    /** The measuring line, or null when it is off. */
+    var line: LineLabel? = null
+
+    /** A line end (0 start, 1 end) dragged to a point in sensor fractions. */
+    var onLineMoved: ((Int, Float, Float) -> Unit)? = null
 
     /** An area dragged by its body: index and the move in sensor fractions. */
     var onAreaMoved: ((Int, Float, Float) -> Unit)? = null
@@ -128,6 +147,28 @@ class ThermalView @JvmOverloads constructor(
 
     private var dragging = -1
 
+    /** The line end being dragged, -1 when none. */
+    private var draggingLineEnd = -1
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 2f * density
+        color = Color.WHITE
+    }
+    private val lineShadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 4.5f * density
+        color = 0x99000000.toInt()
+    }
+    private val graphBackground = Paint().apply { color = 0xB0140B07.toInt() }
+    private val graphPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.8f * density
+        color = 0xFFFFB347.toInt()
+        strokeJoin = Paint.Join.ROUND
+    }
+    private val graphPath = android.graphics.Path()
+    private val lineEnds = FloatArray(4)
+
     /** The area being dragged, and whether by its handle; -1 when none. */
     private var draggingArea = -1
     private var resizingArea = false
@@ -178,6 +219,7 @@ class ThermalView @JvmOverloads constructor(
         canvas.drawBitmap(bmp, matrix, imagePaint)
         zone?.let { drawZone(canvas, bmp, it) }
         for (area in areas) drawArea(canvas, bmp, area)
+        line?.let { drawLine(canvas, bmp, it) }
         for (mark in extremes) drawExtreme(canvas, bmp, mark)
         for (spot in spots) drawSpot(canvas, bmp, spot)
     }
@@ -193,6 +235,75 @@ class ThermalView @JvmOverloads constructor(
         boundsInLabelFrame(x, y, labelBounds)
         glyphs.drawExtreme(canvas, x, y, mark.hot, mark.text, labelBounds)
         canvas.restore()
+    }
+
+    private fun mapLineEnds(bmp: Bitmap, label: LineLabel) {
+        lineEnds[0] = label.start.u * bmp.width
+        lineEnds[1] = label.start.v * bmp.height
+        lineEnds[2] = label.end.u * bmp.width
+        lineEnds[3] = label.end.v * bmp.height
+        matrix.mapPoints(lineEnds)
+    }
+
+    private fun drawLine(canvas: Canvas, bmp: Bitmap, label: LineLabel) {
+        mapLineEnds(bmp, label)
+        val ax = lineEnds[0]
+        val ay = lineEnds[1]
+        val bx = lineEnds[2]
+        val by = lineEnds[3]
+        canvas.drawLine(ax, ay, bx, by, lineShadow)
+        canvas.drawLine(ax, ay, bx, by, linePaint)
+        for (k in 0..1) {
+            canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, lineShadow)
+            canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, linePaint)
+        }
+        // Readings at the middle, upright for the reader like every other label.
+        val cx = (ax + bx) / 2f
+        val cy = (ay + by) / 2f
+        canvas.save()
+        canvas.rotate(-labelRotation.toFloat(), cx, cy)
+        val y = cy - 8f * density
+        val x = cx - areaTextPaint.measureText(label.text) / 2f
+        canvas.drawText(label.text, x, y, areaTextShadow)
+        canvas.drawText(label.text, x, y, areaTextPaint)
+        canvas.restore()
+        drawProfile(canvas, label)
+    }
+
+    /**
+     * The profile graph along the bottom of the view, in screen terms rather than
+     * the picture's: it is a chart, read the same way however the phone is held.
+     */
+    private fun drawProfile(canvas: Canvas, label: LineLabel) {
+        val values = label.profileC
+        if (values.size < 2) return
+        val pad = 8f * density
+        val graphH = 64f * density
+        val top = height - graphH - pad
+        val left = pad
+        val right = width - pad
+        canvas.drawRect(left, top, right, top + graphH, graphBackground)
+        var lo = values.min()
+        var hi = values.max()
+        if (hi - lo < 1f) {
+            val mid = (hi + lo) / 2f
+            lo = mid - 0.5f
+            hi = mid + 0.5f
+        }
+        val textW = maxOf(areaTextPaint.measureText(label.maxText), areaTextPaint.measureText(label.minText))
+        val plotLeft = left + textW + 10f * density
+        val plotRight = right - 6f * density
+        val plotTop = top + 6f * density
+        val plotBottom = top + graphH - 6f * density
+        graphPath.reset()
+        for (i in values.indices) {
+            val x = plotLeft + (plotRight - plotLeft) * i / (values.size - 1)
+            val y = plotBottom - (plotBottom - plotTop) * (values[i] - lo) / (hi - lo)
+            if (i == 0) graphPath.moveTo(x, y) else graphPath.lineTo(x, y)
+        }
+        canvas.drawPath(graphPath, graphPaint)
+        canvas.drawText(label.maxText, left + 4f * density, plotTop + areaTextPaint.textSize, areaTextPaint)
+        canvas.drawText(label.minText, left + 4f * density, plotBottom, areaTextPaint)
     }
 
     /** The area's rectangle on screen, through the picture's own matrix. */
@@ -281,6 +392,11 @@ class ThermalView @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 dragging = nearestSpot(bmp, event.x, event.y)
                 if (dragging < 0) {
+                    draggingLineEnd = pickLineEnd(bmp, event.x, event.y)
+                    if (draggingLineEnd >= 0) {
+                        parent?.requestDisallowInterceptTouchEvent(true)
+                        return true
+                    }
                     // Spots first: they are small and placed on purpose; an area is
                     // big enough to be grabbed anywhere else.
                     pickArea(bmp, event.x, event.y)
@@ -292,6 +408,10 @@ class ThermalView @JvmOverloads constructor(
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
+                if (draggingLineEnd >= 0) {
+                    reportLineMove(bmp, event.x, event.y)
+                    return true
+                }
                 if (draggingArea >= 0) {
                     reportAreaDrag(bmp, event.x, event.y)
                     return true
@@ -301,6 +421,11 @@ class ThermalView @JvmOverloads constructor(
                 return true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (draggingLineEnd >= 0) {
+                    reportLineMove(bmp, event.x, event.y)
+                    draggingLineEnd = -1
+                    return true
+                }
                 if (draggingArea >= 0) {
                     reportAreaDrag(bmp, event.x, event.y)
                     draggingArea = -1
@@ -321,6 +446,29 @@ class ThermalView @JvmOverloads constructor(
         point[1] = viewY
         inverse.mapPoints(point)
         onSpotMoved?.invoke(dragging, point[0] / bmp.width, point[1] / bmp.height)
+        invalidate()
+    }
+
+    /** Which line end is under the finger: 0, 1, or -1 for neither. */
+    private fun pickLineEnd(bmp: Bitmap, viewX: Float, viewY: Float): Int {
+        val label = line ?: return -1
+        mapLineEnds(bmp, label)
+        val reach = 28f * density
+        val d0 = hypot(lineEnds[0] - viewX, lineEnds[1] - viewY)
+        val d1 = hypot(lineEnds[2] - viewX, lineEnds[3] - viewY)
+        return when {
+            d0 < reach && d0 <= d1 -> 0
+            d1 < reach -> 1
+            else -> -1
+        }
+    }
+
+    private fun reportLineMove(bmp: Bitmap, viewX: Float, viewY: Float) {
+        if (!matrix.invert(inverse)) return
+        point[0] = viewX
+        point[1] = viewY
+        inverse.mapPoints(point)
+        onLineMoved?.invoke(draggingLineEnd, point[0] / bmp.width, point[1] / bmp.height)
         invalidate()
     }
 

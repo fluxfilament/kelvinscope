@@ -293,4 +293,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">Ce que la surface voit et renvoie. En intérieur, laissez la température de la pièce, 22 °C par défaut. Dehors sous un ciel dégagé, elle est bien plus froide, souvent sous zéro. Plus ε est faible, plus elle compte.</string>
     <string name="card_reflected">réfl. %1$s °C</string>
+    <string name="row_line">Ligne de mesure</string>
+    <string name="line_on">Activée : une ligne avec Max, moyenne et Min le long, et un profil sous l\'image. Faites glisser ses extrémités. Touchez pour désactiver.</string>
+    <string name="line_off">Désactivée. Touchez pour une ligne qui mesure Max, moyenne et Min le long d\'un tuyau ou d\'un radiateur, avec un profil.</string>
+    <string name="line_readings">Max %1$s · Moy %2$s · Min %3$s</string>
 </resources>

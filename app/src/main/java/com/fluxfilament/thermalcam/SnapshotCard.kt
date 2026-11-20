@@ -55,6 +55,8 @@ class CardScene(
     val extremes: List<ExtremeLabel> = emptyList(),
     /** Measurement areas with their readings, as on screen. */
     val areas: List<AreaLabel> = emptyList(),
+    /** The measuring line, when it was on. */
+    val line: LineLabel? = null,
 )
 
 /**
@@ -213,6 +215,41 @@ object SnapshotCard {
                     y += text.textSize * 1.15f
                 }
             }
+        }
+        scene.line?.let { line ->
+            val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 2f * unit
+                color = Color.WHITE
+            }
+            val shadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 4.5f * unit
+                color = 0x99000000.toInt()
+            }
+            val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textSize = 11.5f * unit
+                isFakeBoldText = true
+                typeface = mono
+            }
+            val textShadow = Paint(text).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 3f * unit
+                color = 0xC8000000.toInt()
+            }
+            val ends = floatArrayOf(
+                line.start.u * src.width, line.start.v * src.height,
+                line.end.u * src.width, line.end.v * src.height,
+            )
+            matrix.mapPoints(ends)
+            canvas.drawLine(ends[0], ends[1], ends[2], ends[3], shadow)
+            canvas.drawLine(ends[0], ends[1], ends[2], ends[3], stroke)
+            val w = text.measureText(line.text)
+            val x = ((ends[0] + ends[2]) / 2f - w / 2f).coerceIn(bounds.left, bounds.right - w)
+            val y = ((ends[1] + ends[3]) / 2f - 8f * unit).coerceIn(bounds.top + text.textSize, bounds.bottom)
+            canvas.drawText(line.text, x, y, textShadow)
+            canvas.drawText(line.text, x, y, text)
         }
         for (mark in scene.extremes) {
             point[0] = mark.u * src.width

@@ -108,6 +108,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
         const val PREF_DELTA = "deltaToSpot1"
+        const val PREF_LINE = "lineProfile"
         const val PREF_REFLECTED = "reflectedC"
 
         /** The reflected-temperature slider starts here, one step per degree. */
@@ -236,6 +237,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var emissivitySummary: TextView
     private lateinit var extremesSummary: TextView
     private lateinit var deltaSummary: TextView
+    private lateinit var lineSummary: TextView
+    private val lineProfile = LineProfile()
+
+    /** The measuring line is on. Camera thread reads it. */
+    @Volatile
+    private var showLine = false
 
     /** Each spot from the second on also shows how far it is from spot 1. Camera thread reads it. */
     @Volatile
@@ -622,6 +629,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         emissivitySummary = findViewById(R.id.emissivitySummary)
         extremesSummary = findViewById(R.id.extremesSummary)
         deltaSummary = findViewById(R.id.deltaSummary)
+        lineSummary = findViewById(R.id.lineSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
         isothermSummary = findViewById(R.id.isothermSummary)
         isothermModes = findViewById(R.id.isothermModes)
@@ -791,6 +799,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
         findViewById<View>(R.id.rowExportCsv).setOnClickListener { pickCounts(REQUEST_CSV) }
+        showLine = prefs.getBoolean(PREF_LINE, false)
+        refreshLineSummary()
+        findViewById<View>(R.id.rowLine).setOnClickListener {
+            showLine = !showLine
+            prefs.edit().putBoolean(PREF_LINE, showLine).apply()
+            refreshLineSummary()
+        }
         showDelta = prefs.getBoolean(PREF_DELTA, false)
         refreshDeltaSummary()
         findViewById<View>(R.id.rowDelta).setOnClickListener {
@@ -880,6 +895,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         spotMinusButton.setOnClickListener { if (spotMeter.remove()) updateSpotCount() }
         spotPlusButton.setOnClickListener { if (spotMeter.add()) updateSpotCount() }
         thermalView.onSpotMoved = { index, u, v -> spotMeter.move(index, u, v) }
+        thermalView.onLineMoved = { which, u, v -> lineProfile.moveEnd(which, u, v) }
         thermalView.onAreaMoved = { index, du, dv -> measureAreas.move(index, du, dv) }
         thermalView.onAreaResized = { index, u, v -> measureAreas.resize(index, u, v) }
         findViewById<View>(R.id.rangeLowButton).setOnClickListener { openSheet(SheetTarget.LOW) }
@@ -2076,6 +2092,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
+        val lineMark = if (showing == Screen.LIVE) lineLabel(frame) else null
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
         if (repaintPending.compareAndSet(false, true)) {
             runOnUiThread {
@@ -2083,6 +2100,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 thermalView.spots = labels
                 thermalView.extremes = marks
                 thermalView.areas = areaMarks
+                thermalView.line = lineMark
                 thermalView.setImage(bitmap, viewRotation, mirrored)
                 if (screen == Screen.FOV) updateFovPreview(thermal)
                 if (screen == Screen.CALIBRATION) calibration.onFrame(thermal, viewRotation, mirrored, zone)
@@ -2327,6 +2345,32 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
+    private fun refreshLineSummary() {
+        lineSummary.text = getString(if (showLine) R.string.line_on else R.string.line_off)
+    }
+
+    /** The line's readings and profile, worked out with the frame in hand. */
+    private fun lineLabel(frame: ThermalFrame): LineLabel? {
+        if (!showLine) return null
+        val calibration = planck
+        val a = lineProfile.start
+        val b = lineProfile.end
+        val r = LineProfile.sample(frame.raw, frame.width, frame.height, a, b)
+        val profile = FloatArray(r.samples.size) { calibration.rawToCelsius(r.samples[it]).toFloat() }
+        val maxC = calibration.rawToCelsius(r.maxRaw)
+        val minC = calibration.rawToCelsius(r.minRaw)
+        return LineLabel(
+            a, b,
+            getString(
+                R.string.line_readings,
+                "${dec(maxC)}°", "${dec(calibration.rawToCelsius(r.meanRaw.roundToInt()))}°", "${dec(minC)}°",
+            ),
+            profile,
+            "${dec(maxC)}°",
+            "${dec(minC)}°",
+        )
+    }
+
     private fun refreshDeltaSummary() {
         deltaSummary.text = getString(if (showDelta) R.string.delta_on else R.string.delta_off)
     }
@@ -2382,6 +2426,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 takenAt = takenAt,
                 extremes = if (showExtremes) extremeLabels(frame) else emptyList(),
                 areas = areaLabels(frame),
+                line = lineLabel(frame),
             ),
         )
         // The thermal layer alone, not the composed one: the original is there to be

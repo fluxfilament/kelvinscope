@@ -292,4 +292,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">Was die Oberfläche sieht und zurückspiegelt. Drinnen die Raumtemperatur lassen, standardmäßig 22 °C. Draußen unter freiem Himmel ist sie viel kälter, oft unter null. Je kleiner ε, desto stärker wirkt sie.</string>
     <string name="card_reflected">refl. %1$s °C</string>
+    <string name="row_line">Messlinie</string>
+    <string name="line_on">An: eine Linie mit Max, Mittel und Min entlang und ein Profilgraph unter dem Bild. Enden ziehen. Tippen zum Ausschalten.</string>
+    <string name="line_off">Aus. Tippen für eine Linie, die Max, Mittel und Min entlang eines Rohrs oder Heizkörpers misst, mit Profilgraph.</string>
+    <string name="line_readings">Max %1$s · Mittel %2$s · Min %3$s</string>
 </resources>

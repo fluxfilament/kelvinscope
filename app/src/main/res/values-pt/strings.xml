@@ -293,4 +293,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">O que a superfície vê e reflete. Em ambientes internos deixe a temperatura do cômodo, 22 °C por padrão. Ao ar livre sob céu aberto ela é muito mais fria, muitas vezes abaixo de zero. Quanto menor o ε, mais ela influi.</string>
     <string name="card_reflected">refl. %1$s °C</string>
+    <string name="row_line">Linha de medição</string>
+    <string name="line_on">Ligada: uma linha com Máx, média e Mín ao longo dela e um gráfico de perfil sob a imagem. Arraste as pontas. Toque para desligar.</string>
+    <string name="line_off">Desligada. Toque para uma linha que mede Máx, média e Mín ao longo de um cano ou radiador, com gráfico de perfil.</string>
+    <string name="line_readings">Máx %1$s · Méd %2$s · Mín %3$s</string>
 </resources>

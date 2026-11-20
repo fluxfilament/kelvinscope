@@ -292,4 +292,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">То, что поверхность «видит» и отражает. В помещении оставьте температуру комнаты, по умолчанию 22 °C. На улице под открытым небом она намного ниже, часто минусовая. Чем ниже ε, тем сильнее она влияет.</string>
     <string name="card_reflected">отр. %1$s °C</string>
+    <string name="row_line">Линия замера</string>
+    <string name="line_on">Вкл: линия с Max, средним и Min вдоль неё и график профиля под кадром. Концы перетаскиваются. Нажмите, чтобы выключить.</string>
+    <string name="line_off">Выкл. Нажмите, чтобы мерить Max, среднее и Min вдоль трубы или радиатора, с графиком профиля.</string>
+    <string name="line_readings">Max %1$s · Ср %2$s · Min %3$s</string>
 </resources>

@@ -294,4 +294,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">What the surface sees and mirrors back. Indoors leave it at the room temperature, 22 °C by default. Outdoors under open sky it is much colder, often below zero. The lower ε is, the more it matters.</string>
     <string name="card_reflected">refl. %1$s °C</string>
+    <string name="row_line">Measuring line</string>
+    <string name="line_on">On: a line with Max, Avg and Min along it and a profile graph under the picture. Drag its ends. Tap to turn off.</string>
+    <string name="line_off">Off. Tap for a line that reads Max, Avg and Min along a pipe or a radiator, with a profile graph.</string>
+    <string name="line_readings">Max %1$s · Avg %2$s · Min %3$s</string>
 </resources>

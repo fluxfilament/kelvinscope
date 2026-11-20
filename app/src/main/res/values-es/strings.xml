@@ -293,4 +293,8 @@
     <string name="reflected_value">%1$s °C</string>
     <string name="reflected_note">Lo que la superficie ve y refleja. En interiores deja la temperatura de la habitación, 22 °C por defecto. Al aire libre bajo cielo abierto es mucho más fría, a menudo bajo cero. Cuanto menor es ε, más influye.</string>
     <string name="card_reflected">refl. %1$s °C</string>
+    <string name="row_line">Línea de medida</string>
+    <string name="line_on">Activada: una línea con Máx, media y Mín a lo largo y un gráfico de perfil bajo la imagen. Arrastra sus extremos. Toca para desactivar.</string>
+    <string name="line_off">Desactivada. Toca para una línea que mide Máx, media y Mín a lo largo de una tubería o un radiador, con gráfico de perfil.</string>
+    <string name="line_readings">Máx %1$s · Med %2$s · Mín %3$s</string>
 </resources>
