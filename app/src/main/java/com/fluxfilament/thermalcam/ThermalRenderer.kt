@@ -214,7 +214,7 @@ class ThermalRenderer {
         for (i in into.indices) {
             val v = (((raw[i] - lo) / span) * 255f).toInt().coerceIn(0, 255)
             into[i] = when {
-                iso != null && iso.contains(raw[i]) -> ISOTHERM_COLOUR
+                iso != null && !fusion && iso.contains(raw[i]) -> ISOTHERM_COLOUR
                 wet != null && wet.contains(raw[i]) -> MOISTURE_COLOUR
                 cold != null && cold.contains(raw[i]) -> INSULATION_COLOUR
                 else -> lut[v]
@@ -232,6 +232,46 @@ class ThermalRenderer {
         /** Magenta for poor insulation: unlike the green, the blue and every palette. */
         const val INSULATION_COLOUR = 0xFFFF2BD6.toInt()
     }
+
+    private var maskBitmap: Bitmap? = null
+    private var maskPixels = IntArray(0)
+
+    /**
+     * [thermal], already rendered from [frame], with every pixel outside [band] made
+     * transparent - the layer thermal fusion lays over the photo. Reuses one bitmap,
+     * like [render], so it is for the live view only.
+     */
+    fun mask(frame: ThermalFrame, thermal: Bitmap, band: IsothermBand): Bitmap {
+        val w = frame.width
+        val h = frame.height
+        var bmp = maskBitmap
+        if (bmp == null || bmp.width != w || bmp.height != h) {
+            bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            maskBitmap = bmp
+            maskPixels = IntArray(w * h)
+        }
+        thermal.getPixels(maskPixels, 0, w, 0, 0, w, h)
+        val raw = frame.raw
+        for (i in maskPixels.indices) if (!band.contains(raw[i])) maskPixels[i] = 0
+        bmp!!.setPixels(maskPixels, 0, w, 0, 0, w, h)
+        return bmp
+    }
+
+    /** The same for a snapshot, into a bitmap of its own. */
+    fun maskCopy(frame: ThermalFrame, thermal: Bitmap, band: IsothermBand): Bitmap {
+        val px = IntArray(frame.width * frame.height)
+        thermal.getPixels(px, 0, frame.width, 0, 0, frame.width, frame.height)
+        for (i in px.indices) if (!band.contains(frame.raw[i])) px[i] = 0
+        return Bitmap.createBitmap(px, frame.width, frame.height, Bitmap.Config.ARGB_8888)
+    }
+
+    /**
+     * True when the isotherm's band is shown as thermal fusion rather than painted
+     * green: the band keeps its palette colours over the photo, so the green is left
+     * off here.
+     */
+    @Volatile
+    var fusion: Boolean = false
 
     /** Forgets the rolling contrast bounds, e.g. after the shutter recalibrates. */
     fun resetBounds() {

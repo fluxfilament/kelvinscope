@@ -116,6 +116,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_ISOTHERM_MODE = "isothermMode"
         const val PREF_ISOTHERM_2 = "isothermC2"
+        const val PREF_FUSION = "isothermFusion"
         const val PREF_ALARM_MODE = "alarmMode"
         const val PREF_ALARM_C = "alarmC"
         const val PREF_MOISTURE_LIMIT = "moistureLimit"
@@ -272,6 +273,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private var isothermC2 = 60
     private lateinit var isothermModes: LinearLayout
     private lateinit var isothermSeek2: SeekBar
+    private lateinit var isothermShow: LinearLayout
     private lateinit var alarmSummary: TextView
     private lateinit var alarmModes: LinearLayout
     private lateinit var alarmSeek: SeekBar
@@ -678,6 +680,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         isothermSummary = findViewById(R.id.isothermSummary)
         isothermModes = findViewById(R.id.isothermModes)
         isothermSeek2 = findViewById(R.id.isothermSeek2)
+        isothermShow = findViewById(R.id.isothermShow)
         alarmSummary = findViewById(R.id.alarmSummary)
         alarmModes = findViewById(R.id.alarmModes)
         alarmSeek = findViewById(R.id.alarmSeek)
@@ -836,6 +839,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             isothermC2 = ISOTHERM_FROM_C + p
             applyIsotherm()
         }, { prefs.edit().putInt(PREF_ISOTHERM_2, isothermC2).apply() }))
+        renderer.fusion = prefs.getBoolean(PREF_FUSION, false)
         buildIsothermModes()
         applyIsotherm()
         alarm.mode = prefs.getString(PREF_ALARM_MODE, null)
@@ -2138,10 +2142,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // No point mixing a visible layer into a picture nobody is looking at: the
         // comparison screen draws the two layers itself, and the rest show neither.
         val showing = screen
-        val bitmap = if (showing == Screen.LIVE) {
-            compositor.compose(frame, thermal, blend) ?: thermal
-        } else {
-            thermal
+        val band = renderer.isotherm
+        val bitmap = when {
+            showing != Screen.LIVE -> thermal
+            renderer.fusion && band != null ->
+                compositor.composeFusion(frame, renderer.mask(frame, thermal, band)) ?: thermal
+            else -> compositor.compose(frame, thermal, blend) ?: thermal
         }
         if (calibrating) {
             calibrating = false
@@ -2211,6 +2217,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         renderer.isotherm = iso?.rawBand(planck::celsiusToRaw)
         isothermSeek2.visibility =
             if (c != null && isothermMode == IsothermMode.BETWEEN) View.VISIBLE else View.GONE
+        buildIsothermShow()
         isothermSummary.text = if (iso == null) {
             getString(R.string.isotherm_off)
         } else {
@@ -2228,10 +2235,21 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val notes = mutableListOf<String>()
         isothermC?.let { c ->
             val (lo, hi) = Isotherm(isothermMode, c, isothermC2).celsiusBand()
-            notes += when (isothermMode) {
+            val band = when (isothermMode) {
                 IsothermMode.ABOVE -> getString(R.string.card_iso_above, lo.toString())
                 IsothermMode.BELOW -> getString(R.string.card_iso_below, hi.toString())
                 IsothermMode.BETWEEN -> getString(R.string.card_iso_between, lo.toString(), hi.toString())
+            }
+            // The same band, said without the green when it is shown as heat on the photo.
+            notes += if (renderer.fusion) {
+                val range = when (isothermMode) {
+                    IsothermMode.ABOVE -> "> $lo °C"
+                    IsothermMode.BELOW -> "< $hi °C"
+                    IsothermMode.BETWEEN -> "$lo…$hi °C"
+                }
+                getString(R.string.card_fusion, range)
+            } else {
+                band
             }
         }
         if (moistureLimit != 0) {
@@ -2458,6 +2476,33 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         generator?.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 400)
         // A haptic tick needs no VIBRATE permission, unlike the Vibrator service.
         thermalView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+    }
+
+    private fun buildIsothermShow() {
+        isothermShow.removeAllViews()
+        listOf(false to R.string.isotherm_show_green, true to R.string.isotherm_show_fusion)
+            .forEachIndexed { index, (fusion, label) ->
+                val selected = fusion == renderer.fusion
+                val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                    setText(label)
+                    textSize = 12f
+                    gravity = Gravity.CENTER
+                    minHeight = dp(40)
+                    setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                    if (selected) setTextColor(getColor(R.color.ff_accent))
+                    isClickable = true
+                    setOnClickListener {
+                        renderer.fusion = fusion
+                        prefs.edit().putBoolean(PREF_FUSION, fusion).apply()
+                        buildIsothermShow()
+                    }
+                }
+                isothermShow.addView(
+                    option,
+                    LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(8) },
+                )
+            }
+        isothermShow.visibility = if (isothermC == null) View.GONE else View.VISIBLE
     }
 
     private fun buildIsothermModes() {
@@ -2748,7 +2793,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // Read once, so the picture and the card's label cannot disagree if the
         // slider moves in between.
         val blend = blend
-        val composed = snapshotCompositor.compose(frame, thermal, blend) ?: thermal
+        val band = renderer.isotherm
+        val composed = if (renderer.fusion && band != null) {
+            snapshotCompositor.composeFusion(frame, renderer.maskCopy(frame, thermal, band)) ?: thermal
+        } else {
+            snapshotCompositor.compose(frame, thermal, blend) ?: thermal
+        }
 
         val card = SnapshotCard.render(
             this,

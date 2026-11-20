@@ -332,4 +332,7 @@
     <string name="timelapse_saved">Таймлапс сохранён · %1$s</string>
     <string name="timelapse_full">Достигнут предел кадров: %1$d. Выберите «Выкл», чтобы сохранить.</string>
     <string name="timelapse_saving">Сохраняю таймлапс, кадров: %1$d…</string>
+    <string name="isotherm_show_green">Зелёным</string>
+    <string name="isotherm_show_fusion">Тепло на фото</string>
+    <string name="card_fusion">ФОТО + ТЕПЛО, %1$s</string>
 </resources>

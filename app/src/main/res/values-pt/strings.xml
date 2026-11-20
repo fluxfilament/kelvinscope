@@ -332,4 +332,7 @@
     <string name="timelapse_saved">Time-lapse salvo · %1$s</string>
     <string name="timelapse_full">Limite de quadros atingido: %1$d. Escolha Não para salvar.</string>
     <string name="timelapse_saving">Salvando o time-lapse, quadros: %1$d…</string>
+    <string name="isotherm_show_green">Em verde</string>
+    <string name="isotherm_show_fusion">Calor na foto</string>
+    <string name="card_fusion">FOTO + CALOR, %1$s</string>
 </resources>

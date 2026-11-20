@@ -332,4 +332,7 @@
     <string name="timelapse_saved">Time-lapse saved · %1$s</string>
     <string name="timelapse_full">Frame limit reached: %1$d. Choose Off to save.</string>
     <string name="timelapse_saving">Saving the time-lapse, frames: %1$d…</string>
+    <string name="isotherm_show_green">Paint green</string>
+    <string name="isotherm_show_fusion">Heat on photo</string>
+    <string name="card_fusion">PHOTO + HEAT, %1$s</string>
 </resources>

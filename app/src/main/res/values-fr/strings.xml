@@ -332,4 +332,7 @@
     <string name="timelapse_saved">Time-lapse enregistré · %1$s</string>
     <string name="timelapse_full">Limite d\'images atteinte : %1$d. Choisissez Non pour enregistrer.</string>
     <string name="timelapse_saving">Enregistrement du time-lapse, images : %1$d…</string>
+    <string name="isotherm_show_green">En vert</string>
+    <string name="isotherm_show_fusion">Chaleur sur photo</string>
+    <string name="card_fusion">PHOTO + CHALEUR, %1$s</string>
 </resources>

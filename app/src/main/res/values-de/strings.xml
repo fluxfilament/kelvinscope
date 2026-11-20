@@ -330,4 +330,7 @@
     <string name="timelapse_saved">Zeitraffer gespeichert · %1$s</string>
     <string name="timelapse_full">Bildgrenze erreicht: %1$d. Aus wählen zum Speichern.</string>
     <string name="timelapse_saving">Speichere den Zeitraffer, Bilder: %1$d…</string>
+    <string name="isotherm_show_green">Grün färben</string>
+    <string name="isotherm_show_fusion">Wärme auf Foto</string>
+    <string name="card_fusion">FOTO + WÄRME, %1$s</string>
 </resources>

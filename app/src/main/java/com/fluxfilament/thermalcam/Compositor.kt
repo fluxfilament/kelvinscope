@@ -147,6 +147,28 @@ class Compositor {
      * between frames, so sharing an instance with the live view would hand the screen
      * a picture the camera thread is in the middle of overwriting.
      */
+    /**
+     * Thermal fusion: the visible photo whole, and the thermal picture only where
+     * [masked] is opaque - the pixels inside the isotherm's band. The photo shows
+     * what the thing is, the colour shows where it is hot, as FLIR's thermal fusion
+     * does. Null when the frame has no photo, so the caller can show plain thermal.
+     */
+    fun composeFusion(frame: ThermalFrame, masked: Bitmap): Bitmap? {
+        val jpeg = frame.jpeg ?: return null
+        val vis = decode(jpeg) ?: return null
+        val out = outputFor(masked.width * OUTPUT_SCALE, masked.height * OUTPUT_SCALE)
+        val canvas = Canvas(out)
+        canvas.drawColor(android.graphics.Color.BLACK)
+        paint.alpha = 255
+        canvas.drawBitmap(vis, placeVisible(vis, out.width, out.height), paint)
+        // Blocky on purpose: smoothing would bleed colour across the band's edge onto
+        // pixels that are outside it.
+        canvas.drawBitmap(masked, null, Rect(0, 0, out.width, out.height), blockPaint)
+        return out
+    }
+
+    private val blockPaint = Paint()
+
     fun decodeVisible(frame: ThermalFrame): Bitmap? = frame.jpeg?.let { decode(it) }
 
     /**

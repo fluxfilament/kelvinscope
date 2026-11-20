@@ -471,6 +471,14 @@
                     android:layout_marginTop="10dp"
                     android:orientation="horizontal" />
 
+                <!-- How the band is shown: painted green, or as heat over the photo. -->
+                <LinearLayout
+                    android:id="@+id/isothermShow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal" />
+
                 <SeekBar
                     android:id="@+id/isothermSeek"
                     style="@style/Ff.Seek"

@@ -41,6 +41,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   Also drawn on snapshot cards.
 - A strip of palettes over the scale bar on the main screen, one tap to
   switch.
+- Thermal fusion: the isotherm's band can be shown as heat over the visible
+  photo instead of in green - the photo says what the thing is, the colour
+  where it is hot. Needs the overlay's FOV and Align set up.
 - Time-lapse: a frame every 1, 5, 30 or 60 seconds; stopping it saves an
   animated GIF on one temperature scale for the whole run (so colour means the
   same temperature throughout) and every frame's counts as PGMs.
