@@ -12,7 +12,13 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Max/Min markers: the hottest and the coldest place are marked on the
   picture and on the snapshot card, found on 3x3 means. Off by default,
   in Settings.
-- Isotherm: everything above a chosen temperature is painted green.
+- Isotherm: everything above, below or between chosen temperatures is
+  painted green.
+- Alarm: a beep and a haptic tick while the hottest place is above a limit,
+  or the coldest below one, with `[ALARM]` in the status bar. Still no
+  permissions: no VIBRATE needed for the tick.
+- Difference to spot 1: every other spot can also show Δ, how much hotter
+  or colder it is than spot 1, on screen and on cards.
 - Measurement areas: up to three rectangles on the picture, each with Max,
   Min and the average inside; drag to move, drag the corner dot to resize.
   Also drawn on snapshot cards.

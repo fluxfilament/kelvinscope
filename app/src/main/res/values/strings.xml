@@ -267,4 +267,7 @@
     <string name="alarm_mode_max">Max ≥</string>
     <string name="alarm_mode_min">Min ≤</string>
     <string name="state_alarm">[ALARM]</string>
+    <string name="row_delta">Difference to spot 1</string>
+    <string name="delta_on">On: every other spot also shows Δ, how much hotter or colder it is than spot 1. Tap to turn off.</string>
+    <string name="delta_off">Off. Tap to show on every other spot how far it is from spot 1.</string>
 </resources>

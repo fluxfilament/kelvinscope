@@ -266,4 +266,7 @@
     <string name="alarm_mode_max">Máx ≥</string>
     <string name="alarm_mode_min">Mín ≤</string>
     <string name="state_alarm">[ALARME]</string>
+    <string name="row_delta">Diferença para o ponto 1</string>
+    <string name="delta_on">Ligado: os outros pontos mostram também Δ, quanto estão mais quentes ou mais frios que o ponto 1. Toque para desligar.</string>
+    <string name="delta_off">Desligado. Toque para mostrar nos outros pontos a diferença para o ponto 1.</string>
 </resources>

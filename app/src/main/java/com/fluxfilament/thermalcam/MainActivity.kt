@@ -107,6 +107,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_RANGE_HIGH = "rangeHigh"
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
+        const val PREF_DELTA = "deltaToSpot1"
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_ISOTHERM_MODE = "isothermMode"
         const val PREF_ISOTHERM_2 = "isothermC2"
@@ -229,6 +230,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var rotationOptions: LinearLayout
     private lateinit var emissivitySummary: TextView
     private lateinit var extremesSummary: TextView
+    private lateinit var deltaSummary: TextView
+
+    /** Each spot from the second on also shows how far it is from spot 1. Camera thread reads it. */
+    @Volatile
+    private var showDelta = false
     private lateinit var spotLogSummary: TextView
     private lateinit var isothermSummary: TextView
     private lateinit var themeOptions: LinearLayout
@@ -605,6 +611,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         rotationOptions = findViewById(R.id.rotationOptions)
         emissivitySummary = findViewById(R.id.emissivitySummary)
         extremesSummary = findViewById(R.id.extremesSummary)
+        deltaSummary = findViewById(R.id.deltaSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
         isothermSummary = findViewById(R.id.isothermSummary)
         isothermModes = findViewById(R.id.isothermModes)
@@ -770,6 +777,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
+        showDelta = prefs.getBoolean(PREF_DELTA, false)
+        refreshDeltaSummary()
+        findViewById<View>(R.id.rowDelta).setOnClickListener {
+            showDelta = !showDelta
+            prefs.edit().putBoolean(PREF_DELTA, showDelta).apply()
+            refreshDeltaSummary()
+        }
         findViewById<View>(R.id.rowExtremes).setOnClickListener {
             showExtremes = !showExtremes
             prefs.edit().putBoolean(PREF_EXTREMES, showExtremes).apply()
@@ -2201,10 +2215,23 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
      */
     private fun spotLabels(frame: ThermalFrame): List<SpotLabel> {
         val calibration = planck
-        return spotMeter.positions().mapIndexed { index, spot ->
-            val celsius = calibration.rawToCelsius(frame.rawAt(spot.u, spot.v))
-            SpotLabel(spot.u, spot.v, index + 1, "${dec(celsius)}°C")
+        val spots = spotMeter.positions()
+        val celsius = spots.map { calibration.rawToCelsius(frame.rawAt(it.u, it.v)) }
+        return spots.mapIndexed { index, spot ->
+            val reading = "${dec(celsius[index])}°C"
+            // Spot 1 is the reference: "how much hotter is this contact than that one".
+            val text = if (showDelta && index > 0) {
+                val d = celsius[index] - celsius[0]
+                reading + " Δ" + (if (d < 0) "−" else "+") + dec(abs(d))
+            } else {
+                reading
+            }
+            SpotLabel(spot.u, spot.v, index + 1, text)
         }
+    }
+
+    private fun refreshDeltaSummary() {
+        deltaSummary.text = getString(if (showDelta) R.string.delta_on else R.string.delta_off)
     }
 
     // --- snapshots ----------------------------------------------------------------

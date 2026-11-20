@@ -265,4 +265,7 @@
     <string name="alarm_mode_max">Max ≥</string>
     <string name="alarm_mode_min">Min ≤</string>
     <string name="state_alarm">[ТРЕВОГА]</string>
+    <string name="row_delta">Разница с точкой 1</string>
+    <string name="delta_on">Вкл: у остальных точек показана Δ — насколько они горячее или холоднее точки 1. Нажмите, чтобы выключить.</string>
+    <string name="delta_off">Выкл. Нажмите, чтобы у остальных точек показывалась разница с точкой 1.</string>
 </resources>
