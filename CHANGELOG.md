@@ -25,6 +25,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   prints the same ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
 - F-Droid metadata in `fastlane/`, in English and Russian.
 
+### Changed
+- The interface is set in Golos Text, and figures in JetBrains Mono, both
+  bundled with the app (SIL Open Font License), instead of the phone's
+  system fonts.
+
 ### Fixed
 - The Field of view screen gave the resolutions as 80×60 and 1440×1080
   whatever the camera; it now reads them off the frames, so a FLIR ONE Pro

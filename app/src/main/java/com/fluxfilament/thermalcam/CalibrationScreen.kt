@@ -392,7 +392,7 @@ class CalibrationScreen(
                 gravity = Gravity.CENTER
                 minHeight = dp(48)
                 textSize = 13f
-                typeface = android.graphics.Typeface.MONOSPACE
+                typeface = Fonts.mono(activity)
                 setTextColor(activity.getColor(if (selected) R.color.ff_text else R.color.ff_muted))
                 setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
                 isClickable = true

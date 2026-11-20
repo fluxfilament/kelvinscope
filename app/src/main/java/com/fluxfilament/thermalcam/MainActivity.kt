@@ -1168,7 +1168,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             TextView(this, null, 0, R.style.Ff_Mono).apply {
                 text = dec(preset.emissivity, 2)
                 textSize = 14f
-                setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+                setTypeface(Fonts.mono(this@MainActivity), Typeface.BOLD)
                 if (selected) setTextColor(getColor(R.color.ff_accent))
             },
             LinearLayout.LayoutParams(WRAP, WRAP).apply { marginStart = dp(12) },

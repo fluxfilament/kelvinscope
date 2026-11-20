@@ -89,6 +89,7 @@ object SnapshotCard {
     private var locale: Locale = Locale.ROOT
 
     fun render(context: Context, scene: CardScene): Bitmap {
+        val mono = Fonts.mono(context)
         locale = context.uiLocale()
         val src = scene.picture
         val turned = scene.rotation % 180 != 0
@@ -109,7 +110,7 @@ object SnapshotCard {
         val dataPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = MUTED
             textSize = 10.5f * unit
-            typeface = Typeface.MONOSPACE
+            typeface = mono
         }
         val lines = wrap(data, dataPaint, pictureW.toFloat())
 
@@ -130,7 +131,7 @@ object SnapshotCard {
 
         canvas.save()
         canvas.translate(pad, pad + pictureH + gap)
-        drawScale(canvas, scene, pictureW.toFloat(), barHeight, unit)
+        drawScale(canvas, scene, pictureW.toFloat(), barHeight, unit, mono)
         canvas.restore()
 
         var baseline = pad + pictureH + gap + barHeight + tickArea + gap + dataPaint.textSize
@@ -204,16 +205,17 @@ object SnapshotCard {
         width: Float,
         barHeight: Float,
         unit: Float,
+        mono: Typeface,
     ) {
         val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = MUTED
             textSize = 10.5f * unit
-            typeface = Typeface.MONOSPACE
+            typeface = mono
         }
         val endPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = TEXT
             textSize = 12.5f * unit
-            typeface = Typeface.MONOSPACE
+            typeface = mono
         }
 
         val window = scene.window

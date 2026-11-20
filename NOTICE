@@ -26,3 +26,14 @@ engineering published in two GPL-2.0-or-later projects:
 Neither upstream project is affiliated with this one; this is an
 independent, unofficial reimplementation for Android. Not affiliated
 with or endorsed by Teledyne FLIR.
+
+Fonts
+-----
+
+The app bundles two typefaces under the SIL Open Font License 1.1; the
+licence texts ship in the app as assets/licenses/:
+
+- Golos Text, Copyright 2019 The Golos Text Project Authors
+  (https://github.com/googlefonts/golos-text) - app/src/main/res/font/golos_text.ttf
+- JetBrains Mono, Copyright 2020 The JetBrains Mono Project Authors
+  (https://github.com/JetBrains/JetBrainsMono) - app/src/main/res/font/jetbrains_mono.ttf

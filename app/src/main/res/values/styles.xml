@@ -4,7 +4,7 @@
     <!-- A small-caps monospaced label: the eyebrow over a section. White, because a
          heading that does not stand out is not doing its job. -->
     <style name="Ff.Eyebrow" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
         <item name="android:textSize">12sp</item>
         <item name="android:letterSpacing">0.14</item>
         <item name="android:textAllCaps">true</item>
@@ -13,14 +13,14 @@
     </style>
 
     <style name="Ff.Mono" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
         <item name="android:textColor">@color/ff_text</item>
     </style>
 
     <!-- [LIVE], [В РАБОТЕ], [ФИКСАЦИЯ]: a boxed status word. The box is drawn by the
          background, whose stroke colour is what distinguishes the three kinds. -->
     <style name="Ff.Stamp" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">10.5sp</item>
         <item name="android:letterSpacing">0.08</item>
@@ -77,7 +77,7 @@
 
     <!-- A tool in the bottom bar: icon over a tiny caption, 56 dp square. -->
     <style name="Ff.ToolLabel" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
         <item name="android:textSize">10sp</item>
         <item name="android:letterSpacing">0.06</item>
         <item name="android:includeFontPadding">false</item>
@@ -86,7 +86,7 @@
 
     <!-- Uppercase monospaced action button, e.g. "Готово" in the scale sheet. -->
     <style name="Ff.Button" parent="">
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
         <item name="android:textSize">12sp</item>
         <item name="android:letterSpacing">0.06</item>
         <item name="android:textAllCaps">true</item>

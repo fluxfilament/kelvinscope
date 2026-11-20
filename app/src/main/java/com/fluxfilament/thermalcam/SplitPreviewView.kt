@@ -22,7 +22,6 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -73,7 +72,7 @@ class SplitPreviewView @JvmOverloads constructor(
     private val tagText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = TEXT
         textSize = 10.5f * density
-        typeface = Typeface.MONOSPACE
+        typeface = Fonts.mono(context)
     }
     private val gripRect = RectF()
     private val tagRect = RectF()

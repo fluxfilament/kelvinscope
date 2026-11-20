@@ -22,7 +22,6 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 
@@ -60,7 +59,7 @@ class ScaleBarView @JvmOverloads constructor(
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = MUTED
         textSize = 10.5f * density
-        typeface = Typeface.MONOSPACE
+        typeface = Fonts.mono(context)
     }
 
     /** Rebuilt only when it would actually differ: a new shader per frame is waste. */

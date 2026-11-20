@@ -16,5 +16,7 @@
         <item name="android:textColorPrimary">@color/ff_text</item>
         <item name="android:textColorSecondary">@color/ff_muted</item>
         <item name="android:colorAccent">@color/ff_accent2</item>
+        <!-- Golos Text for everything that does not ask for the mono face itself. -->
+        <item name="android:fontFamily">@font/golos_text</item>
     </style>
 </resources>
