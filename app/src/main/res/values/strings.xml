@@ -130,6 +130,7 @@
     <string name="consts_msg_applied_clean">Constants loaded.</string>
     <string name="consts_msg_not_flir">This file has no FLIR radiometric data. It needs a JPEG saved by the official FLIR ONE app, not recompressed or edited.</string>
     <string name="consts_msg_read_failed">Could not read the file: %1$s</string>
+    <string name="consts_msg_pip">FLIR overlay alignment in this snapshot: Real2IR %1$.4f · offset %2$d, %3$d px in %4$d×%5$d</string>
     <string name="calib_section_correction">Reading correction</string>
     <string name="calib_none">None</string>
     <string name="calib_summary_none">no correction</string>
@@ -202,12 +203,20 @@
     <string name="nothing_to_save">No frame yet</string>
 
     <!-- figures in layouts, kept here so their decimal separator follows the language -->
-    <string name="fov_res_thermal">IR 80×60</string>
-    <string name="fov_res_visible">VIS 1440×1080</string>
+    <string name="fov_res_thermal">IR %1$d×%2$d</string>
+    <string name="fov_res_visible">VIS %1$d×%2$d</string>
+    <string name="fov_res_thermal_none">IR —</string>
+    <string name="fov_res_visible_none">VIS —</string>
     <string name="why_eps_1">0.92</string>
     <string name="why_hot_1">36.7 °C</string>
     <string name="why_eps_2">0.61</string>
     <string name="why_hot_2">43.3 °C</string>
     <string name="why_eps_3">0.27</string>
     <string name="why_hot_3">65.9 °C</string>
+    <!-- Under the palette choice: what the selected one is good and bad at. -->
+    <string name="palette_hint_grayscale">Grayscale: shades without colour. Best for reading temperatures and for long sessions; a small hot spot is easy to miss.</string>
+    <string name="palette_hint_iron">Iron: black through red to white, like heated metal. Hot spots stand out, so it suits wiring and overheating; weak in the cold end.</string>
+    <string name="palette_hint_rainbow">Rainbow: the most colours per degree. Shows small differences and gradients, but draws edges that are not really there.</string>
+    <string name="palette_hint_arctic">Arctic: most of the scale in blues. Made for cold spots, draughts and thermal bridges in a building; poor for hot objects.</string>
+    <string name="palette_hint_lava">Lava: black to white through the reds. Hot areas read at a glance (pipes, heaters, stoves); little contrast in the cold end.</string>
 </resources>

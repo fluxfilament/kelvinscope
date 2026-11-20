@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
@@ -78,6 +79,42 @@ class FffReaderTest {
         assertRefused(flirJpeg(r1 = 1.0e-20f))
     }
 
+    @Test
+    fun readsFlirsOverlayAlignment() {
+        // This unit's values, from a snapshot taken in portrait.
+        val pip = FffReader.readPip(flirJpeg(pip = pipRecord(1.3682539f, -1, 44, 479, 639)))!!
+        assertEquals(1.36825, pip.real2Ir, 1e-5)
+        assertEquals(-1, pip.offsetX)
+        assertEquals(44, pip.offsetY)
+        assertEquals(480, pip.width)
+        assertEquals(640, pip.height)
+        assertEquals(44.0 / 640, pip.shiftY, 1e-12)
+    }
+
+    @Test
+    fun aJpegWithoutPipStillImports() {
+        assertNull(FffReader.readPip(flirJpeg()))
+        FffReader.read(flirJpeg())
+    }
+
+    @Test
+    fun aNonsensePipIsIgnored() {
+        assertNull(FffReader.readPip(flirJpeg(pip = pipRecord(0f, 0, 0, 479, 639))))
+        assertNull(FffReader.readPip(flirJpeg(pip = pipRecord(1.37f, 900, 0, 479, 639))))
+    }
+
+    private fun pipRecord(real2Ir: Float, offX: Int, offY: Int, x2: Int, y2: Int): ByteArray {
+        val rec = ByteBuffer.allocate(96).order(ByteOrder.LITTLE_ENDIAN)
+        rec.putFloat(0, real2Ir)
+        rec.putShort(4, offX.toShort())
+        rec.putShort(6, offY.toShort())
+        rec.putShort(8, 0)
+        rec.putShort(10, x2.toShort())
+        rec.putShort(12, 0)
+        rec.putShort(14, y2.toShort())
+        return rec.array()
+    }
+
     private fun assertRefused(jpeg: ByteArray) {
         try {
             FffReader.read(jpeg)
@@ -105,14 +142,23 @@ class FffReaderTest {
         return rec.array()
     }
 
-    private fun fff(indexOrder: ByteOrder, r1: Float): ByteArray {
+    private fun fff(indexOrder: ByteOrder, r1: Float, pip: ByteArray?): ByteArray {
         val info = cameraInfo(r1)
         val indexAt = 0x40
-        val infoAt = indexAt + 2 * 32
-        val blob = ByteBuffer.allocate(infoAt + info.size).order(indexOrder)
+        val count = if (pip == null) 2 else 3
+        val infoAt = indexAt + count * 32
+        val pipAt = infoAt + info.size
+        val blob = ByteBuffer.allocate(pipAt + (pip?.size ?: 0)).order(indexOrder)
         "FFF\u0000".toByteArray(Charsets.ISO_8859_1).copyInto(blob.array(), 0)
         blob.putInt(0x18, indexAt)
-        blob.putInt(0x1C, 2)
+        blob.putInt(0x1C, count)
+        if (pip != null) {
+            blob.putShort(indexAt + 64, 0x2A)
+            blob.putShort(indexAt + 64 + 2, 1)
+            blob.putInt(indexAt + 64 + 12, pipAt)
+            blob.putInt(indexAt + 64 + 16, pip.size)
+            pip.copyInto(blob.array(), pipAt)
+        }
         // An empty raw-data entry first, so the reader has to look past it.
         blob.putShort(indexAt, 0x01)
         blob.putShort(indexAt + 32, 0x20)
@@ -127,8 +173,9 @@ class FffReaderTest {
         indexOrder: ByteOrder = ByteOrder.BIG_ENDIAN,
         chunksReversed: Boolean = false,
         r1: Float = 16515.199f,
+        pip: ByteArray? = null,
     ): ByteArray {
-        val blob = fff(indexOrder, r1)
+        val blob = fff(indexOrder, r1, pip)
         val half = blob.size / 2
         val chunks = listOf(blob.copyOfRange(0, half), blob.copyOfRange(half, blob.size))
         val order = if (chunksReversed) listOf(1, 0) else listOf(0, 1)

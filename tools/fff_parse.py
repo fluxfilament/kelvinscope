@@ -102,6 +102,17 @@ def camera_info(rec: bytes) -> dict:
     return info
 
 
+def pip(rec: bytes) -> dict:
+    """The PiP record (0x2A): FLIR's own placement of the visible photo.
+
+    Real2IR, then the visible picture's shift and the frame it is measured in,
+    all little-endian like CameraInfo.
+    """
+    real2ir, off_x, off_y, x1, x2, y1, y2 = struct.unpack("<fhhHHHH", rec[:16])
+    return {"Real2IR": real2ir, "OffsetX": off_x, "OffsetY": off_y,
+            "PiPX1": x1, "PiPX2": x2, "PiPY1": y1, "PiPY2": y2}
+
+
 def main(path):
     data = open(path, "rb").read()
     fff = collect_fff(data)
@@ -112,6 +123,10 @@ def main(path):
     print(f"  index byte order: {'big' if order == '>' else 'little'}-endian")
     for main_t, sub_t, off, length in records(fff, order):
         print(f"  record main=0x{main_t:02x} sub=0x{sub_t:02x} off={off} len={length}")
+        if main_t == 0x2A and length >= 16:  # PiP
+            for name, value in pip(fff[off:off + length]).items():
+                print(f"    {name}: {value:.6g}" if isinstance(value, float) else f"    {name}: {value}")
+            continue
         if main_t != 0x20:  # CameraInfo
             continue
         # The serial number sits at 0x104 and is left out on purpose: it

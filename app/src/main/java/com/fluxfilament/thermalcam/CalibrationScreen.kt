@@ -264,13 +264,25 @@ class CalibrationScreen(
             val outcome = try {
                 val bytes = activity.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     ?: throw java.io.IOException("empty")
-                Result.success(FffReader.read(bytes))
+                Result.success(FffReader.read(bytes) to FffReader.readPip(bytes))
             } catch (e: Exception) {
                 Result.failure(e)
             }
             activity.runOnUiThread {
                 outcome.fold(
-                    onSuccess = { useConstants(it, imported = true) },
+                    onSuccess = { (constants, pip) ->
+                        useConstants(constants, imported = true)
+                        // Shown, not applied: whether FLIR's alignment is a property of
+                        // the unit or of the slider in its app is still open.
+                        if (pip != null) {
+                            showConstantsMessage(
+                                constsMessage.text.toString() + "\n" + activity.getString(
+                                    R.string.consts_msg_pip,
+                                    pip.real2Ir, pip.offsetX, pip.offsetY, pip.width, pip.height,
+                                ),
+                            )
+                        }
+                    },
                     onFailure = { e ->
                         showConstantsMessage(
                             if (e is FffReader.NotFlir) activity.getString(R.string.consts_msg_not_flir)

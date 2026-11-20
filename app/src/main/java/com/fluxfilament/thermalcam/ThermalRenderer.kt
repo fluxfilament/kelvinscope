@@ -23,9 +23,12 @@ import android.graphics.Bitmap
  * interpolating control points rather than shipping a binary palette file, so the
  * app carries no data dependency on the upstream raw palette files.
  */
-enum class Palette(val label: String) {
-    GRAYSCALE("Grayscale"),
-    IRON("Iron");
+enum class Palette(val label: String, val hint: Int) {
+    GRAYSCALE("Grayscale", R.string.palette_hint_grayscale),
+    IRON("Iron", R.string.palette_hint_iron),
+    RAINBOW("Rainbow", R.string.palette_hint_rainbow),
+    ARCTIC("Arctic", R.string.palette_hint_arctic),
+    LAVA("Lava", R.string.palette_hint_lava);
 
     val lut: IntArray by lazy {
         when (this) {
@@ -38,6 +41,36 @@ enum class Palette(val label: String) {
                 0.60f to intArrayOf(215, 60, 50),
                 0.75f to intArrayOf(245, 130, 0),
                 0.90f to intArrayOf(255, 215, 60),
+                1.00f to intArrayOf(255, 255, 255),
+            )
+            // Violet through blue, green and yellow to red: the most hues per degree,
+            // so small differences show, at the price of edges that are not there.
+            RAINBOW -> ramp(
+                0.00f to intArrayOf(40, 0, 80),
+                0.15f to intArrayOf(80, 0, 170),
+                0.30f to intArrayOf(0, 60, 230),
+                0.45f to intArrayOf(0, 170, 200),
+                0.60f to intArrayOf(40, 200, 40),
+                0.75f to intArrayOf(240, 230, 0),
+                0.88f to intArrayOf(255, 130, 0),
+                1.00f to intArrayOf(220, 0, 0),
+            )
+            // Most of the range spent in blues, where a building's cold spots are.
+            ARCTIC -> ramp(
+                0.00f to intArrayOf(5, 10, 60),
+                0.25f to intArrayOf(10, 60, 160),
+                0.50f to intArrayOf(90, 180, 240),
+                0.68f to intArrayOf(240, 250, 255),
+                0.84f to intArrayOf(255, 210, 40),
+                1.00f to intArrayOf(230, 30, 0),
+            )
+            // Black to white through the reds: all contrast at the hot end.
+            LAVA -> ramp(
+                0.00f to intArrayOf(0, 0, 0),
+                0.30f to intArrayOf(110, 0, 0),
+                0.55f to intArrayOf(220, 50, 0),
+                0.75f to intArrayOf(255, 150, 0),
+                0.90f to intArrayOf(255, 230, 80),
                 1.00f to intArrayOf(255, 255, 255),
             )
         }

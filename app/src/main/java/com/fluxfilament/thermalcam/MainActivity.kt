@@ -228,6 +228,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var fovSeek: SeekBar
     private lateinit var fovAlignLabel: TextView
     private lateinit var fovAlignSeek: SeekBar
+    private lateinit var fovResThermal: TextView
+    private lateinit var fovResVisible: TextView
 
     // calibration and log screens
     private lateinit var screenCalibration: View
@@ -512,6 +514,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         fovSeek = findViewById(R.id.fovSeek)
         fovAlignLabel = findViewById(R.id.fovAlignLabel)
         fovAlignSeek = findViewById(R.id.fovAlignSeek)
+        fovResThermal = findViewById(R.id.fovResThermal)
+        fovResVisible = findViewById(R.id.fovResVisible)
 
         screenCalibration = findViewById(R.id.screenCalibration)
         calibrationSummary = findViewById(R.id.calibrationSummary)
@@ -1180,6 +1184,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 },
             )
         }
+        // What the chosen palette is good at, so picking one is not guesswork.
+        paletteOptions.addView(
+            TextView(this, null, 0, R.style.Ff_Note).apply {
+                text = getString(renderer.palette.hint)
+            },
+            LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dp(10) },
+        )
     }
 
     private fun paletteOption(palette: Palette): View {
@@ -1402,6 +1413,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         splitPreview.show(thermal, visible, placement, viewRotation, mirrored)
         thumbThermal.setImageBitmap(thermal)
         thumbVisible.setImageBitmap(visible)
+        // Read off the frames themselves: a FLIR ONE Pro sends 160x120, and a fixed
+        // "80x60" here once made a Pro owner suspect the overlay offset came from it.
+        fovResThermal.text = getString(R.string.fov_res_thermal, thermal.width, thermal.height)
+        fovResVisible.text = visible?.let { getString(R.string.fov_res_visible, it.width, it.height) }
+            ?: getString(R.string.fov_res_visible_none)
         placeCropRect()
     }
 

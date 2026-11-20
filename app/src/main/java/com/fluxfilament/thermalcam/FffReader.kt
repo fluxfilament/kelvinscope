@@ -83,6 +83,30 @@ data class CameraConstants(
 }
 
 /**
+ * FLIR's own alignment of the visible photo onto the thermal one, from the PiP
+ * record (0x2A) of a JPEG the official app saved. Fields as exiftool names them.
+ *
+ * [real2Ir] is how many visible pixels span one thermal pixel's worth of scene, and
+ * [offsetX]/[offsetY] move the visible picture, in pixels of a [width] x [height]
+ * frame - 480 x 640 on a gen 3, portrait. On this project's gen 3 every snapshot
+ * reads 1.3683 and a 44 px shift along one axis, 1 px along the other; the axes and
+ * signs follow the orientation the picture was taken in. Whether these are per-unit
+ * constants or the official app's alignment slider at the time is not known yet,
+ * so the app only shows them for now.
+ */
+data class PipAlignment(
+    val real2Ir: Double,
+    val offsetX: Int,
+    val offsetY: Int,
+    val width: Int,
+    val height: Int,
+) {
+    /** The shift as a fraction of the frame, the unit the app's Align works in. */
+    val shiftX: Double get() = offsetX.toDouble() / width
+    val shiftY: Double get() = offsetY.toDouble() / height
+}
+
+/**
  * Reads [CameraConstants] out of a FLIR ONE JPEG - the Kotlin side of
  * `tools/fff_parse.py`, at the same exiftool offsets.
  *
@@ -99,7 +123,7 @@ object FffReader {
     fun read(jpeg: ByteArray): CameraConstants {
         val fff = collectFff(jpeg)
         if (fff.size < 0x20 || !fff.startsWith("FFF\u0000")) throw NotFlir("no FFF data")
-        val info = cameraInfo(fff) ?: throw NotFlir("no CameraInfo record")
+        val info = record(fff, CAMERA_INFO) ?: throw NotFlir("no CameraInfo record")
         val le = ByteBuffer.wrap(info).order(ByteOrder.LITTLE_ENDIAN)
         if (info.size < 0x310) throw NotFlir("CameraInfo too short")
         val constants = CameraConstants(
@@ -115,6 +139,33 @@ object FffReader {
         )
         if (!plausible(constants)) throw NotFlir("values out of range")
         return constants
+    }
+
+    /**
+     * The PiP record, or null when the file has none or it does not look like one -
+     * it is an extra the import shows, never a reason to refuse the file.
+     */
+    fun readPip(jpeg: ByteArray): PipAlignment? {
+        val fff = collectFff(jpeg)
+        if (fff.size < 0x20 || !fff.startsWith("FFF\u0000")) return null
+        val rec = record(fff, PIP) ?: return null
+        if (rec.size < 16) return null
+        val le = ByteBuffer.wrap(rec).order(ByteOrder.LITTLE_ENDIAN)
+        val real2Ir = le.getFloat(0).toDouble()
+        val x1 = le.getShort(8).toInt() and 0xFFFF
+        val x2 = le.getShort(10).toInt() and 0xFFFF
+        val y1 = le.getShort(12).toInt() and 0xFFFF
+        val y2 = le.getShort(14).toInt() and 0xFFFF
+        val pip = PipAlignment(
+            real2Ir = real2Ir,
+            offsetX = le.getShort(4).toInt(),
+            offsetY = le.getShort(6).toInt(),
+            width = x2 - x1 + 1,
+            height = y2 - y1 + 1,
+        )
+        val sane = real2Ir in 0.2..5.0 && pip.width in 16..8192 && pip.height in 16..8192 &&
+            kotlin.math.abs(pip.offsetX) < pip.width && kotlin.math.abs(pip.offsetY) < pip.height
+        return if (sane) pip else null
     }
 
     /**
@@ -156,7 +207,7 @@ object FffReader {
         return out.toByteArray()
     }
 
-    private fun cameraInfo(fff: ByteArray): ByteArray? {
+    private fun record(fff: ByteArray, type: Int): ByteArray? {
         for (order in listOf(ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN)) {
             val buf = ByteBuffer.wrap(fff).order(order)
             val indexOff = buf.getInt(0x18)
@@ -167,7 +218,7 @@ object FffReader {
                 val main = buf.getShort(at).toInt() and 0xFFFF
                 val off = buf.getInt(at + 12)
                 val len = buf.getInt(at + 16)
-                if (main == CAMERA_INFO && len > 0 && off >= 0 && off + len <= fff.size) {
+                if (main == type && len > 0 && off >= 0 && off + len <= fff.size) {
                     return fff.copyOfRange(off, off + len)
                 }
             }
@@ -186,4 +237,5 @@ object FffReader {
         prefix.indices.all { at + it < data.size && data[at + it] == prefix[it].code.toByte() }
 
     private const val CAMERA_INFO = 0x20
+    private const val PIP = 0x2A
 }

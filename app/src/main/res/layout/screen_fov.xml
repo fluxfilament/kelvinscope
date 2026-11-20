@@ -94,12 +94,13 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/fovResThermal"
                 style="@style/Ff.Mono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:letterSpacing="0.04"
-                android:text="@string/fov_res_thermal"
+                android:text="@string/fov_res_thermal_none"
                 android:textColor="@color/ff_muted"
                 android:textSize="10sp" />
         </LinearLayout>
@@ -131,12 +132,13 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/fovResVisible"
                 style="@style/Ff.Mono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:letterSpacing="0.04"
-                android:text="@string/fov_res_visible"
+                android:text="@string/fov_res_visible_none"
                 android:textColor="@color/ff_muted"
                 android:textSize="10sp" />
         </LinearLayout>
