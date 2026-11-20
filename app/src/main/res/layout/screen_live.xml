@@ -168,6 +168,14 @@
         android:paddingEnd="16dp"
         android:paddingBottom="8dp">
 
+        <!-- One tap between palettes, each shown as itself rather than by name. -->
+        <LinearLayout
+            android:id="@+id/paletteStrip"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal" />
+
         <com.fluxfilament.thermalcam.ScaleBarView
             android:id="@+id/scaleBar"
             android:layout_width="match_parent"

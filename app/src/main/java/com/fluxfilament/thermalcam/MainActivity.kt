@@ -225,6 +225,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var spotLogSummary: TextView
     private lateinit var isothermSummary: TextView
     private lateinit var themeOptions: LinearLayout
+    private lateinit var paletteStrip: LinearLayout
 
     /** The isotherm threshold in degrees, or null when off. */
     private var isothermC: Int? = null
@@ -486,6 +487,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         setUpRange()
         setUpOverlayControls()
         buildPaletteOptions()
+        buildPaletteStrip()
         buildRotationOptions()
         buildThemeOptions()
         buildPresetRows()
@@ -570,6 +572,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         spotLogSummary = findViewById(R.id.spotLogSummary)
         isothermSummary = findViewById(R.id.isothermSummary)
         themeOptions = findViewById(R.id.themeOptions)
+        paletteStrip = findViewById(R.id.paletteStrip)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -1321,10 +1324,36 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
+    /** The strip of palettes over the scale bar on the live screen. */
+    private fun buildPaletteStrip() {
+        paletteStrip.removeAllViews()
+        Palette.entries.forEachIndexed { index, palette ->
+            val selected = renderer.palette == palette
+            val chip = FrameLayout(this).apply {
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                setPadding(dp(4), dp(4), dp(4), dp(4))
+                contentDescription = getString(R.string.palette_chip_description, palette.label)
+                isClickable = true
+                setOnClickListener { pickPalette(palette) }
+                addView(
+                    View(context).apply { background = paletteStrip(palette) },
+                    FrameLayout.LayoutParams(MATCH, MATCH),
+                )
+            }
+            paletteStrip.addView(
+                chip,
+                LinearLayout.LayoutParams(0, MATCH, 1f).apply {
+                    if (index > 0) marginStart = dp(6)
+                },
+            )
+        }
+    }
+
     private fun pickPalette(palette: Palette) {
         renderer.palette = palette
         prefs.edit().putString(PREF_PALETTE, palette.name).apply()
         buildPaletteOptions()
+        buildPaletteStrip()
         refreshLegend()
     }
 
