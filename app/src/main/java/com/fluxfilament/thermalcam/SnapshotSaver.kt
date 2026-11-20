@@ -71,6 +71,75 @@ object SnapshotSaver {
         save(context, bitmap, name, RAW)
 
     /**
+     * Any other file - the counts of a snapshot, a spot log - written as is. Images go
+     * beside the pictures; anything MediaStore will not take as an image goes to
+     * Downloads/Kelvinscope, which accepts every type.
+     */
+    fun saveBytes(context: Context, bytes: ByteArray, name: String, mime: String, subfolder: String? = null): Result {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val base = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+                ?: throw IllegalStateException("no external storage available")
+            val dir = if (subfolder == null) base else File(base, subfolder)
+            dir.mkdirs()
+            val file = File(dir, name)
+            file.writeBytes(bytes)
+            return Result(file.absolutePath)
+        }
+        val album = if (subfolder == null) ALBUM else "$ALBUM/$subfolder"
+        val targets = buildList {
+            if (mime.startsWith("image/")) {
+                add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI to "${Environment.DIRECTORY_PICTURES}/$album")
+            }
+            add(MediaStore.Downloads.EXTERNAL_CONTENT_URI to "${Environment.DIRECTORY_DOWNLOADS}/$album")
+        }
+        var last: Exception? = null
+        for ((collection, relative) in targets) {
+            try {
+                writeEntry(context, collection, relative, name, mime, bytes)
+                return Result("$relative/$name")
+            } catch (e: Exception) {
+                last = e
+            }
+        }
+        throw last ?: IllegalStateException("nowhere to save")
+    }
+
+    private fun writeEntry(
+        context: Context,
+        collection: android.net.Uri,
+        relative: String,
+        name: String,
+        mime: String,
+        bytes: ByteArray,
+    ) {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, mime)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, relative)
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val resolver = context.contentResolver
+        val uri = resolver.insert(collection, values)
+            ?: throw IllegalStateException("MediaStore refused to create an entry")
+        try {
+            resolver.openOutputStream(uri).use { out ->
+                checkNotNull(out) { "MediaStore returned no output stream" }
+                out.write(bytes)
+            }
+        } catch (e: Exception) {
+            resolver.delete(uri, null, null)
+            throw e
+        }
+        values.clear()
+        values.put(MediaStore.MediaColumns.IS_PENDING, 0)
+        resolver.update(uri, values, null, null)
+    }
+
+    /** The counts behind a snapshot, under the same name as its pictures. */
+    fun saveCounts(context: Context, bytes: ByteArray, pngName: String): Result =
+        saveBytes(context, bytes, pngName.removeSuffix(".png") + "." + RawCounts.EXTENSION, RawCounts.MIME, RAW)
+
+    /**
      * Android 10+: MediaStore takes the file into shared storage with no storage
      * permission at all. IS_PENDING hides the entry until the bytes are written, so
      * a gallery scanning at the wrong moment never sees a half-file.

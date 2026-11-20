@@ -223,4 +223,10 @@
     <string name="empty_no_permission">Камера подключена, но у приложения нет к ней доступа. Нажмите сюда и разрешите доступ к USB.</string>
     <string name="empty_waiting">Камера подключена, ждём изображение. Если за полминуты ничего не появится, выньте камеру и вставьте снова.</string>
     <string name="empty_stopped">Камера перестала присылать кадры. Выньте её и вставьте снова; подробности — в Настройки → Журнал.</string>
+    <string name="row_spot_log">Журнал температуры</string>
+    <string name="spot_log_off">Выкл. Нажмите, чтобы раз в секунду записывать все точки, Max и Min в файл CSV.</string>
+    <string name="spot_log_on">Запись · строк: %1$d. Нажмите, чтобы остановить и сохранить.</string>
+    <string name="spot_log_started">Идёт запись температуры точек. Остановите её в настройках, чтобы сохранить файл.</string>
+    <string name="spot_log_saved">Журнал сохранён · %1$s</string>
+    <string name="spot_log_empty">Ничего не записано: кадров не было.</string>
 </resources>

@@ -226,4 +226,10 @@
     <string name="empty_no_permission">The camera is plugged in, but the app has no access to it. Tap here and allow USB access.</string>
     <string name="empty_waiting">Camera connected, waiting for the picture. If nothing shows within half a minute, unplug the camera and plug it back in.</string>
     <string name="empty_stopped">The camera stopped sending pictures. Unplug it and plug it back in; the details are in Settings → Log.</string>
+    <string name="row_spot_log">Temperature log</string>
+    <string name="spot_log_off">Off. Tap to record every spot, Max and Min once a second to a CSV file.</string>
+    <string name="spot_log_on">Recording · %1$d rows. Tap to stop and save.</string>
+    <string name="spot_log_started">Recording spot temperatures. Stop it in Settings to save the file.</string>
+    <string name="spot_log_saved">Log saved · %1$s</string>
+    <string name="spot_log_empty">Nothing recorded: no frames came in.</string>
 </resources>

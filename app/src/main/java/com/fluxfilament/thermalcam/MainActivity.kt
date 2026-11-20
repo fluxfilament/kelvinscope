@@ -50,6 +50,7 @@ import android.widget.Space
 import android.widget.TextView
 import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
@@ -211,6 +212,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var rotationOptions: LinearLayout
     private lateinit var emissivitySummary: TextView
     private lateinit var extremesSummary: TextView
+    private lateinit var spotLogSummary: TextView
+
+    /** The temperature log being recorded, or null. Fed on the camera thread. */
+    @Volatile
+    private var spotLog: SpotLog? = null
+    private var spotLogStartedAt: Date? = null
 
     /** Max/Min markers on the live picture. Read on the camera thread. */
     @Volatile
@@ -513,6 +520,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         rotationOptions = findViewById(R.id.rotationOptions)
         emissivitySummary = findViewById(R.id.emissivitySummary)
         extremesSummary = findViewById(R.id.extremesSummary)
+        spotLogSummary = findViewById(R.id.spotLogSummary)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -634,6 +642,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         findViewById<View>(R.id.rowEmissivity).setOnClickListener { go(Screen.EMISSIVITY) }
         showExtremes = prefs.getBoolean(PREF_EXTREMES, false)
         refreshExtremesSummary()
+        refreshSpotLogSummary()
+        findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowExtremes).setOnClickListener {
             showExtremes = !showExtremes
             prefs.edit().putBoolean(PREF_EXTREMES, showExtremes).apply()
@@ -1511,6 +1521,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     }
 
     override fun onDestroy() {
+        // A log still recording is saved rather than lost with the activity.
+        if (spotLog != null) toggleSpotLog()
         super.onDestroy()
         camera.stop()
         unregisterReceiver(usbReceiver)
@@ -1608,6 +1620,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             runOnUiThread { refreshTopBar() }
         }
         val labels = spotLabels(frame)
+        feedSpotLog(frame)
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
         if (repaintPending.compareAndSet(false, true)) {
@@ -1650,6 +1663,59 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             refreshTopBar()
             refreshStats()
         }
+    }
+
+    private fun refreshSpotLogSummary() {
+        val log = spotLog
+        spotLogSummary.text = if (log == null) getString(R.string.spot_log_off)
+        else getString(R.string.spot_log_on, log.rows)
+    }
+
+    private fun toggleSpotLog() {
+        val log = spotLog
+        if (log == null) {
+            val now = Date()
+            spotLogStartedAt = now
+            spotLog = SpotLog(now.time)
+            toast(getString(R.string.spot_log_started))
+            refreshSpotLogSummary()
+            return
+        }
+        spotLog = null
+        refreshSpotLogSummary()
+        if (log.rows == 0) {
+            toast(getString(R.string.spot_log_empty))
+            return
+        }
+        val name = "spots-" + SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
+            .format(spotLogStartedAt ?: Date()) + ".csv"
+        val bytes = log.csv().toByteArray(Charsets.UTF_8)
+        thread(name = "flir-save-log") {
+            val message = try {
+                getString(R.string.spot_log_saved, SnapshotSaver.saveBytes(this, bytes, name, "text/csv").displayPath)
+            } catch (e: Exception) {
+                Log.e(TAG, "spot log save failed", e)
+                getString(R.string.save_failed, e.message ?: e.javaClass.simpleName)
+            }
+            runOnUiThread {
+                toast(message)
+                onLog(message)
+            }
+        }
+    }
+
+    /** One row of the temperature log, if one is due. Camera thread. */
+    private fun feedSpotLog(frame: ThermalFrame) {
+        val log = spotLog ?: return
+        val calibration = planck
+        val spots = spotMeter.positions().map { calibration.rawToCelsius(frame.rawAt(it.u, it.v)) }
+        val e = Extremes.of(frame)
+        val added = log.offer(
+            System.currentTimeMillis(), spots,
+            calibration.rawToCelsius(e.hotRaw), calibration.rawToCelsius(e.coldRaw),
+            calibration.emissivity,
+        )
+        if (added && screen == Screen.SETTINGS) runOnUiThread { refreshSpotLogSummary() }
     }
 
     private fun refreshExtremesSummary() {
@@ -1734,11 +1800,22 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // measured from later, and a visible-light mix is a picture, not a measurement.
         // The card already carries the mix, at a size worth looking at.
         val original = ViewTransform.orient(thermal, viewRotation, mirrored)
+        // The measurement itself, in sensor orientation, with how to read it.
+        val counts = RawCounts.encode(
+            frame.width, frame.height, frame.raw.copyOf(), planck,
+            mapOf(
+                "taken_at" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(takenAt),
+                "rotation" to viewRotation.toString(),
+                "mirrored" to mirrored.toString(),
+                "lepton" to (geometry?.versionLepton ?: ""),
+            ),
+        )
 
         thread(name = "flir-save") {
             val message = try {
                 val saved = SnapshotSaver.save(this, card, name)
                 SnapshotSaver.saveRaw(this, original, name)
+                SnapshotSaver.saveCounts(this, counts, name)
                 getString(R.string.saved_to, saved.displayPath)
             } catch (e: Exception) {
                 Log.e(TAG, "snapshot save failed", e)
