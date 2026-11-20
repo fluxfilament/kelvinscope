@@ -273,4 +273,25 @@
     <string name="row_export_csv">Export a snapshot to CSV</string>
     <string name="export_csv_note">Pick a .pgm: its temperatures in °C, one line per row of the picture, go to Download/Kelvinscope for a spreadsheet.</string>
     <string name="csv_saved">Table saved · %1$s</string>
+    <string name="section_materials">By material</string>
+    <string name="materials_note">Typical values; a real surface can differ by a few hundredths with its finish and dirt. Tap one to use it.</string>
+    <string name="material_skin">Human skin</string>
+    <string name="material_water">Water</string>
+    <string name="material_tape">Black electrical tape</string>
+    <string name="material_paint">Paint, any colour</string>
+    <string name="material_brick">Brick</string>
+    <string name="material_paper">Paper, cardboard</string>
+    <string name="material_concrete">Concrete</string>
+    <string name="material_glass">Glass (its surface; it is opaque to the camera)</string>
+    <string name="material_plastic">Plastic, PVC, rubber</string>
+    <string name="material_plaster">Plaster, drywall</string>
+    <string name="material_pcb">Circuit board with solder mask</string>
+    <string name="material_wood">Wood</string>
+    <string name="material_steel_oxidised">Steel, oxidised</string>
+    <string name="material_copper_oxidised">Copper, oxidised</string>
+    <string name="material_aluminium_anodised">Aluminium, anodised</string>
+    <string name="section_reflected">Reflected temperature</string>
+    <string name="reflected_value">%1$s °C</string>
+    <string name="reflected_note">What the surface sees and mirrors back. Indoors leave it at the room temperature, 22 °C by default. Outdoors under open sky it is much colder, often below zero. The lower ε is, the more it matters.</string>
+    <string name="card_reflected">refl. %1$s °C</string>
 </resources>

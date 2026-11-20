@@ -108,6 +108,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
         const val PREF_DELTA = "deltaToSpot1"
+        const val PREF_REFLECTED = "reflectedC"
+
+        /** The reflected-temperature slider starts here, one step per degree. */
+        const val REFLECTED_FROM_C = -40
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_ISOTHERM_MODE = "isothermMode"
         const val PREF_ISOTHERM_2 = "isothermC2"
@@ -278,6 +282,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var emissivitySeek: SeekBar
     private lateinit var emissivityMarks: FrameLayout
     private lateinit var presetRows: LinearLayout
+    private lateinit var materialRows: LinearLayout
+    private lateinit var reflectedValue: TextView
+    private lateinit var reflectedSeek: SeekBar
     private lateinit var metalSwatch: View
 
     // field of view screen
@@ -534,6 +541,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         measureAreas.setCount(prefs.getInt(PREF_AREAS, 0))
         buildAreaOptions()
         buildPresetRows()
+        buildMaterialRows()
+        setUpReflected()
         metalSwatch.background = metalSwatchDrawable()
 
         updateBlendTool()
@@ -633,6 +642,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         emissivitySeek = findViewById(R.id.emissivitySeek)
         emissivityMarks = findViewById(R.id.emissivityMarks)
         presetRows = findViewById(R.id.presetRows)
+        materialRows = findViewById(R.id.materialRows)
+        reflectedValue = findViewById(R.id.reflectedValue)
+        reflectedSeek = findViewById(R.id.reflectedSeek)
         metalSwatch = findViewById(R.id.metalSwatch)
 
         screenFov = findViewById(R.id.screenFov)
@@ -1332,6 +1344,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private fun refreshEmissivityScreen() {
         val eps = planck.emissivity
         emissivityBig.text = getString(R.string.emissivity_big, dec(eps, 2))
+        if (::materialRows.isInitialized) buildMaterialRows()
         val nearest = nearestPreset(eps)
         emissivitySurface.text = if (nearest != null) {
             getString(R.string.emissivity_surface, getString(nearest.nameRes))
@@ -1416,6 +1429,62 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             LinearLayout.LayoutParams(WRAP, WRAP).apply { marginStart = dp(12) },
         )
         return row
+    }
+
+    private fun buildMaterialRows() {
+        materialRows.removeAllViews()
+        for (material in Materials.ALL) {
+            val selected = abs(material.emissivity - planck.emissivity) < 0.005
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                minimumHeight = dp(44)
+                background = rippleBackground()
+                isClickable = true
+                setOnClickListener { pickEmissivity(material.emissivity) }
+            }
+            row.addView(
+                TextView(this, null, 0, R.style.Ff_RowTitle).apply {
+                    setText(material.nameRes)
+                    textSize = 14.5f
+                },
+                LinearLayout.LayoutParams(0, WRAP, 1f),
+            )
+            row.addView(
+                TextView(this, null, 0, R.style.Ff_Mono).apply {
+                    text = dec(material.emissivity, 2)
+                    textSize = 14f
+                    if (selected) setTextColor(getColor(R.color.ff_accent))
+                },
+            )
+            materialRows.addView(row)
+        }
+    }
+
+    /**
+     * The reflected temperature: what the surface sees and mirrors back. Indoors that
+     * is the room, which the 22 °C default stands for; outdoors facing the sky it can
+     * be tens of degrees colder. It matters more the lower ε is.
+     */
+    private fun setUpReflected() {
+        val saved = prefs.getInt(PREF_REFLECTED, Materials.DEFAULT_REFLECTED_C)
+        planck = planck.copy(reflectedTemperature = saved + 273.15)
+        reflectedSeek.progress = saved - REFLECTED_FROM_C
+        updateReflectedLabel()
+        reflectedSeek.setOnSeekBarChangeListener(seekListener({ p ->
+            planck = planck.copy(reflectedTemperature = (REFLECTED_FROM_C + p) + 273.15)
+            updateReflectedLabel()
+            applyRange()
+            refreshLegend()
+        }, {
+            prefs.edit().putInt(PREF_REFLECTED, reflectedC()).apply()
+        }))
+    }
+
+    private fun reflectedC(): Int = (planck.reflectedTemperature - 273.15).roundToInt()
+
+    private fun updateReflectedLabel() {
+        reflectedValue.text = getString(R.string.reflected_value, reflectedC().toString())
     }
 
     private fun pickEmissivity(value: Double) {

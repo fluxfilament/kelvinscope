@@ -272,4 +272,25 @@
     <string name="row_export_csv">Exportar uma captura para CSV</string>
     <string name="export_csv_note">Escolha um .pgm: as temperaturas em °C, uma linha por fileira da imagem, vão para Download/Kelvinscope para uma planilha.</string>
     <string name="csv_saved">Tabela salva · %1$s</string>
+    <string name="section_materials">Por material</string>
+    <string name="materials_note">Valores típicos; uma superfície real pode variar alguns centésimos conforme o acabamento e a sujeira. Toque para usar.</string>
+    <string name="material_skin">Pele humana</string>
+    <string name="material_water">Água</string>
+    <string name="material_tape">Fita isolante preta</string>
+    <string name="material_paint">Tinta, qualquer cor</string>
+    <string name="material_brick">Tijolo</string>
+    <string name="material_paper">Papel, papelão</string>
+    <string name="material_concrete">Concreto</string>
+    <string name="material_glass">Vidro (a superfície; a câmera não vê através dele)</string>
+    <string name="material_plastic">Plástico, PVC, borracha</string>
+    <string name="material_plaster">Reboco, drywall</string>
+    <string name="material_pcb">Placa de circuito com máscara</string>
+    <string name="material_wood">Madeira</string>
+    <string name="material_steel_oxidised">Aço oxidado</string>
+    <string name="material_copper_oxidised">Cobre oxidado</string>
+    <string name="material_aluminium_anodised">Alumínio anodizado</string>
+    <string name="section_reflected">Temperatura refletida</string>
+    <string name="reflected_value">%1$s °C</string>
+    <string name="reflected_note">O que a superfície vê e reflete. Em ambientes internos deixe a temperatura do cômodo, 22 °C por padrão. Ao ar livre sob céu aberto ela é muito mais fria, muitas vezes abaixo de zero. Quanto menor o ε, mais ela influi.</string>
+    <string name="card_reflected">refl. %1$s °C</string>
 </resources>

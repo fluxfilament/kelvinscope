@@ -271,4 +271,25 @@
     <string name="row_export_csv">Aufnahme als CSV exportieren</string>
     <string name="export_csv_note">Eine .pgm wählen: ihre Temperaturen in °C, eine Zeile pro Bildzeile, landen für eine Tabelle in Download/Kelvinscope.</string>
     <string name="csv_saved">Tabelle gespeichert · %1$s</string>
+    <string name="section_materials">Nach Material</string>
+    <string name="materials_note">Typische Werte; eine echte Oberfläche kann je nach Beschaffenheit und Schmutz um einige Hundertstel abweichen. Zum Übernehmen tippen.</string>
+    <string name="material_skin">Menschliche Haut</string>
+    <string name="material_water">Wasser</string>
+    <string name="material_tape">Schwarzes Isolierband</string>
+    <string name="material_paint">Farbe, beliebiger Farbton</string>
+    <string name="material_brick">Ziegel</string>
+    <string name="material_paper">Papier, Karton</string>
+    <string name="material_concrete">Beton</string>
+    <string name="material_glass">Glas (nur die Oberfläche; die Kamera sieht nicht hindurch)</string>
+    <string name="material_plastic">Kunststoff, PVC, Gummi</string>
+    <string name="material_plaster">Putz, Gipskarton</string>
+    <string name="material_pcb">Leiterplatte mit Lötstopplack</string>
+    <string name="material_wood">Holz</string>
+    <string name="material_steel_oxidised">Stahl, oxidiert</string>
+    <string name="material_copper_oxidised">Kupfer, oxidiert</string>
+    <string name="material_aluminium_anodised">Aluminium, eloxiert</string>
+    <string name="section_reflected">Reflektierte Temperatur</string>
+    <string name="reflected_value">%1$s °C</string>
+    <string name="reflected_note">Was die Oberfläche sieht und zurückspiegelt. Drinnen die Raumtemperatur lassen, standardmäßig 22 °C. Draußen unter freiem Himmel ist sie viel kälter, oft unter null. Je kleiner ε, desto stärker wirkt sie.</string>
+    <string name="card_reflected">refl. %1$s °C</string>
 </resources>

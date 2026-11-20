@@ -338,6 +338,11 @@ object SnapshotCard {
             scene.blend.isVisibleOnly -> context.getString(R.string.card_blend_visible)
             else -> context.getString(R.string.card_blend_mix, scene.blend.visiblePercent)
         }
+        // Only when moved off the room default: it is part of what the numbers mean.
+        val reflectedC = (scene.planck.reflectedTemperature - 273.15).roundToInt()
+        if (reflectedC != Materials.DEFAULT_REFLECTED_C) {
+            tokens += context.getString(R.string.card_reflected, reflectedC.toString())
+        }
         if (!scene.planck.correction.isIdentity) {
             tokens += context.getString(R.string.card_correction, scene.planck.correction.label(locale))
         }

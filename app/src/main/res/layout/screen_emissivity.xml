@@ -162,6 +162,55 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:paddingBottom="8dp"
+                android:text="@string/section_materials" />
+
+            <TextView
+                style="@style/Ff.RowSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/materials_note" />
+
+            <LinearLayout
+                android:id="@+id/materialRows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                style="@style/Ff.Eyebrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:paddingBottom="8dp"
+                android:text="@string/section_reflected" />
+
+            <TextView
+                android:id="@+id/reflectedValue"
+                style="@style/Ff.RowTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <SeekBar
+                android:id="@+id/reflectedSeek"
+                style="@style/Ff.Seek"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:contentDescription="@string/section_reflected"
+                android:max="100" />
+
+            <TextView
+                style="@style/Ff.Note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reflected_note" />
+
+            <TextView
+                style="@style/Ff.Eyebrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:paddingBottom="8dp"
                 android:text="@string/section_why" />
 
             <View

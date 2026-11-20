@@ -272,4 +272,25 @@
     <string name="row_export_csv">Exporter une capture en CSV</string>
     <string name="export_csv_note">Choisissez un .pgm : ses températures en °C, une ligne par rangée de l\'image, sont enregistrées dans Download/Kelvinscope pour un tableur.</string>
     <string name="csv_saved">Tableau enregistré · %1$s</string>
+    <string name="section_materials">Par matériau</string>
+    <string name="materials_note">Valeurs typiques ; une surface réelle peut s\'en écarter de quelques centièmes selon sa finition et sa saleté. Touchez pour l\'utiliser.</string>
+    <string name="material_skin">Peau humaine</string>
+    <string name="material_water">Eau</string>
+    <string name="material_tape">Ruban isolant noir</string>
+    <string name="material_paint">Peinture, toute couleur</string>
+    <string name="material_brick">Brique</string>
+    <string name="material_paper">Papier, carton</string>
+    <string name="material_concrete">Béton</string>
+    <string name="material_glass">Verre (sa surface ; la caméra ne voit pas à travers)</string>
+    <string name="material_plastic">Plastique, PVC, caoutchouc</string>
+    <string name="material_plaster">Plâtre, placo</string>
+    <string name="material_pcb">Circuit imprimé avec vernis</string>
+    <string name="material_wood">Bois</string>
+    <string name="material_steel_oxidised">Acier oxydé</string>
+    <string name="material_copper_oxidised">Cuivre oxydé</string>
+    <string name="material_aluminium_anodised">Aluminium anodisé</string>
+    <string name="section_reflected">Température réfléchie</string>
+    <string name="reflected_value">%1$s °C</string>
+    <string name="reflected_note">Ce que la surface voit et renvoie. En intérieur, laissez la température de la pièce, 22 °C par défaut. Dehors sous un ciel dégagé, elle est bien plus froide, souvent sous zéro. Plus ε est faible, plus elle compte.</string>
+    <string name="card_reflected">réfl. %1$s °C</string>
 </resources>
