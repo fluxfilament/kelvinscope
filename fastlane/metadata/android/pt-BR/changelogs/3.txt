@@ -1,0 +1,1 @@
+Sobreposição: controle Mix para a proporção da camada visível; Align também na tela de campo de visão.

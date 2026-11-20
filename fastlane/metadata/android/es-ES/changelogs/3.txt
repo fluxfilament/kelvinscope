@@ -1,0 +1,1 @@
+Superposición: control Mix para la proporción de la capa visible; Align también en la pantalla de campo de visión.

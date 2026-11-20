@@ -1,0 +1,1 @@
+Überlagerung: Mix-Schieber für den Anteil des sichtbaren Bildes; Align auch auf dem Sichtfeld-Bildschirm.

@@ -31,7 +31,9 @@ camera the app works with.
 - **Calibration.** Import your camera's own constants from a JPEG saved
   by the official app, then correct readings against melting ice,
   boiling water or a contact thermometer.
-- Palettes: grayscale and iron. Interface in English and Russian.
+- Palettes: grayscale, iron, rainbow, arctic and lava. Interface in English,
+  Russian, German, Spanish, French and Portuguese (the last four
+  machine-assisted and not yet reviewed by native speakers; corrections welcome).
 - **No permissions and no network.** Snapshots go through the system
   media store, and a JPEG for calibration is opened through the system
   file picker, one file at a time. Settings are left out of the cloud

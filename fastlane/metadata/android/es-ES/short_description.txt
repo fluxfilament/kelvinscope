@@ -1,0 +1,1 @@
+App térmica para FLIR ONE (USB-C), de código abierto, sin el SDK de FLIR

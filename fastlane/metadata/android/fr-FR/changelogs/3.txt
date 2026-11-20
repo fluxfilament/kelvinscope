@@ -1,0 +1,1 @@
+Superposition : curseur Mix pour la part du calque visible ; Align aussi sur l’écran du champ de vision.

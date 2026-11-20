@@ -1,0 +1,1 @@
+Umbenannt in Kelvinscope. Installiert sich über 0.1.0 und behält Einstellungen und Kalibrierung.

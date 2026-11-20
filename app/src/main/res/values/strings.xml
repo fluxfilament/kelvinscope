@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     English: the default for every locale without its own translation. Russian, the
-    language the interface was designed in, lives in values-ru/. A string added here
-    needs its Russian counterpart there too.
+    language the interface was designed in, lives in values-ru/; German, Spanish,
+    French and Portuguese in values-de/, -es/, -fr/ and -pt/. A string added here
+    needs its counterpart in each of them, or Lint fails the build.
 -->
 <resources>
     <!-- Which language numbers and dates are formatted for: the one these strings are in. -->

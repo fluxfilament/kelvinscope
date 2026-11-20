@@ -2,11 +2,12 @@
 <p><b>Not affiliated with or endorsed by Teledyne FLIR.</b> FLIR and FLIR ONE are trademarks of Teledyne FLIR, used here only to say which camera the app works with.</p>
 <ul>
 <li>Live view at the sensor's own resolution (80×60 on the gen 3, 160×120 on the Pro).</li>
-<li>Temperatures in °C: up to nine spot meters you drag with a finger, emissivity from 0.10 to 1.00.</li>
-<li>Automatic or fixed temperature range, with a scale bar under the picture.</li>
-<li>Visible-light overlay from the camera's second lens, at any share, with field-of-view and alignment adjustment.</li>
-<li>Snapshots saved as a card with the picture, spots, scale and settings on it, plus the bare sensor picture.</li>
-<li>Calibration: import your camera's own constants from a JPEG saved by the official app, then correct readings against melting ice, boiling water or a contact thermometer.</li>
+<li>Temperatures in °C: up to nine spot meters, measurement areas with Max/Min/average, Max/Min markers, isotherm.</li>
+<li>Automatic or fixed temperature range with a scale bar under the picture, five palettes.</li>
+<li>Visible-light overlay from the camera's second lens, with field-of-view and alignment adjustment.</li>
+<li>Snapshots saved as a card with the picture, spots, scale and settings on it, plus the 16-bit counts to measure them again later.</li>
+<li>Temperature log to CSV; calibration against melting ice, boiling water or a contact thermometer.</li>
+<li>Interface in English, German, Spanish, French, Portuguese and Russian.</li>
 <li>No permissions and no network.</li>
 </ul>
 <p>Tested on a FLIR ONE gen 3 and reported working on a FLIR ONE Pro. iPhone and Lightning models are not supported.</p>

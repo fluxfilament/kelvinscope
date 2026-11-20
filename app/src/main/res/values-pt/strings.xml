@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Brazilian Portuguese. Machine-assisted translation of values/strings.xml; a native
+    speaker has not reviewed it yet. A string added in values/ needs one here too.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Which language numbers and dates are formatted for: the one these strings are in. -->
+    <string name="number_locale" translatable="false" tools:ignore="Untranslatable">pt</string>
+    <string name="app_name">Kelvinscope</string>
+    <string name="thermal_view_description">Imagem térmica ao vivo</string>
+
+    <!-- live screen -->
+    <string name="state_live">[AO VIVO]</string>
+    <string name="state_calibrating">[CALIBRANDO]</string>
+    <string name="state_no_camera">[SEM CÂMERA]</string>
+    <string name="state_waiting">[AGUARDANDO]</string>
+    <string name="geometry">%1$d×%2$d · LEPTON %3$s</string>
+    <string name="geometry_short">%1$d×%2$d</string>
+    <string name="geometry_unknown">SEM RESOLUÇÃO</string>
+    <string name="align_label">Align %1$s</string>
+    <string name="align_description">Alinhamento das camadas pela distância</string>
+    <string name="mix_label">Mix %1$d %%</string>
+    <string name="mix_description">Proporção da camada visível</string>
+    <string name="scale_min">MÍN</string>
+    <string name="scale_max">MÁX</string>
+    <string name="scale_low_description">Extremo inferior da escala</string>
+    <string name="scale_high_description">Extremo superior da escala</string>
+    <string name="lock_locked_description">Escala fixa. Toque para voltar ao automático</string>
+    <string name="lock_auto_description">A escala acompanha a cena. Toque para fixá-la</string>
+    <string name="emissivity_chip">ε %1$s</string>
+    <string name="degrees_short">%1$s°</string>
+    <string name="settings_description">Configurações</string>
+    <string name="blend_description">Modo de mistura com luz visível</string>
+    <string name="mirror_description">Espelhar imagem</string>
+    <string name="mirror_label">ESPELHO</string>
+    <string name="shutter_description">Salvar captura</string>
+    <string name="spot_minus_description">Remover um ponto de medição</string>
+    <string name="spot_plus_description">Adicionar um ponto de medição</string>
+
+    <!-- blend modes, as they appear under the tool icon -->
+    <string name="blend_thermal">IR</string>
+    <string name="blend_mix">IR %1$d</string>
+    <string name="blend_visible">VIS</string>
+
+    <!-- scale sheet -->
+    <string name="sheet_low">Extremo inferior</string>
+    <string name="sheet_high">Extremo superior</string>
+    <string name="sheet_celsius">%1$d °C</string>
+    <string name="sheet_other_low">mín. %1$d °C</string>
+    <string name="sheet_other_high">máx. %1$d °C</string>
+    <string name="sheet_fixed">[FIXA]</string>
+    <string name="sheet_will_fix">Ao mover, a escala fica fixa</string>
+    <string name="sheet_done">Concluído</string>
+    <string name="close">Fechar</string>
+    <string name="back">Voltar</string>
+
+    <!-- settings -->
+    <string name="settings_title">Configurações</string>
+    <string name="section_image">Imagem</string>
+    <string name="field_palette">Paleta</string>
+    <string name="field_rotation">Rotação da imagem</string>
+    <string name="rotation_option">%1$d°</string>
+    <string name="section_measurement">Medição</string>
+    <string name="row_emissivity">Emissividade</string>
+    <string name="emissivity_summary">ε %1$s · %2$s</string>
+    <string name="emissivity_custom">valor próprio</string>
+    <string name="section_alignment">Alinhamento das câmeras</string>
+    <string name="row_fov">Campo de visão (FOV)</string>
+    <string name="fov_summary">%1$s · padrão 0,77</string>
+    <string name="align_note">O deslocamento das camadas pela distância (Align) é ajustado ao lado do campo de visão, e na tela principal enquanto a sobreposição estiver ligada.</string>
+    <string name="section_calibration">Calibração</string>
+    <string name="row_calibration">Calibração</string>
+    <string name="stamp_wip">[EM ANDAMENTO]</string>
+    <string name="section_diagnostics">Diagnóstico</string>
+    <string name="row_log">Registro</string>
+    <string name="log_summary">%1$s fps · FFC %2$d · ressinc. %3$d</string>
+    <string name="log_summary_idle">fluxo parado</string>
+    <string name="stamp_design">[F&amp;F DESIGN]</string>
+
+    <!-- emissivity screen -->
+    <string name="emissivity_title">Emissividade</string>
+    <string name="emissivity_current">Valor atual</string>
+    <string name="emissivity_big">ε %1$s</string>
+    <string name="emissivity_surface">Superfície %1$s</string>
+    <string name="emissivity_own">Valor próprio</string>
+    <string name="section_gloss">Brilho da superfície</string>
+    <string name="preset_matte">Fosca</string>
+    <string name="preset_matte_examples">Tinta, tijolo, madeira, plástico, pele</string>
+    <string name="preset_semi_matte">Semifosca</string>
+    <string name="preset_semi_matte_examples">Brilho leve</string>
+    <string name="preset_semi_gloss">Acetinada</string>
+    <string name="preset_semi_gloss_examples">Brilho perceptível</string>
+    <string name="preset_gloss">Brilhante</string>
+    <string name="preset_gloss_examples">Brilho forte: a superfície reflete o ambiente</string>
+    <string name="stamp_default">[PADRÃO]</string>
+    <string name="preset_metal">Metal polido</string>
+    <string name="preset_metal_note">Abaixo de 0,30 a superfície reflete mais do que emite, e a correção amplifica o ruído do sensor. A leitura não é confiável.</string>
+    <string name="stamp_unreliable">[INCERTO]</string>
+    <string name="section_why">Por que importa</string>
+    <string name="why_header_eps">ε</string>
+    <string name="why_header_hot">Ponto quente</string>
+    <string name="why_note">O mesmo objeto, a mesma câmera, só o ε mudou. Quanto mais quente o objeto em relação ao ambiente, maior o erro.</string>
+    <string name="section_recommendation">Recomendação</string>
+    <string name="recommendation">Se não conhece a superfície, deixe 0,95: a maioria das superfícies do dia a dia é fosca. Em metal brilhante, cole um pedaço de fita isolante ou fita fosca e meça sobre ela.</string>
+
+    <!-- field of view screen -->
+    <string name="fov_title">Campo de visão</string>
+    <string name="fov_reset">Redefinir</string>
+    <string name="fov_value">FOV</string>
+    <string name="fov_default">padrão 0,77</string>
+    <string name="fov_note">Arraste a linha até uma borda do objeto e ajuste FOV e Align até a borda coincidir dos dois lados.</string>
+    <string name="fov_tag_thermal">IR</string>
+    <string name="fov_tag_visible">VISÍVEL</string>
+    <string name="fov_split_description">Divisor da comparação das câmeras</string>
+    <string name="fov_description">Campo de visão</string>
+
+    <!-- calibration screen -->
+    <string name="calibration_title">Calibração</string>
+    <string name="unit_celsius">°C</string>
+    <string name="consts_section">Constantes da câmera</string>
+    <string name="consts_built_in_status">Embutidas: o aparelho em que este app foi desenvolvido</string>
+    <string name="consts_imported_status">De uma captura %1$s · %2$s</string>
+    <string name="consts_values">R1 %1$s · B %2$s · F %3$s\nO %4$s · R2 %5$s\njanela %6$s a %7$s °C · ar %8$s °C</string>
+    <string name="consts_note">Cada FLIR ONE tem suas próprias constantes, e as de outro aparelho desviam as leituras em graus. Se a sua câmera não é aquela em que este app foi desenvolvido, salve qualquer imagem com o app oficial FLIR ONE e escolha-a aqui.</string>
+    <string name="consts_import">Da captura</string>
+    <string name="consts_built_in">Embutidas</string>
+    <string name="consts_msg_same">As constantes desta captura são iguais às atuais; nada mudou.</string>
+    <string name="consts_msg_applied">Constantes carregadas. A correção e as medições foram redefinidas: foram feitas com as constantes anteriores.</string>
+    <string name="consts_msg_applied_clean">Constantes carregadas.</string>
+    <string name="consts_msg_not_flir">Este arquivo não tem dados radiométricos da FLIR. É preciso um JPEG salvo pelo app oficial FLIR ONE, sem recompressão nem edição.</string>
+    <string name="consts_msg_read_failed">Não foi possível ler o arquivo: %1$s</string>
+    <string name="consts_msg_pip">Alinhamento da FLIR nesta captura: Real2IR %1$.4f · deslocamento %2$d, %3$d px em %4$d×%5$d</string>
+    <string name="calib_section_correction">Correção das leituras</string>
+    <string name="calib_none">Nenhuma</string>
+    <string name="calib_summary_none">sem correção</string>
+    <string name="calib_none_sub">As leituras são usadas como estão, a partir das constantes da câmera.</string>
+    <string name="calib_shift">%1$s °C</string>
+    <string name="calib_linear">×%1$s %2$s °C</string>
+    <string name="calib_applied_sub">%1$s · aplicada %2$s</string>
+    <string name="calib_section_measure">Medição de referência</string>
+    <string name="calib_live_note">média dentro do quadro, ε 0,96, sem correção</string>
+    <string name="calib_reference">Referência</string>
+    <string name="calib_ref_ice">Gelo\n0 °C</string>
+    <string name="calib_ref_boiling">Fervendo\n100 °C</string>
+    <string name="calib_ref_custom">Termômetro\npróprio</string>
+    <string name="calib_ref_ice_short">gelo</string>
+    <string name="calib_ref_boiling_short">água fervendo</string>
+    <string name="calib_ref_custom_short">referência própria</string>
+    <string name="calib_custom_prompt">Temperatura de um termômetro de contato</string>
+    <string name="calib_note_ice">Gelo derretendo com água, não gelo seco direto do congelador: mexa e espere alguns minutos. Mantenha todo o quadro sobre a superfície da água com gelo.</string>
+    <string name="calib_note_boiling">A água precisa estar fervendo forte. Segure a câmera de lado e fora do vapor: a condensação na lente estraga a medição. 100 °C vale ao nível do mar; cai cerca de um grau a cada ~300 m de altitude.</string>
+    <string name="calib_note_custom">Uma superfície fosca com ε em torno de 0,95–0,96 (água, fita isolante, tinta) cuja temperatura um termômetro de contato mediu no mesmo momento.</string>
+    <string name="calib_measure">Medir · 3 s</string>
+    <string name="calib_measuring">Medindo… %1$d / %2$d</string>
+    <string name="calib_no_camera">Conecte a câmera</string>
+    <string name="calib_section_points">Medições</string>
+    <string name="calib_points_empty">Nenhuma ainda. Uma medição dá um deslocamento; duas referências com pelo menos 30 °C de diferença dão deslocamento e inclinação.</string>
+    <string name="calib_point">%1$s %2$s °C → lido %3$s °C</string>
+    <string name="calib_point_sub">diferença %1$s °C · dispersão %2$s °C</string>
+    <string name="calib_remove_point">Remover medição</string>
+    <string name="calib_apply">Aplicar</string>
+    <string name="calib_reset">Redefinir</string>
+    <string name="calib_msg_restarted">A câmera fechou o obturador durante a medição; recomeçou.</string>
+    <string name="calib_msg_unsteady">Dispersão %1$s °C: a câmera ou a água se mexeu. A medição foi registrada, mas é melhor repeti-la.</string>
+    <string name="calib_msg_bad_custom">Informe a temperatura de referência.</string>
+    <string name="calib_msg_no_points">Faça uma medição primeiro.</string>
+    <string name="calib_msg_too_close">As referências estão a menos de 30 °C uma da outra, então a inclinação seria aleatória. Mantenha uma ou use referências mais distantes.</string>
+    <string name="calib_msg_too_steep">A inclinação ficou ×%1$s, fora de ±10 %%. Provavelmente uma das medições está errada.</string>
+    <string name="calib_msg_too_far">A correção moveria as leituras em %1$s °C, mais de 10 °C. Provavelmente a medição está errada: confira a referência e o ε.</string>
+    <string name="calib_msg_applied">Correção aplicada a todas as leituras.</string>
+    <string name="calib_msg_reset">Correção redefinida.</string>
+    <string name="calib_section_howto">Como funciona</string>
+    <string name="calib_howto">Isto é uma verificação caseira, não uma calibração de laboratório: uma de verdade é feita contra um corpo negro de referência. A câmera é comparada com coisas cuja temperatura se conhece sem ela: gelo derretendo, água fervendo ou um termômetro de contato.\n\nUma medição tira por três segundos a média dentro do quadro no centro da imagem, com ε 0,96 (água) e sem a correção atual. Uma referência desloca todas as leituras. Duas referências com pelo menos 30 °C de diferença, como gelo e água fervendo, dão também uma inclinação.\n\nUma correção que moveria as leituras mais de 10 °C é recusada: uma diferença tão grande quase sempre significa uma medição falha. As constantes da câmera não mudam, e a correção pode ser redefinida a qualquer momento.</string>
+    <string name="card_correction">correção %1$s</string>
+
+    <!-- log screen -->
+    <string name="log_title">Registro</string>
+    <string name="stat_frame">Quadro</string>
+    <string name="stat_lepton">Lepton</string>
+    <string name="stat_stream">Fluxo</string>
+    <string name="stat_ffc">FFC</string>
+    <string name="stat_resync">Ressinc.</string>
+    <string name="stat_scene">Cena, °C</string>
+    <string name="stat_none">—</string>
+    <string name="stat_fps">%1$s fps</string>
+    <string name="stat_scene_range">%1$s…%2$s</string>
+
+    <!-- snapshots -->
+    <!-- The blend modes as a card spells them out. The live screen can label the
+         button "IR" because a lit-up icon sits beside it and the picture is right
+         there; a card is read on its own, months later, by someone who was not
+         holding the camera. -->
+    <string name="card_blend_thermal">SÓ IR</string>
+    <string name="card_blend_mix">IR + VIS %1$d %%</string>
+    <string name="card_blend_visible">SÓ VISÍVEL</string>
+    <!-- On a card, beside the palette: the colours are pinned to a window the user
+         set, not to the scene. Without it the same colour means something different
+         in every picture. -->
+    <string name="card_range_fixed">FIXA</string>
+    <string name="saved_to">Captura salva · %1$s</string>
+    <string name="save_failed">Não foi possível salvar: %1$s</string>
+    <string name="nothing_to_save">Ainda não há imagem</string>
+
+    <!-- figures in layouts, kept here so their decimal separator follows the language -->
+    <string name="fov_res_thermal">IR %1$d×%2$d</string>
+    <string name="fov_res_visible">VIS %1$d×%2$d</string>
+    <string name="fov_res_thermal_none">IR —</string>
+    <string name="fov_res_visible_none">VIS —</string>
+    <string name="why_eps_1">0,92</string>
+    <string name="why_hot_1">36,7 °C</string>
+    <string name="why_eps_2">0,61</string>
+    <string name="why_hot_2">43,3 °C</string>
+    <string name="why_eps_3">0,27</string>
+    <string name="why_hot_3">65,9 °C</string>
+    <!-- Under the palette choice: what the selected one is good and bad at. -->
+    <string name="palette_hint_grayscale">Tons de cinza: tons sem cor. Melhor para ler temperaturas e para sessões longas; um ponto quente pequeno passa despercebido com facilidade.</string>
+    <string name="palette_hint_iron">Iron: do preto ao branco passando pelo vermelho, como metal aquecido. Pontos quentes se destacam, bom para fiação e superaquecimento; fraca na parte fria.</string>
+    <string name="palette_hint_rainbow">Rainbow: o maior número de cores por grau. Mostra pequenas diferenças e gradientes, mas desenha bordas que não existem.</string>
+    <string name="palette_hint_arctic">Arctic: a maior parte da escala em azuis. Para pontos frios, correntes de ar e pontes térmicas em casa; fraca com objetos quentes.</string>
+    <string name="palette_hint_lava">Lava: do preto ao branco passando pelos vermelhos. Áreas quentes aparecem de imediato (canos, aquecedores, fogões); pouco contraste na parte fria.</string>
+    <string name="row_extremes">Marcadores Máx/Mín</string>
+    <string name="extremes_on">Ligado: o ponto mais quente e o mais frio estão marcados na imagem. Toque para desligar.</string>
+    <string name="extremes_off">Desligado. Toque para marcar na imagem o ponto mais quente e o mais frio.</string>
+    <string name="empty_not_plugged">Nenhuma câmera encontrada. Conecte a FLIR ONE na porta USB-C e ligue-a pelo botão.</string>
+    <string name="empty_no_permission">A câmera está conectada, mas o app não tem acesso a ela. Toque aqui e permita o acesso USB.</string>
+    <string name="empty_waiting">Câmera conectada, aguardando a imagem. Se nada aparecer em meio minuto, desconecte a câmera e conecte de novo.</string>
+    <string name="empty_stopped">A câmera parou de enviar imagens. Desconecte e conecte de novo; os detalhes estão em Configurações → Registro.</string>
+    <string name="row_spot_log">Registro de temperatura</string>
+    <string name="spot_log_off">Desligado. Toque para gravar a cada segundo todos os pontos, Máx e Mín em um arquivo CSV.</string>
+    <plurals name="spot_log_on">
+        <item quantity="one">Gravando · %1$d linha. Toque para parar e salvar.</item>
+        <item quantity="many">Gravando · %1$d linhas. Toque para parar e salvar.</item>
+        <item quantity="other">Gravando · %1$d linhas. Toque para parar e salvar.</item>
+    </plurals>
+    <string name="spot_log_started">Gravando as temperaturas dos pontos. Pare em Configurações para salvar o arquivo.</string>
+    <string name="spot_log_saved">Registro salvo · %1$s</string>
+    <string name="spot_log_empty">Nada gravado: não chegaram imagens.</string>
+    <string name="row_isotherm">Isoterma</string>
+    <string name="isotherm_off">Desligada. Deslize para pintar de verde tudo acima de uma temperatura.</string>
+    <string name="isotherm_on">Tudo acima de %1$s °C fica pintado de verde.</string>
+    <string name="field_theme">Tema</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Sistema</string>
+    <string name="palette_chip_description">Paleta %1$s</string>
+    <string name="field_areas">Áreas de medição</string>
+    <string name="areas_note">Retângulos na imagem com Máx, Mín e a média dentro. Arraste um para movê-lo, ou o ponto no canto para mudar o tamanho.</string>
+    <string name="area_readings">Máx %1$s\nMéd %2$s\nMín %3$s</string>
+    <string name="areas_off">Não</string>
+    <string name="state_review">[CAPTURA]</string>
+    <string name="row_open_snapshot">Abrir uma captura</string>
+    <string name="open_snapshot_note">Escolha um .pgm em Pictures/Kelvinscope/raw para medi-lo de novo: pontos, áreas, paleta e emissividade funcionam nele. Voltar retorna à câmera.</string>
+    <string name="review_started">Captura aberta; foi salva com emissividade %1$s. Voltar retorna à câmera.</string>
+    <string name="review_failed">Não foi possível abrir a captura: %1$s</string>
+</resources>

@@ -1,0 +1,1 @@
+Renombrada a Kelvinscope. Se instala sobre la 0.1.0 y conserva ajustes y calibración.

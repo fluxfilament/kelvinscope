@@ -33,7 +33,10 @@ versions follow [Semantic Versioning](https://semver.org/).
   prints the same ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
 - A light theme, in the cream of the same palette, chosen in Settings:
   dark (still the default), light, or following the system.
-- F-Droid metadata in `fastlane/`, in English and Russian.
+- German, Spanish, French and Portuguese (Brazilian) translations, offered
+  in the system's per-app language setting as well. Machine-assisted and not
+  yet reviewed by native speakers.
+- F-Droid metadata in `fastlane/`, in all six languages.
 
 ### Changed
 - The interface is set in Golos Text, and figures in JetBrains Mono, both

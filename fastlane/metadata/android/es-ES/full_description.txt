@@ -1,0 +1,12 @@
+<p>Kelvinscope es una app de código abierto para la cámara térmica <b>FLIR ONE for Android</b> (gen 3 y Pro, USB-C). Se comunica con la cámara directamente por USB, sin el SDK de FLIR, y lee el sensor en su resolución nativa.</p>
+<p><b>No está afiliada ni respaldada por Teledyne FLIR.</b> FLIR y FLIR ONE son marcas de Teledyne FLIR y aquí solo indican con qué cámara funciona la app.</p>
+<ul>
+<li>Imagen en directo en la resolución del sensor (80×60 en gen 3, 160×120 en Pro).</li>
+<li>Temperaturas en °C: hasta nueve puntos de medida, áreas con Máx/Mín/media, marcadores Máx/Mín, isoterma.</li>
+<li>Rango de temperatura automático o fijo con escala bajo la imagen, cinco paletas.</li>
+<li>Superposición con la imagen visible de la segunda lente, con ajuste de campo de visión y alineación.</li>
+<li>Capturas guardadas como tarjeta con la imagen, los puntos, la escala y los ajustes, más los datos de 16 bits para volver a medir.</li>
+<li>Registro de temperatura en CSV, calibración con hielo, agua hirviendo o termómetro de contacto.</li>
+<li>Sin permisos y sin red.</li>
+</ul>
+<p>Probada en una FLIR ONE gen 3; los usuarios informan que también funciona en la FLIR ONE Pro. Los modelos para iPhone y Lightning no son compatibles.</p>
