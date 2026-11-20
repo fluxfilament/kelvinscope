@@ -222,4 +222,8 @@
     <string name="row_extremes">Max/Min markers</string>
     <string name="extremes_on">On: the hottest and coldest places are marked on the picture. Tap to turn off.</string>
     <string name="extremes_off">Off. Tap to mark the hottest and coldest places on the picture.</string>
+    <string name="empty_not_plugged">No camera found. Plug the FLIR ONE into the USB-C port and switch it on with its button.</string>
+    <string name="empty_no_permission">The camera is plugged in, but the app has no access to it. Tap here and allow USB access.</string>
+    <string name="empty_waiting">Camera connected, waiting for the picture. If nothing shows within half a minute, unplug the camera and plug it back in.</string>
+    <string name="empty_stopped">The camera stopped sending pictures. Unplug it and plug it back in; the details are in Settings → Log.</string>
 </resources>

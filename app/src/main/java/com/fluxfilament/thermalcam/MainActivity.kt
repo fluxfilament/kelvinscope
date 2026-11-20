@@ -176,6 +176,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var stateStamp: TextView
     private lateinit var geometryView: TextView
     private lateinit var thermalView: ThermalView
+    private lateinit var emptyHint: TextView
+
+    /** Set when the stream stopped by itself, cleared when it starts again. */
+    @Volatile
+    private var stoppedWithReason = false
     private lateinit var flashView: View
     private lateinit var mixRow: View
     private lateinit var mixLabel: TextView
@@ -384,15 +389,21 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                     val device: UsbDevice? = intent.usbDeviceExtra()
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.let { camera.start(it) }
+                        refreshTopBar()
                     } else {
                         onLog("USB permission denied by user for device: $device")
+                        refreshTopBar()
                     }
                 }
-                UsbManager.ACTION_USB_DEVICE_ATTACHED ->
+                UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
+                    stoppedWithReason = false
                     intent.usbDeviceExtra()?.let { requestPermissionOrStart(it) }
+                    refreshTopBar()
+                }
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
                     onLog("Camera detached.")
                     camera.stop()
+                    refreshTopBar()
                 }
             }
         }
@@ -470,6 +481,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         stateStamp = findViewById(R.id.stateStamp)
         geometryView = findViewById(R.id.geometryView)
         thermalView = findViewById(R.id.thermalView)
+        emptyHint = findViewById(R.id.emptyHint)
+        // In the no-access case the hint is also the way to ask again.
+        emptyHint.setOnClickListener { findFlirDevice()?.let { requestPermissionOrStart(it) } }
         flashView = findViewById(R.id.flashView)
         mixRow = findViewById(R.id.mixRow)
         mixLabel = findViewById(R.id.mixLabel)
@@ -731,6 +745,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             }
         }
         stateStamp.setText(state)
+        refreshEmptyHint()
         stateStamp.setBackgroundResource(stamp)
         stateStamp.setTextColor(getColor(colour))
 
@@ -1512,14 +1527,38 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         return ((degrees + 45) / 90 % 4) * 90
     }
 
+    /** Says why the picture is empty, or hides itself once frames come in. */
+    private fun refreshEmptyHint() {
+        val device = findFlirDevice()
+        val diagnosis = EmptyDiagnosis.of(
+            devicePresent = device != null,
+            hasPermission = device != null && usbManager.hasPermission(device),
+            running = camera.isRunning(),
+            haveGeometry = geometry != null,
+            stoppedWithReason = stoppedWithReason,
+        )
+        val text = when (diagnosis) {
+            EmptyDiagnosis.NONE -> null
+            EmptyDiagnosis.NOT_PLUGGED -> R.string.empty_not_plugged
+            EmptyDiagnosis.NO_PERMISSION -> R.string.empty_no_permission
+            EmptyDiagnosis.WAITING -> R.string.empty_waiting
+            EmptyDiagnosis.STOPPED -> R.string.empty_stopped
+        }
+        emptyHint.visibility = if (text == null) View.GONE else View.VISIBLE
+        emptyHint.isClickable = diagnosis == EmptyDiagnosis.NO_PERMISSION
+        if (text != null) emptyHint.setText(text)
+    }
+
     private fun findFlirDevice(): UsbDevice? =
         usbManager.deviceList.values.firstOrNull {
             it.vendorId == FlirProtocol.VENDOR_ID && it.productId == FlirProtocol.PRODUCT_ID
         }
 
     private fun requestPermissionOrStart(device: UsbDevice) {
+        stoppedWithReason = false
         if (usbManager.hasPermission(device)) {
             camera.start(device)
+            refreshTopBar()
             return
         }
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -1606,6 +1645,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     override fun onStopped(reason: String) {
         runOnUiThread {
+            stoppedWithReason = findFlirDevice() != null
             lastStats = null
             refreshTopBar()
             refreshStats()
