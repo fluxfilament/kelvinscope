@@ -236,7 +236,6 @@
     <string name="spot_log_saved">Registro guardado · %1$s</string>
     <string name="spot_log_empty">No se registró nada: no llegaron imágenes.</string>
     <string name="row_isotherm">Isoterma</string>
-    <string name="isotherm_off">Desactivada. Desliza para pintar de verde todo lo que supere una temperatura.</string>
     <string name="isotherm_on">Todo lo que supera %1$s °C se pinta de verde.</string>
     <string name="field_theme">Tema</string>
     <string name="theme_dark">Oscuro</string>
@@ -252,4 +251,11 @@
     <string name="open_snapshot_note">Elige un .pgm de Pictures/Kelvinscope/raw para volver a medirlo: los puntos, las áreas, la paleta y la emisividad funcionan sobre él. Atrás vuelve a la cámara.</string>
     <string name="review_started">Captura abierta; se guardó con emisividad %1$s. Atrás vuelve a la cámara.</string>
     <string name="review_failed">No se pudo abrir la captura: %1$s</string>
+    <string name="isotherm_off">Desactivada. Desliza para pintar de verde todo lo que esté por encima, por debajo o entre temperaturas.</string>
+    <string name="isotherm_on_below">Todo lo que está por debajo de %1$s °C se pinta de verde.</string>
+    <string name="isotherm_on_between">Todo lo que está entre %1$s y %2$s °C se pinta de verde.</string>
+    <string name="isotherm_mode_above">Encima</string>
+    <string name="isotherm_mode_below">Debajo</string>
+    <string name="isotherm_mode_between">Entre</string>
+    <string name="isotherm_upper_description">Extremo superior de la isoterma</string>
 </resources>

@@ -235,7 +235,6 @@
     <string name="spot_log_saved">Protokoll gespeichert · %1$s</string>
     <string name="spot_log_empty">Nichts aufgezeichnet: es kamen keine Bilder.</string>
     <string name="row_isotherm">Isotherme</string>
-    <string name="isotherm_off">Aus. Schieben, um alles über einer Temperatur grün zu färben.</string>
     <string name="isotherm_on">Alles über %1$s °C wird grün gefärbt.</string>
     <string name="field_theme">Design</string>
     <string name="theme_dark">Dunkel</string>
@@ -251,4 +250,11 @@
     <string name="open_snapshot_note">Eine .pgm aus Pictures/Kelvinscope/raw wählen, um sie erneut zu messen: Messpunkte, Bereiche, Palette und Emissionsgrad funktionieren darauf. Zurück kehrt zur Kamera zurück.</string>
     <string name="review_started">Aufnahme geöffnet; gespeichert mit Emissionsgrad %1$s. Zurück kehrt zur Kamera zurück.</string>
     <string name="review_failed">Aufnahme konnte nicht geöffnet werden: %1$s</string>
+    <string name="isotherm_off">Aus. Schieben, um alles über, unter oder zwischen Temperaturen grün zu färben.</string>
+    <string name="isotherm_on_below">Alles unter %1$s °C wird grün gefärbt.</string>
+    <string name="isotherm_on_between">Alles zwischen %1$s und %2$s °C wird grün gefärbt.</string>
+    <string name="isotherm_mode_above">Über</string>
+    <string name="isotherm_mode_below">Unter</string>
+    <string name="isotherm_mode_between">Zwischen</string>
+    <string name="isotherm_upper_description">Oberes Ende der Isotherme</string>
 </resources>

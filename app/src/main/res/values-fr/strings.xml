@@ -236,7 +236,6 @@
     <string name="spot_log_saved">Journal enregistré · %1$s</string>
     <string name="spot_log_empty">Rien d\'enregistré : aucune image n\'est arrivée.</string>
     <string name="row_isotherm">Isotherme</string>
-    <string name="isotherm_off">Désactivée. Faites glisser pour colorer en vert tout ce qui dépasse une température.</string>
     <string name="isotherm_on">Tout ce qui dépasse %1$s °C est coloré en vert.</string>
     <string name="field_theme">Thème</string>
     <string name="theme_dark">Sombre</string>
@@ -252,4 +251,11 @@
     <string name="open_snapshot_note">Choisissez un .pgm dans Pictures/Kelvinscope/raw pour le mesurer à nouveau : points, zones, palette et émissivité fonctionnent dessus. Retour revient à la caméra.</string>
     <string name="review_started">Capture ouverte ; enregistrée avec une émissivité de %1$s. Retour revient à la caméra.</string>
     <string name="review_failed">Impossible d\'ouvrir la capture : %1$s</string>
+    <string name="isotherm_off">Désactivée. Faites glisser pour colorer en vert tout ce qui est au-dessus, en dessous ou entre des températures.</string>
+    <string name="isotherm_on_below">Tout ce qui est en dessous de %1$s °C est coloré en vert.</string>
+    <string name="isotherm_on_between">Tout ce qui est entre %1$s et %2$s °C est coloré en vert.</string>
+    <string name="isotherm_mode_above">Au-dessus</string>
+    <string name="isotherm_mode_below">Dessous</string>
+    <string name="isotherm_mode_between">Entre</string>
+    <string name="isotherm_upper_description">Limite haute de l\'isotherme</string>
 </resources>

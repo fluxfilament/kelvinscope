@@ -329,6 +329,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp" />
 
+                <LinearLayout
+                    android:id="@+id/isothermModes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal" />
+
                 <SeekBar
                     android:id="@+id/isothermSeek"
                     style="@style/Ff.Seek"
@@ -336,6 +343,16 @@
                     android:layout_height="48dp"
                     android:contentDescription="@string/row_isotherm"
                     android:max="171" />
+
+                <!-- The upper end, shown only for "between". -->
+                <SeekBar
+                    android:id="@+id/isothermSeek2"
+                    style="@style/Ff.Seek"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/isotherm_upper_description"
+                    android:max="170"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <View

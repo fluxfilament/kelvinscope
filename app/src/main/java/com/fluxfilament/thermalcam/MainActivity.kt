@@ -108,6 +108,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
         const val PREF_ISOTHERM = "isothermC"
+        const val PREF_ISOTHERM_MODE = "isothermMode"
+        const val PREF_ISOTHERM_2 = "isothermC2"
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
         const val REQUEST_COUNTS = 42
@@ -234,6 +236,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     /** The isotherm threshold in degrees, or null when off. */
     private var isothermC: Int? = null
+    private var isothermMode = IsothermMode.ABOVE
+
+    /** The other end of the band, for [IsothermMode.BETWEEN]. */
+    private var isothermC2 = 60
+    private lateinit var isothermModes: LinearLayout
+    private lateinit var isothermSeek2: SeekBar
 
     /** The temperature log being recorded, or null. Fed on the camera thread. */
     @Volatile
@@ -590,6 +598,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         extremesSummary = findViewById(R.id.extremesSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
         isothermSummary = findViewById(R.id.isothermSummary)
+        isothermModes = findViewById(R.id.isothermModes)
+        isothermSeek2 = findViewById(R.id.isothermSeek2)
         themeOptions = findViewById(R.id.themeOptions)
         paletteStrip = findViewById(R.id.paletteStrip)
         areaOptions = findViewById(R.id.areaOptions)
@@ -725,6 +735,15 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 prefs.edit().apply { if (c == null) remove(PREF_ISOTHERM) else putInt(PREF_ISOTHERM, c) }.apply()
             }))
         }
+        isothermMode = prefs.getString(PREF_ISOTHERM_MODE, null)
+            ?.let { saved -> IsothermMode.entries.firstOrNull { it.name == saved } } ?: IsothermMode.ABOVE
+        isothermC2 = prefs.getInt(PREF_ISOTHERM_2, 60)
+        isothermSeek2.progress = isothermC2 - ISOTHERM_FROM_C
+        isothermSeek2.setOnSeekBarChangeListener(seekListener({ p ->
+            isothermC2 = ISOTHERM_FROM_C + p
+            applyIsotherm()
+        }, { prefs.edit().putInt(PREF_ISOTHERM_2, isothermC2).apply() }))
+        buildIsothermModes()
         applyIsotherm()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
@@ -1961,10 +1980,51 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     /** Pushes the isotherm down as counts; called again whenever the conversion changes. */
     private fun applyIsotherm() {
         val c = isothermC
-        val raw = c?.let { planck.celsiusToRaw(it.toDouble()) }
-        renderer.isothermRaw = raw?.takeUnless { it.isNaN() }?.toFloat()
-        isothermSummary.text = if (c == null) getString(R.string.isotherm_off)
-        else getString(R.string.isotherm_on, c.toString())
+        val iso = c?.let { Isotherm(isothermMode, it, isothermC2) }
+        renderer.isotherm = iso?.rawBand(planck::celsiusToRaw)
+        isothermSeek2.visibility =
+            if (c != null && isothermMode == IsothermMode.BETWEEN) View.VISIBLE else View.GONE
+        isothermSummary.text = if (iso == null) {
+            getString(R.string.isotherm_off)
+        } else {
+            val (lo, hi) = iso.celsiusBand()
+            when (isothermMode) {
+                IsothermMode.ABOVE -> getString(R.string.isotherm_on, lo.toString())
+                IsothermMode.BELOW -> getString(R.string.isotherm_on_below, hi.toString())
+                IsothermMode.BETWEEN -> getString(R.string.isotherm_on_between, lo.toString(), hi.toString())
+            }
+        }
+    }
+
+    private fun buildIsothermModes() {
+        isothermModes.removeAllViews()
+        listOf(
+            IsothermMode.ABOVE to R.string.isotherm_mode_above,
+            IsothermMode.BELOW to R.string.isotherm_mode_below,
+            IsothermMode.BETWEEN to R.string.isotherm_mode_between,
+        ).forEachIndexed { index, (mode, label) ->
+            val selected = mode == isothermMode
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                setText(label)
+                textSize = 12f
+                letterSpacing = 0.06f
+                gravity = Gravity.CENTER
+                minHeight = dp(40)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener {
+                    isothermMode = mode
+                    prefs.edit().putString(PREF_ISOTHERM_MODE, mode.name).apply()
+                    buildIsothermModes()
+                    applyIsotherm()
+                }
+            }
+            isothermModes.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(8) },
+            )
+        }
     }
 
     private fun refreshSpotLogSummary() {

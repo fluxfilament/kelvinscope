@@ -133,14 +133,14 @@ class ThermalRenderer {
         get() = if (haveBounds) ContrastRange(smoothedMin, smoothedMax) else null
 
     /**
-     * Counts at and above which a pixel is painted [ISOTHERM_COLOUR] instead of its
-     * palette colour, or null for no isotherm. Everything over a temperature the user
-     * cares about lights up at once, without hunting the picture with spots.
+     * Counts inside which a pixel is painted [ISOTHERM_COLOUR] instead of its palette
+     * colour, or null for no isotherm. Everything in the band the user cares about
+     * lights up at once, without hunting the picture with spots. See [Isotherm].
      *
      * Written from the UI thread, read on the camera thread.
      */
     @Volatile
-    var isothermRaw: Float? = null
+    var isotherm: IsothermBand? = null
 
     private var bitmap: Bitmap? = null
     private var argb = IntArray(0)
@@ -194,10 +194,10 @@ class ThermalRenderer {
         val span = (hi - lo).coerceAtLeast(1f)
         val lut = palette.lut
         val raw = frame.raw
-        val iso = isothermRaw
+        val iso = isotherm
         for (i in into.indices) {
             val v = (((raw[i] - lo) / span) * 255f).toInt().coerceIn(0, 255)
-            into[i] = if (iso != null && raw[i] >= iso) ISOTHERM_COLOUR else lut[v]
+            into[i] = if (iso != null && iso.contains(raw[i])) ISOTHERM_COLOUR else lut[v]
         }
     }
 

@@ -235,7 +235,6 @@
     <string name="spot_log_saved">Журнал сохранён · %1$s</string>
     <string name="spot_log_empty">Ничего не записано: кадров не было.</string>
     <string name="row_isotherm">Изотерма</string>
-    <string name="isotherm_off">Выкл. Сдвиньте, чтобы закрашивать зелёным всё, что горячее заданной температуры.</string>
     <string name="isotherm_on">Всё, что горячее %1$s °C, закрашено зелёным.</string>
     <string name="field_theme">Тема</string>
     <string name="theme_dark">Тёмная</string>
@@ -251,4 +250,11 @@
     <string name="open_snapshot_note">Выберите .pgm из Pictures/Kelvinscope/raw, чтобы измерить его заново: точки, области, палитра и излучательная способность работают на нём. «Назад» возвращает к камере.</string>
     <string name="review_started">Снимок открыт; сохранён с ε %1$s. «Назад» возвращает к камере.</string>
     <string name="review_failed">Не удалось открыть снимок: %1$s</string>
+    <string name="isotherm_off">Выкл. Сдвиньте, чтобы закрашивать зелёным всё выше, ниже или между заданными температурами.</string>
+    <string name="isotherm_on_below">Всё, что холоднее %1$s °C, закрашено зелёным.</string>
+    <string name="isotherm_on_between">Всё от %1$s до %2$s °C закрашено зелёным.</string>
+    <string name="isotherm_mode_above">Выше</string>
+    <string name="isotherm_mode_below">Ниже</string>
+    <string name="isotherm_mode_between">Между</string>
+    <string name="isotherm_upper_description">Верхняя граница изотермы</string>
 </resources>

@@ -237,7 +237,6 @@
     <string name="spot_log_saved">Log saved · %1$s</string>
     <string name="spot_log_empty">Nothing recorded: no frames came in.</string>
     <string name="row_isotherm">Isotherm</string>
-    <string name="isotherm_off">Off. Slide to paint everything above a temperature green.</string>
     <string name="isotherm_on">Everything above %1$s °C is painted green.</string>
     <string name="field_theme">Theme</string>
     <string name="theme_dark">Dark</string>
@@ -253,4 +252,11 @@
     <string name="open_snapshot_note">Pick a .pgm from Pictures/Kelvinscope/raw to measure it again: spots, areas, palette and emissivity all work on it. Back returns to the camera.</string>
     <string name="review_started">Snapshot open; it was saved with emissivity %1$s. Back returns to the camera.</string>
     <string name="review_failed">Could not open the snapshot: %1$s</string>
+    <string name="isotherm_off">Off. Slide to paint green everything above, below or between temperatures.</string>
+    <string name="isotherm_on_below">Everything below %1$s °C is painted green.</string>
+    <string name="isotherm_on_between">Everything between %1$s and %2$s °C is painted green.</string>
+    <string name="isotherm_mode_above">Above</string>
+    <string name="isotherm_mode_below">Below</string>
+    <string name="isotherm_mode_between">Between</string>
+    <string name="isotherm_upper_description">Upper end of the isotherm band</string>
 </resources>
