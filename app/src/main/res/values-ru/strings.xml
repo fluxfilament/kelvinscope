@@ -225,7 +225,12 @@
     <string name="empty_stopped">Камера перестала присылать кадры. Выньте её и вставьте снова; подробности — в Настройки → Журнал.</string>
     <string name="row_spot_log">Журнал температуры</string>
     <string name="spot_log_off">Выкл. Нажмите, чтобы раз в секунду записывать все точки, Max и Min в файл CSV.</string>
-    <string name="spot_log_on">Запись · строк: %1$d. Нажмите, чтобы остановить и сохранить.</string>
+    <plurals name="spot_log_on">
+        <item quantity="one">Запись · %1$d строка. Нажмите, чтобы остановить и сохранить.</item>
+        <item quantity="few">Запись · %1$d строки. Нажмите, чтобы остановить и сохранить.</item>
+        <item quantity="many">Запись · %1$d строк. Нажмите, чтобы остановить и сохранить.</item>
+        <item quantity="other">Запись · %1$d строки. Нажмите, чтобы остановить и сохранить.</item>
+    </plurals>
     <string name="spot_log_started">Идёт запись температуры точек. Остановите её в настройках, чтобы сохранить файл.</string>
     <string name="spot_log_saved">Журнал сохранён · %1$s</string>
     <string name="spot_log_empty">Ничего не записано: кадров не было.</string>

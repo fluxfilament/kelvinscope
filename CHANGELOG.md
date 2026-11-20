@@ -6,6 +6,30 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Rainbow, Arctic and Lava palettes, with a line under the palette choice
+  on what the selected one is good and bad at.
+- Max/Min markers: the hottest and the coldest place are marked on the
+  picture and on the snapshot card, found on 3x3 means. Off by default,
+  in Settings.
+- Isotherm: everything above a chosen temperature is painted green.
+- Temperature log: every spot, Max and Min once a second to a CSV file in
+  `Download/Kelvinscope`, started and stopped in Settings.
+- Each snapshot also keeps the sensor's 16-bit counts as a PGM in
+  `Pictures/Kelvinscope/raw`, with the conversion parameters in its header,
+  so a picture can be measured again later.
+- When the picture is empty, the app says why: no camera, no USB access
+  (tap to ask again), waiting for frames, or the stream stopped.
+- Importing camera constants from a FLIR JPEG also shows FLIR's own overlay
+  alignment from it (`Real2IR`, `OffsetX`, `OffsetY`); `tools/fff_parse.py`
+  prints the same ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+- F-Droid metadata in `fastlane/`, in English and Russian.
+
+### Fixed
+- The Field of view screen gave the resolutions as 80×60 and 1440×1080
+  whatever the camera; it now reads them off the frames, so a FLIR ONE Pro
+  shows 160×120 ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+
 ## [0.2.0] - 2026-10-19
 
 ### Added

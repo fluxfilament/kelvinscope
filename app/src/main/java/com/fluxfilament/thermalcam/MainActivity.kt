@@ -1699,7 +1699,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private fun refreshSpotLogSummary() {
         val log = spotLog
         spotLogSummary.text = if (log == null) getString(R.string.spot_log_off)
-        else getString(R.string.spot_log_on, log.rows)
+        else resources.getQuantityString(R.plurals.spot_log_on, log.rows, log.rows)
     }
 
     private fun toggleSpotLog() {

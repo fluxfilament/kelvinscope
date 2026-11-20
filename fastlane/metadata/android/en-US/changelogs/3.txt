@@ -1,0 +1,1 @@
+Overlay: a Mix slider for the share of the visible layer; Align also on the Field of view screen.
