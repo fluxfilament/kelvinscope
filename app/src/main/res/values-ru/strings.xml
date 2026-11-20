@@ -318,4 +318,18 @@
     <string name="insulation_outside">На улице %1$s °C</string>
     <string name="insulation_outside_description">Температура на улице</string>
     <string name="card_insulation">ПУРПУРНЫМ: TI &lt; %1$d %% ≤ %2$s °C (внутри %3$s °C, снаружи %4$s °C)</string>
+    <plurals name="timelapse_on">
+        <item quantity="one">Каждые %1$d с · %2$d кадр. Выберите «Выкл», чтобы сохранить.</item>
+        <item quantity="few">Каждые %1$d с · %2$d кадра. Выберите «Выкл», чтобы сохранить.</item>
+        <item quantity="many">Каждые %1$d с · %2$d кадров. Выберите «Выкл», чтобы сохранить.</item>
+        <item quantity="other">Каждые %1$d с · %2$d кадра. Выберите «Выкл», чтобы сохранить.</item>
+    </plurals>
+    <string name="row_timelapse">Таймлапс</string>
+    <string name="timelapse_off">Выкл. Выберите интервал, и кадр будет сохраняться с этой частотой; выберите «Выкл», чтобы сохранить серию в GIF на одной шкале, вместе с отсчётами каждого кадра.</string>
+    <string name="timelapse_off_chip">Выкл</string>
+    <string name="timelapse_every">%1$d с</string>
+    <string name="timelapse_started">Идёт запись таймлапса. Выберите «Выкл» в настройках, чтобы сохранить.</string>
+    <string name="timelapse_saved">Таймлапс сохранён · %1$s</string>
+    <string name="timelapse_full">Достигнут предел кадров: %1$d. Выберите «Выкл», чтобы сохранить.</string>
+    <string name="timelapse_saving">Сохраняю таймлапс, кадров: %1$d…</string>
 </resources>

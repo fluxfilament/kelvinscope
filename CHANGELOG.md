@@ -41,6 +41,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   Also drawn on snapshot cards.
 - A strip of palettes over the scale bar on the main screen, one tap to
   switch.
+- Time-lapse: a frame every 1, 5, 30 or 60 seconds; stopping it saves an
+  animated GIF on one temperature scale for the whole run (so colour means the
+  same temperature throughout) and every frame's counts as PGMs.
 - While the temperature log records, a graph of the last ten minutes runs
   across the top of the picture: Max red, Min blue, each spot in its own
   colour, on one scale.

@@ -320,4 +320,16 @@
     <string name="insulation_outside">Outdoors %1$s °C</string>
     <string name="insulation_outside_description">Outdoor temperature</string>
     <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (in %3$s °C, out %4$s °C)</string>
+    <plurals name="timelapse_on">
+        <item quantity="one">Every %1$d s · %2$d frame so far. Choose Off to save.</item>
+        <item quantity="other">Every %1$d s · %2$d frames so far. Choose Off to save.</item>
+    </plurals>
+    <string name="row_timelapse">Time-lapse</string>
+    <string name="timelapse_off">Off. Choose an interval to keep a frame that often; choose Off to save the run as a GIF on one temperature scale, with every frame\'s counts.</string>
+    <string name="timelapse_off_chip">Off</string>
+    <string name="timelapse_every">%1$d s</string>
+    <string name="timelapse_started">Time-lapse recording. Choose Off in Settings to save it.</string>
+    <string name="timelapse_saved">Time-lapse saved · %1$s</string>
+    <string name="timelapse_full">Frame limit reached: %1$d. Choose Off to save.</string>
+    <string name="timelapse_saving">Saving the time-lapse, frames: %1$d…</string>
 </resources>

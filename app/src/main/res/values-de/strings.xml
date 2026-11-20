@@ -318,4 +318,16 @@
     <string name="insulation_outside">Draußen %1$s °C</string>
     <string name="insulation_outside_description">Außentemperatur</string>
     <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (innen %3$s °C, außen %4$s °C)</string>
+    <plurals name="timelapse_on">
+        <item quantity="one">Alle %1$d s · bisher %2$d Bild. Aus wählen zum Speichern.</item>
+        <item quantity="other">Alle %1$d s · bisher %2$d Bilder. Aus wählen zum Speichern.</item>
+    </plurals>
+    <string name="row_timelapse">Zeitraffer</string>
+    <string name="timelapse_off">Aus. Ein Intervall wählen, um so oft ein Bild zu behalten; Aus wählen, um die Serie als GIF auf einer Temperaturskala zu speichern, mit den Rohdaten jedes Bildes.</string>
+    <string name="timelapse_off_chip">Aus</string>
+    <string name="timelapse_every">%1$d s</string>
+    <string name="timelapse_started">Zeitraffer läuft. In den Einstellungen Aus wählen, um zu speichern.</string>
+    <string name="timelapse_saved">Zeitraffer gespeichert · %1$s</string>
+    <string name="timelapse_full">Bildgrenze erreicht: %1$d. Aus wählen zum Speichern.</string>
+    <string name="timelapse_saving">Speichere den Zeitraffer, Bilder: %1$d…</string>
 </resources>

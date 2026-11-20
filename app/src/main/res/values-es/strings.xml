@@ -319,4 +319,17 @@
     <string name="insulation_outside">Exterior %1$s °C</string>
     <string name="insulation_outside_description">Temperatura exterior</string>
     <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (dentro %3$s °C, fuera %4$s °C)</string>
+    <plurals name="timelapse_on">
+        <item quantity="one">Cada %1$d s · %2$d fotograma. Elige No para guardar.</item>
+        <item quantity="many">Cada %1$d s · %2$d fotogramas. Elige No para guardar.</item>
+        <item quantity="other">Cada %1$d s · %2$d fotogramas. Elige No para guardar.</item>
+    </plurals>
+    <string name="row_timelapse">Time-lapse</string>
+    <string name="timelapse_off">Desactivado. Elige un intervalo para guardar un fotograma con esa frecuencia; elige No para guardar la serie como GIF en una sola escala de temperatura, con los datos de cada fotograma.</string>
+    <string name="timelapse_off_chip">No</string>
+    <string name="timelapse_every">%1$d s</string>
+    <string name="timelapse_started">Grabando time-lapse. Elige No en Ajustes para guardarlo.</string>
+    <string name="timelapse_saved">Time-lapse guardado · %1$s</string>
+    <string name="timelapse_full">Límite de fotogramas alcanzado: %1$d. Elige No para guardar.</string>
+    <string name="timelapse_saving">Guardando el time-lapse, fotogramas: %1$d…</string>
 </resources>

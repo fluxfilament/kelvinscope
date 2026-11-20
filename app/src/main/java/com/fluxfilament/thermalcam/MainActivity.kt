@@ -298,6 +298,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     /** Made on first use and kept: creating one per beep is slow and can fail. */
     private var tone: android.media.ToneGenerator? = null
 
+    private lateinit var timelapseSummary: TextView
+    private lateinit var timelapseOptions: LinearLayout
+
+    /** The time-lapse being recorded, or null. Fed on the camera thread. */
+    @Volatile
+    private var timelapse: Timelapse? = null
+    private var timelapseStartedAt: Date? = null
+
     /** The log's recent run for the on-screen graph, and the last copy taken of it. */
     private val trendBuffer = TrendBuffer()
 
@@ -665,6 +673,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         deltaSummary = findViewById(R.id.deltaSummary)
         lineSummary = findViewById(R.id.lineSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
+        timelapseSummary = findViewById(R.id.timelapseSummary)
+        timelapseOptions = findViewById(R.id.timelapseOptions)
         isothermSummary = findViewById(R.id.isothermSummary)
         isothermModes = findViewById(R.id.isothermModes)
         isothermSeek2 = findViewById(R.id.isothermSeek2)
@@ -841,6 +851,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         setUpMoisture()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
+        buildTimelapseOptions()
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
         findViewById<View>(R.id.rowExportCsv).setOnClickListener { pickCounts(REQUEST_CSV) }
         showLine = prefs.getBoolean(PREF_LINE, false)
@@ -2031,6 +2042,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     override fun onDestroy() {
         // A log still recording is saved rather than lost with the activity.
         if (spotLog != null) toggleSpotLog()
+        if (timelapse != null) pickTimelapse(0L)
         tone?.release()
         tone = null
         super.onDestroy()
@@ -2140,6 +2152,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         if (reviewing == null) {
             feedSpotLog(frame)
             feedAlarm(frame)
+            feedTimelapse(frame)
         }
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
@@ -2516,6 +2529,105 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 toast(message)
                 onLog(message)
             }
+        }
+    }
+
+    // --- time-lapse ------------------------------------------------------------
+
+    private fun buildTimelapseOptions() {
+        timelapseOptions.removeAllViews()
+        val current = timelapse?.intervalMillis ?: 0L
+        listOf(0L, 1000L, 5000L, 30_000L, 60_000L).forEachIndexed { index, interval ->
+            val selected = interval == current
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                text = if (interval == 0L) getString(R.string.timelapse_off_chip)
+                else getString(R.string.timelapse_every, (interval / 1000).toInt())
+                textSize = 12f
+                gravity = Gravity.CENTER
+                minHeight = dp(40)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener { pickTimelapse(interval) }
+            }
+            timelapseOptions.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(6) },
+            )
+        }
+        refreshTimelapseSummary()
+    }
+
+    private fun refreshTimelapseSummary() {
+        val t = timelapse
+        timelapseSummary.text = when {
+            t == null -> getString(R.string.timelapse_off)
+            t.full -> getString(R.string.timelapse_full, t.count)
+            else -> resources.getQuantityString(R.plurals.timelapse_on, t.count, (t.intervalMillis / 1000).toInt(), t.count)
+        }
+    }
+
+    /** Starts at a new interval, or with 0 stops and saves what was recorded. */
+    private fun pickTimelapse(interval: Long) {
+        val running = timelapse
+        if (running != null && running.intervalMillis == interval) return
+        timelapse = null
+        if (running != null && running.count > 0) saveTimelapse(running)
+        if (interval > 0) {
+            timelapseStartedAt = Date()
+            timelapse = Timelapse(interval)
+            toast(getString(R.string.timelapse_started))
+        }
+        buildTimelapseOptions()
+    }
+
+    private fun saveTimelapse(t: Timelapse) {
+        val frames = t.frames()
+        val base = "timelapse-" + SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(timelapseStartedAt ?: Date())
+        val palette = renderer.palette
+        val rotation = viewRotation
+        val mirror = mirrored
+        val conversion = planck
+        val lepton = geometry?.versionLepton ?: ""
+        toast(getString(R.string.timelapse_saving, frames.size))
+        thread(name = "flir-timelapse") {
+            val message = try {
+                val gif = Timelapse.gif(frames, palette, rotation, mirror)
+                val saved = SnapshotSaver.saveBytes(this, gif, "$base.gif", "image/gif")
+                // Every frame's counts too, beside it in a folder of their own.
+                val stamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US)
+                for ((n, f) in frames.withIndex()) {
+                    val pgm = RawCounts.encode(
+                        f.width, f.height, f.raw, conversion,
+                        mapOf(
+                            "taken_at" to stamp.format(Date(f.takenAt)),
+                            "rotation" to rotation.toString(),
+                            "mirrored" to mirror.toString(),
+                            "lepton" to lepton,
+                            "timelapse_frame" to n.toString(),
+                        ),
+                    )
+                    SnapshotSaver.saveBytes(
+                        this, pgm, String.format(Locale.US, "%s-%04d.pgm", base, n),
+                        RawCounts.MIME, "raw/$base",
+                    )
+                }
+                getString(R.string.timelapse_saved, saved.displayPath)
+            } catch (e: Exception) {
+                Log.e(TAG, "time-lapse save failed", e)
+                getString(R.string.save_failed, e.message ?: e.javaClass.simpleName)
+            }
+            runOnUiThread {
+                toast(message)
+                onLog(message)
+            }
+        }
+    }
+
+    private fun feedTimelapse(frame: ThermalFrame) {
+        val t = timelapse ?: return
+        if (t.offer(System.currentTimeMillis(), frame) && screen == Screen.SETTINGS) {
+            runOnUiThread { refreshTimelapseSummary() }
         }
     }
 
