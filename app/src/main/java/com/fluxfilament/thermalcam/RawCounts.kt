@@ -103,6 +103,63 @@ object RawCounts {
         return Decoded(width, height, raw, meta)
     }
 
+    /** Counts turned the way the picture was on screen, with the new width and height. */
+    class Oriented(val width: Int, val height: Int, val raw: IntArray)
+
+    /**
+     * The same turn and mirror as [ViewTransform.orient] gives a bitmap, done on the
+     * counts: rotate clockwise about the centre by [rotation], then flip left to
+     * right if [mirrored]. Worked on pixel centres, so a quarter turn of a 80x60
+     * frame lands exactly on a 60x80 grid.
+     */
+    fun orient(raw: IntArray, width: Int, height: Int, rotation: Int, mirrored: Boolean): Oriented {
+        val r = ((rotation % 360) + 360) % 360
+        val outW = if (r % 180 == 0) width else height
+        val outH = if (r % 180 == 0) height else width
+        val out = IntArray(raw.size)
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                // Doubled centred coordinates keep everything in integers.
+                val cx = 2 * x + 1 - width
+                val cy = 2 * y + 1 - height
+                var rx: Int
+                val ry: Int
+                when (r) {
+                    90 -> { rx = -cy; ry = cx }
+                    180 -> { rx = -cx; ry = -cy }
+                    270 -> { rx = cy; ry = -cx }
+                    else -> { rx = cx; ry = cy }
+                }
+                if (mirrored) rx = -rx
+                val ox = (rx + outW - 1) / 2
+                val oy = (ry + outH - 1) / 2
+                out[oy * outW + ox] = raw[y * width + x]
+            }
+        }
+        return Oriented(outW, outH, out)
+    }
+
+    /**
+     * The snapshot as a table of degrees Celsius, one row of the picture per line,
+     * turned the way it was on screen - for a spreadsheet or a script. Commas between
+     * values and dots for decimals whatever the language, like the temperature log.
+     */
+    fun toCsv(decoded: Decoded): String {
+        val planck = planckOf(decoded.meta) ?: throw IllegalArgumentException("no conversion in the file")
+        val rotation = decoded.meta["rotation"]?.toIntOrNull() ?: 0
+        val mirrored = decoded.meta["mirrored"]?.toBooleanStrictOrNull() ?: false
+        val o = orient(decoded.raw, decoded.width, decoded.height, rotation, mirrored)
+        val sb = StringBuilder(o.raw.size * 7)
+        for (y in 0 until o.height) {
+            for (x in 0 until o.width) {
+                if (x > 0) sb.append(',')
+                sb.append(String.format(java.util.Locale.US, "%.2f", planck.rawToCelsius(o.raw[y * o.width + x])))
+            }
+            sb.append('\n')
+        }
+        return sb.toString()
+    }
+
     /** The conversion the file was saved with, rebuilt from its header. */
     fun planckOf(meta: Map<String, String>): Planck? {
         fun d(k: String) = meta[k]?.toDoubleOrNull()

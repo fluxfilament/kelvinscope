@@ -268,4 +268,7 @@
     <string name="row_delta">Разница с точкой 1</string>
     <string name="delta_on">Вкл: у остальных точек показана Δ — насколько они горячее или холоднее точки 1. Нажмите, чтобы выключить.</string>
     <string name="delta_off">Выкл. Нажмите, чтобы у остальных точек показывалась разница с точкой 1.</string>
+    <string name="row_export_csv">Выгрузить снимок в CSV</string>
+    <string name="export_csv_note">Выберите .pgm: температуры в °C, по строке на каждый ряд кадра, сохранятся в Download/Kelvinscope для таблицы.</string>
+    <string name="csv_saved">Таблица сохранена · %1$s</string>
 </resources>

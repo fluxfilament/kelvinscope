@@ -268,4 +268,7 @@
     <string name="row_delta">Differenz zu Punkt 1</string>
     <string name="delta_on">An: jeder weitere Punkt zeigt auch Δ, wie viel wärmer oder kälter er als Punkt 1 ist. Tippen zum Ausschalten.</string>
     <string name="delta_off">Aus. Tippen, um bei den anderen Punkten den Abstand zu Punkt 1 anzuzeigen.</string>
+    <string name="row_export_csv">Aufnahme als CSV exportieren</string>
+    <string name="export_csv_note">Eine .pgm wählen: ihre Temperaturen in °C, eine Zeile pro Bildzeile, landen für eine Tabelle in Download/Kelvinscope.</string>
+    <string name="csv_saved">Tabelle gespeichert · %1$s</string>
 </resources>

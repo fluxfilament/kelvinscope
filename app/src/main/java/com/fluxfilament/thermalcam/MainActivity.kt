@@ -116,6 +116,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
         const val REQUEST_COUNTS = 42
+        const val REQUEST_CSV = 43
         const val REVIEW_REFRESH_MS = 120L
         const val STATE_IN_SETTINGS = "inSettings"
         const val THEME_DARK = "dark"
@@ -777,6 +778,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
+        findViewById<View>(R.id.rowExportCsv).setOnClickListener { pickCounts(REQUEST_CSV) }
         showDelta = prefs.getBoolean(PREF_DELTA, false)
         refreshDeltaSummary()
         findViewById<View>(R.id.rowDelta).setOnClickListener {
@@ -1209,9 +1211,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     @Deprecated("Activity has no result API of its own; this is still the way for it")
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_COUNTS) {
+        if (requestCode == REQUEST_COUNTS || requestCode == REQUEST_CSV) {
             val uri = data?.data
-            if (resultCode == RESULT_OK && uri != null) openCounts(uri)
+            if (resultCode == RESULT_OK && uri != null) {
+                if (requestCode == REQUEST_COUNTS) openCounts(uri) else exportCsv(uri)
+            }
             return
         }
         if (!calibration.onActivityResult(requestCode, resultCode, data)) {
@@ -1221,14 +1225,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     // --- reviewing a saved snapshot ------------------------------------------------
 
-    private fun pickCounts() {
+    private fun pickCounts(request: Int = REQUEST_COUNTS) {
         // Any type: phones disagree on what to call a .pgm, and a filter on it would
         // hide the very files this is for.
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             .addCategory(Intent.CATEGORY_OPENABLE)
             .setType("*/*")
         @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_COUNTS)
+        startActivityForResult(intent, request)
     }
 
     private fun openCounts(uri: android.net.Uri) {
@@ -1248,6 +1252,30 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                         toast(getString(R.string.review_failed, e.message ?: e.javaClass.simpleName))
                     },
                 )
+            }
+        }
+    }
+
+    /** A saved snapshot as a table of degrees, next to the temperature logs. */
+    private fun exportCsv(uri: android.net.Uri) {
+        thread(name = "flir-csv") {
+            val message = try {
+                val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    ?: throw java.io.IOException("empty")
+                val csv = RawCounts.toCsv(RawCounts.decode(bytes))
+                val picked = contentResolver.query(
+                    uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null,
+                )?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+                val name = (picked?.substringBeforeLast('.') ?: "snapshot") + ".csv"
+                val saved = SnapshotSaver.saveBytes(this, csv.toByteArray(Charsets.UTF_8), name, "text/csv")
+                getString(R.string.csv_saved, saved.displayPath)
+            } catch (e: Exception) {
+                Log.e(TAG, "csv export failed", e)
+                getString(R.string.review_failed, e.message ?: e.javaClass.simpleName)
+            }
+            runOnUiThread {
+                toast(message)
+                onLog(message)
             }
         }
     }

@@ -269,4 +269,7 @@
     <string name="row_delta">Diferença para o ponto 1</string>
     <string name="delta_on">Ligado: os outros pontos mostram também Δ, quanto estão mais quentes ou mais frios que o ponto 1. Toque para desligar.</string>
     <string name="delta_off">Desligado. Toque para mostrar nos outros pontos a diferença para o ponto 1.</string>
+    <string name="row_export_csv">Exportar uma captura para CSV</string>
+    <string name="export_csv_note">Escolha um .pgm: as temperaturas em °C, uma linha por fileira da imagem, vão para Download/Kelvinscope para uma planilha.</string>
+    <string name="csv_saved">Tabela salva · %1$s</string>
 </resources>

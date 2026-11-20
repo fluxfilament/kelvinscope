@@ -270,4 +270,7 @@
     <string name="row_delta">Difference to spot 1</string>
     <string name="delta_on">On: every other spot also shows Δ, how much hotter or colder it is than spot 1. Tap to turn off.</string>
     <string name="delta_off">Off. Tap to show on every other spot how far it is from spot 1.</string>
+    <string name="row_export_csv">Export a snapshot to CSV</string>
+    <string name="export_csv_note">Pick a .pgm: its temperatures in °C, one line per row of the picture, go to Download/Kelvinscope for a spreadsheet.</string>
+    <string name="csv_saved">Table saved · %1$s</string>
 </resources>
