@@ -106,6 +106,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_RANGE_HIGH = "rangeHigh"
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
+        const val PREF_ISOTHERM = "isothermC"
+
+        /** The isotherm slider: 0 is off, then one step per degree from here. */
+        const val ISOTHERM_FROM_C = -20
 
         /** Alignment slider covers +/- this fraction of the visible frame's width. */
         const val ALIGN_RANGE = 0.10f
@@ -213,6 +217,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var emissivitySummary: TextView
     private lateinit var extremesSummary: TextView
     private lateinit var spotLogSummary: TextView
+    private lateinit var isothermSummary: TextView
+
+    /** The isotherm threshold in degrees, or null when off. */
+    private var isothermC: Int? = null
 
     /** The temperature log being recorded, or null. Fed on the camera thread. */
     @Volatile
@@ -521,6 +529,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         emissivitySummary = findViewById(R.id.emissivitySummary)
         extremesSummary = findViewById(R.id.extremesSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
+        isothermSummary = findViewById(R.id.isothermSummary)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -642,6 +651,18 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         findViewById<View>(R.id.rowEmissivity).setOnClickListener { go(Screen.EMISSIVITY) }
         showExtremes = prefs.getBoolean(PREF_EXTREMES, false)
         refreshExtremesSummary()
+        isothermC = if (prefs.contains(PREF_ISOTHERM)) prefs.getInt(PREF_ISOTHERM, 0) else null
+        findViewById<SeekBar>(R.id.isothermSeek).apply {
+            progress = isothermC?.let { it - ISOTHERM_FROM_C + 1 } ?: 0
+            setOnSeekBarChangeListener(seekListener({ p ->
+                isothermC = if (p == 0) null else ISOTHERM_FROM_C + p - 1
+                applyIsotherm()
+            }, {
+                val c = isothermC
+                prefs.edit().apply { if (c == null) remove(PREF_ISOTHERM) else putInt(PREF_ISOTHERM, c) }.apply()
+            }))
+        }
+        applyIsotherm()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowExtremes).setOnClickListener {
@@ -999,6 +1020,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             } else {
                 null
             }
+        if (::isothermSummary.isInitialized) applyIsotherm()
     }
 
     // --- emissivity ---------------------------------------------------------------
@@ -1663,6 +1685,15 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             refreshTopBar()
             refreshStats()
         }
+    }
+
+    /** Pushes the isotherm down as counts; called again whenever the conversion changes. */
+    private fun applyIsotherm() {
+        val c = isothermC
+        val raw = c?.let { planck.celsiusToRaw(it.toDouble()) }
+        renderer.isothermRaw = raw?.takeUnless { it.isNaN() }?.toFloat()
+        isothermSummary.text = if (c == null) getString(R.string.isotherm_off)
+        else getString(R.string.isotherm_on, c.toString())
     }
 
     private fun refreshSpotLogSummary() {

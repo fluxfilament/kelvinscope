@@ -232,4 +232,7 @@
     <string name="spot_log_started">Recording spot temperatures. Stop it in Settings to save the file.</string>
     <string name="spot_log_saved">Log saved · %1$s</string>
     <string name="spot_log_empty">Nothing recorded: no frames came in.</string>
+    <string name="row_isotherm">Isotherm</string>
+    <string name="isotherm_off">Off. Slide to paint everything above a temperature green.</string>
+    <string name="isotherm_on">Everything above %1$s °C is painted green.</string>
 </resources>

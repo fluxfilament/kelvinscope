@@ -229,4 +229,7 @@
     <string name="spot_log_started">Идёт запись температуры точек. Остановите её в настройках, чтобы сохранить файл.</string>
     <string name="spot_log_saved">Журнал сохранён · %1$s</string>
     <string name="spot_log_empty">Ничего не записано: кадров не было.</string>
+    <string name="row_isotherm">Изотерма</string>
+    <string name="isotherm_off">Выкл. Сдвиньте, чтобы закрашивать зелёным всё, что горячее заданной температуры.</string>
+    <string name="isotherm_on">Всё, что горячее %1$s °C, закрашено зелёным.</string>
 </resources>
