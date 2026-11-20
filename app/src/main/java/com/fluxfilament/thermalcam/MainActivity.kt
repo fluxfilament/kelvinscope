@@ -104,6 +104,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_RANGE_LOW = "rangeLow"
         const val PREF_RANGE_HIGH = "rangeHigh"
         const val PREF_PALETTE = "palette"
+        const val PREF_EXTREMES = "extremes"
 
         /** Alignment slider covers +/- this fraction of the visible frame's width. */
         const val ALIGN_RANGE = 0.10f
@@ -204,6 +205,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var paletteOptions: LinearLayout
     private lateinit var rotationOptions: LinearLayout
     private lateinit var emissivitySummary: TextView
+    private lateinit var extremesSummary: TextView
+
+    /** Max/Min markers on the live picture. Read on the camera thread. */
+    @Volatile
+    private var showExtremes = false
     private lateinit var fovSummary: TextView
     private lateinit var logSummary: TextView
 
@@ -492,6 +498,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         paletteOptions = findViewById(R.id.paletteOptions)
         rotationOptions = findViewById(R.id.rotationOptions)
         emissivitySummary = findViewById(R.id.emissivitySummary)
+        extremesSummary = findViewById(R.id.extremesSummary)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -611,6 +618,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         findViewById<View>(R.id.calibrationBack).setOnClickListener { handleBack() }
         findViewById<View>(R.id.logBack).setOnClickListener { handleBack() }
         findViewById<View>(R.id.rowEmissivity).setOnClickListener { go(Screen.EMISSIVITY) }
+        showExtremes = prefs.getBoolean(PREF_EXTREMES, false)
+        refreshExtremesSummary()
+        findViewById<View>(R.id.rowExtremes).setOnClickListener {
+            showExtremes = !showExtremes
+            prefs.edit().putBoolean(PREF_EXTREMES, showExtremes).apply()
+            refreshExtremesSummary()
+        }
         findViewById<View>(R.id.rowFov).setOnClickListener { go(Screen.FOV) }
         findViewById<View>(R.id.rowCalibration).setOnClickListener { go(Screen.CALIBRATION) }
         findViewById<View>(R.id.rowLog).setOnClickListener { go(Screen.LOG) }
@@ -1555,11 +1569,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             runOnUiThread { refreshTopBar() }
         }
         val labels = spotLabels(frame)
+        val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
         if (repaintPending.compareAndSet(false, true)) {
             runOnUiThread {
                 repaintPending.set(false)
                 thermalView.spots = labels
+                thermalView.extremes = marks
                 thermalView.setImage(bitmap, viewRotation, mirrored)
                 if (screen == Screen.FOV) updateFovPreview(thermal)
                 if (screen == Screen.CALIBRATION) calibration.onFrame(thermal, viewRotation, mirrored, zone)
@@ -1601,6 +1617,19 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
      * hand, so the numbers on screen belong to the picture under them rather than to
      * whatever frame happened to be current when the UI got round to drawing.
      */
+    private fun refreshExtremesSummary() {
+        extremesSummary.text = getString(if (showExtremes) R.string.extremes_on else R.string.extremes_off)
+    }
+
+    private fun extremeLabels(frame: ThermalFrame): List<ExtremeLabel> {
+        val e = Extremes.of(frame)
+        val calibration = planck
+        return listOf(
+            ExtremeLabel(e.cold.u, e.cold.v, hot = false, "${dec(calibration.rawToCelsius(e.coldRaw))}°C"),
+            ExtremeLabel(e.hot.u, e.hot.v, hot = true, "${dec(calibration.rawToCelsius(e.hotRaw))}°C"),
+        )
+    }
+
     private fun spotLabels(frame: ThermalFrame): List<SpotLabel> {
         val calibration = planck
         return spotMeter.positions().mapIndexed { index, spot ->

@@ -117,6 +117,46 @@ class SpotGlyphs(private val unit: Float) {
         draw(canvas, text, numberX, numberY, numberPaint, numberShadow)
     }
 
+    private val hotFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(255, 70, 40) }
+    private val coldFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(60, 170, 255) }
+    private val triangleOutline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.5f * unit
+        color = Color.WHITE
+    }
+    private val triangle = android.graphics.Path()
+
+    /**
+     * A Max or Min marker: a small triangle, pointing up for the hottest place and
+     * down for the coldest, with the figure beside it. Coloured and shaped unlike a
+     * spot's crosshair, so nobody mistakes the one that moves by itself for one they
+     * placed. Only the triangle's tip sits on the place; it is drawn upright to the
+     * reader like the labels, so the caller turns the canvas first.
+     */
+    fun drawExtreme(canvas: Canvas, x: Float, y: Float, hot: Boolean, reading: String, bounds: RectF) {
+        val s = 6f * unit
+        triangle.reset()
+        if (hot) {
+            triangle.moveTo(x, y)
+            triangle.lineTo(x - s, y - s * 1.6f)
+            triangle.lineTo(x + s, y - s * 1.6f)
+        } else {
+            triangle.moveTo(x, y)
+            triangle.lineTo(x - s, y + s * 1.6f)
+            triangle.lineTo(x + s, y + s * 1.6f)
+        }
+        triangle.close()
+        canvas.drawPath(triangle, if (hot) hotFill else coldFill)
+        canvas.drawPath(triangle, triangleOutline)
+
+        val width = textPaint.measureText(reading)
+        val left = (if (x + s * 1.5f + width < bounds.right) x + s * 1.5f else x - s * 1.5f - width)
+            .coerceIn(bounds.left, bounds.right - width)
+        val baseline = (if (hot) y - s * 0.4f else y + s * 1.6f)
+            .coerceIn(bounds.top + textPaint.textSize, bounds.bottom - 4f * unit)
+        draw(canvas, reading, left, baseline, textPaint, textShadow)
+    }
+
     /** Outline first, then the glyphs: legible over a light scene as well as a dark one. */
     private fun draw(canvas: Canvas, text: String, x: Float, y: Float, fill: Paint, outline: Paint) {
         canvas.drawText(text, x, y, outline)

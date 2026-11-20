@@ -219,4 +219,7 @@
     <string name="palette_hint_rainbow">Rainbow: the most colours per degree. Shows small differences and gradients, but draws edges that are not really there.</string>
     <string name="palette_hint_arctic">Arctic: most of the scale in blues. Made for cold spots, draughts and thermal bridges in a building; poor for hot objects.</string>
     <string name="palette_hint_lava">Lava: black to white through the reds. Hot areas read at a glance (pipes, heaters, stoves); little contrast in the cold end.</string>
+    <string name="row_extremes">Max/Min markers</string>
+    <string name="extremes_on">On: the hottest and coldest places are marked on the picture. Tap to turn off.</string>
+    <string name="extremes_off">Off. Tap to mark the hottest and coldest places on the picture.</string>
 </resources>

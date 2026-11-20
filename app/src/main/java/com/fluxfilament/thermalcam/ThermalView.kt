@@ -31,6 +31,9 @@ import kotlin.math.hypot
 /** One spot as the view needs it: where it sits, its number, and what it reads. */
 class SpotLabel(val u: Float, val v: Float, val number: Int, val text: String)
 
+/** A Max or Min marker on the picture; not draggable, it follows the scene. */
+class ExtremeLabel(val u: Float, val v: Float, val hot: Boolean, val text: String)
+
 /**
  * Draws the live picture and the spot meters on it, and lets the spots be dragged.
  *
@@ -50,6 +53,9 @@ class ThermalView @JvmOverloads constructor(
     private var mirrored = true
 
     var spots: List<SpotLabel> = emptyList()
+
+    /** Max/Min markers, drawn under the spots so a placed spot is never hidden. */
+    var extremes: List<ExtremeLabel> = emptyList()
 
     /**
      * How far the phone itself is turned, in degrees clockwise from upright.
@@ -131,7 +137,21 @@ class ThermalView @JvmOverloads constructor(
         )
         canvas.drawBitmap(bmp, matrix, imagePaint)
         zone?.let { drawZone(canvas, bmp, it) }
+        for (mark in extremes) drawExtreme(canvas, bmp, mark)
         for (spot in spots) drawSpot(canvas, bmp, spot)
+    }
+
+    private fun drawExtreme(canvas: Canvas, bmp: Bitmap, mark: ExtremeLabel) {
+        point[0] = mark.u * bmp.width
+        point[1] = mark.v * bmp.height
+        matrix.mapPoints(point)
+        val x = point[0]
+        val y = point[1]
+        canvas.save()
+        canvas.rotate(-labelRotation.toFloat(), x, y)
+        boundsInLabelFrame(x, y, labelBounds)
+        glyphs.drawExtreme(canvas, x, y, mark.hot, mark.text, labelBounds)
+        canvas.restore()
     }
 
     private fun drawZone(canvas: Canvas, bmp: Bitmap, area: RectF) {
