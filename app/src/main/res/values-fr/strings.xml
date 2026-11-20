@@ -297,4 +297,19 @@
     <string name="line_on">Activée : une ligne avec Max, moyenne et Min le long, et un profil sous l\'image. Faites glisser ses extrémités. Touchez pour désactiver.</string>
     <string name="line_off">Désactivée. Touchez pour une ligne qui mesure Max, moyenne et Min le long d\'un tuyau ou d\'un radiateur, avec un profil.</string>
     <string name="line_readings">Max %1$s · Moy %2$s · Min %3$s</string>
+    <string name="row_moisture">Risque de condensation et de moisissure</string>
+    <string name="moisture_off">Désactivé. Indiquez la température et l\'humidité de la pièce : les surfaces assez froides pour l\'humidité sont colorées en bleu.</string>
+    <string name="moisture_on_condensation">Point de rosée %1$s °C : les surfaces à cette température ou en dessous, où l\'eau se condense, sont colorées en bleu.</string>
+    <string name="moisture_on_mould">Point de rosée %1$s °C. Les surfaces à %2$s °C ou moins, où l\'air à leur contact atteint 80 %% et où la moisissure peut se développer, sont colorées en bleu.</string>
+    <string name="moisture_mode_off">Non</string>
+    <string name="moisture_air">Air de la pièce %1$s °C</string>
+    <string name="moisture_rh">Humidité relative %1$d %%</string>
+    <string name="moisture_air_description">Température de l\'air de la pièce</string>
+    <string name="moisture_rh_description">Humidité relative de la pièce</string>
+    <string name="moisture_mode_condensation">Rosée 100 %</string>
+    <string name="moisture_mode_mould">Moisi 80 %</string>
+    <string name="card_iso_above">VERT > %1$s °C</string>
+    <string name="card_iso_below">VERT &lt; %1$s °C</string>
+    <string name="card_iso_between">VERT %1$s…%2$s °C</string>
+    <string name="card_moisture">BLEU : %1$d %% HR ≤ %2$s °C (air %3$s °C, %4$d %%)</string>
 </resources>

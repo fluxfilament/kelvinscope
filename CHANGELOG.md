@@ -17,6 +17,13 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Alarm: a beep and a haptic tick while the hottest place is above a limit,
   or the coldest below one, with `[ALARM]` in the status bar. Still no
   permissions: no VIBRATE needed for the tick.
+- Measuring line: Max, average and Min along a segment you drag, with a
+  profile graph of the temperature along it under the picture; also on cards.
+- Condensation and mould risk: from the room's air temperature and relative
+  humidity, surfaces at or below the dew point (100 %) or where the air at
+  them reaches 80 % (mould) are painted blue, as building thermography does.
+- Cards now say what the overlays painted: the isotherm's band and the damp
+  limit with the air it was worked out for.
 - Export a snapshot as CSV: a saved `.pgm` becomes a table of degrees,
   turned the way it was on screen, in `Download/Kelvinscope`.
 - Emissivity by material: fifteen everyday materials with typical values,

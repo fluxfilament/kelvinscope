@@ -296,4 +296,19 @@
     <string name="line_on">An: eine Linie mit Max, Mittel und Min entlang und ein Profilgraph unter dem Bild. Enden ziehen. Tippen zum Ausschalten.</string>
     <string name="line_off">Aus. Tippen für eine Linie, die Max, Mittel und Min entlang eines Rohrs oder Heizkörpers misst, mit Profilgraph.</string>
     <string name="line_readings">Max %1$s · Mittel %2$s · Min %3$s</string>
+    <string name="row_moisture">Kondensat- und Schimmelrisiko</string>
+    <string name="moisture_off">Aus. Raumtemperatur und Luftfeuchte angeben, dann werden Flächen, die kalt genug für Feuchte sind, blau gefärbt.</string>
+    <string name="moisture_on_condensation">Taupunkt %1$s °C: Flächen auf oder unter ihm, an denen Wasser kondensiert, sind blau gefärbt.</string>
+    <string name="moisture_on_mould">Taupunkt %1$s °C. Flächen bei %2$s °C oder darunter, an denen die Luft 80 %% erreicht und Schimmel wachsen kann, sind blau gefärbt.</string>
+    <string name="moisture_mode_off">Aus</string>
+    <string name="moisture_air">Raumluft %1$s °C</string>
+    <string name="moisture_rh">Relative Luftfeuchte %1$d %%</string>
+    <string name="moisture_air_description">Raumlufttemperatur</string>
+    <string name="moisture_rh_description">Relative Luftfeuchte im Raum</string>
+    <string name="moisture_mode_condensation">Tau 100 %</string>
+    <string name="moisture_mode_mould">Schimmel 80 %</string>
+    <string name="card_iso_above">GRÜN > %1$s °C</string>
+    <string name="card_iso_below">GRÜN &lt; %1$s °C</string>
+    <string name="card_iso_between">GRÜN %1$s…%2$s °C</string>
+    <string name="card_moisture">BLAU: %1$d %% rF ≤ %2$s °C (Luft %3$s °C, %4$d %%)</string>
 </resources>

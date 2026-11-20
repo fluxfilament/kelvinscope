@@ -298,4 +298,19 @@
     <string name="line_on">On: a line with Max, Avg and Min along it and a profile graph under the picture. Drag its ends. Tap to turn off.</string>
     <string name="line_off">Off. Tap for a line that reads Max, Avg and Min along a pipe or a radiator, with a profile graph.</string>
     <string name="line_readings">Max %1$s · Avg %2$s · Min %3$s</string>
+    <string name="row_moisture">Condensation and mould risk</string>
+    <string name="moisture_off">Off. Give the room\'s temperature and humidity, and surfaces cold enough for damp are painted blue.</string>
+    <string name="moisture_on_condensation">Dew point %1$s °C: surfaces at or below it, where water condenses, are painted blue.</string>
+    <string name="moisture_on_mould">Dew point %1$s °C. Surfaces at or below %2$s °C, where the air at them reaches 80 %% and mould can grow, are painted blue.</string>
+    <string name="moisture_mode_off">Off</string>
+    <string name="moisture_air">Room air %1$s °C</string>
+    <string name="moisture_rh">Relative humidity %1$d %%</string>
+    <string name="moisture_air_description">Room air temperature</string>
+    <string name="moisture_rh_description">Room relative humidity</string>
+    <string name="moisture_mode_condensation">Dew 100 %</string>
+    <string name="moisture_mode_mould">Mould 80 %</string>
+    <string name="card_iso_above">GREEN > %1$s °C</string>
+    <string name="card_iso_below">GREEN &lt; %1$s °C</string>
+    <string name="card_iso_between">GREEN %1$s…%2$s °C</string>
+    <string name="card_moisture">BLUE: %1$d %% RH ≤ %2$s °C (air %3$s °C, %4$d %%)</string>
 </resources>

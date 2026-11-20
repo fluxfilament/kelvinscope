@@ -296,4 +296,19 @@
     <string name="line_on">Вкл: линия с Max, средним и Min вдоль неё и график профиля под кадром. Концы перетаскиваются. Нажмите, чтобы выключить.</string>
     <string name="line_off">Выкл. Нажмите, чтобы мерить Max, среднее и Min вдоль трубы или радиатора, с графиком профиля.</string>
     <string name="line_readings">Max %1$s · Ср %2$s · Min %3$s</string>
+    <string name="row_moisture">Риск конденсата и плесени</string>
+    <string name="moisture_off">Выкл. Укажите температуру и влажность в комнате — поверхности, достаточно холодные для сырости, закрасятся синим.</string>
+    <string name="moisture_on_condensation">Точка росы %1$s °C: поверхности с этой температурой и ниже, где выпадет конденсат, закрашены синим.</string>
+    <string name="moisture_on_mould">Точка росы %1$s °C. Поверхности при %2$s °C и ниже, где влажность у поверхности доходит до 80 %% и может расти плесень, закрашены синим.</string>
+    <string name="moisture_mode_off">Выкл</string>
+    <string name="moisture_air">Воздух в комнате %1$s °C</string>
+    <string name="moisture_rh">Относительная влажность %1$d %%</string>
+    <string name="moisture_air_description">Температура воздуха в комнате</string>
+    <string name="moisture_rh_description">Относительная влажность в комнате</string>
+    <string name="moisture_mode_condensation">Роса 100 %</string>
+    <string name="moisture_mode_mould">Плесень 80 %</string>
+    <string name="card_iso_above">ЗЕЛЁНЫМ > %1$s °C</string>
+    <string name="card_iso_below">ЗЕЛЁНЫМ &lt; %1$s °C</string>
+    <string name="card_iso_between">ЗЕЛЁНЫМ %1$s…%2$s °C</string>
+    <string name="card_moisture">СИНИМ: %1$d %% RH ≤ %2$s °C (воздух %3$s °C, %4$d %%)</string>
 </resources>

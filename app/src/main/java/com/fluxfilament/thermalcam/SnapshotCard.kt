@@ -57,6 +57,11 @@ class CardScene(
     val areas: List<AreaLabel> = emptyList(),
     /** The measuring line, when it was on. */
     val line: LineLabel? = null,
+    /**
+     * What the overlays painted, already worded - the isotherm's band, the damp
+     * limit. A green or blue patch on a card says nothing without them.
+     */
+    val overlayNotes: List<String> = emptyList(),
 )
 
 /**
@@ -383,6 +388,7 @@ object SnapshotCard {
         if (!scene.planck.correction.isIdentity) {
             tokens += context.getString(R.string.card_correction, scene.planck.correction.label(locale))
         }
+        tokens += scene.overlayNotes
         if (scene.rangeFixed) tokens += context.getString(R.string.card_range_fixed)
         if (scene.mirrored) tokens += context.getString(R.string.mirror_label)
         return tokens.joinToString(SEPARATOR)

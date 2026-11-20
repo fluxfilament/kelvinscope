@@ -142,6 +142,13 @@ class ThermalRenderer {
     @Volatile
     var isotherm: IsothermBand? = null
 
+    /**
+     * Counts of surfaces cold enough for moisture to settle on, painted
+     * [MOISTURE_COLOUR]; see [Humidity]. Under the isotherm if both are on.
+     */
+    @Volatile
+    var moisture: IsothermBand? = null
+
     private var bitmap: Bitmap? = null
     private var argb = IntArray(0)
 
@@ -195,15 +202,23 @@ class ThermalRenderer {
         val lut = palette.lut
         val raw = frame.raw
         val iso = isotherm
+        val wet = moisture
         for (i in into.indices) {
             val v = (((raw[i] - lo) / span) * 255f).toInt().coerceIn(0, 255)
-            into[i] = if (iso != null && iso.contains(raw[i])) ISOTHERM_COLOUR else lut[v]
+            into[i] = when {
+                iso != null && iso.contains(raw[i]) -> ISOTHERM_COLOUR
+                wet != null && wet.contains(raw[i]) -> MOISTURE_COLOUR
+                else -> lut[v]
+            }
         }
     }
 
     companion object {
         /** A green none of the palettes runs through at full strength. */
         const val ISOTHERM_COLOUR = 0xFF39FF14.toInt()
+
+        /** A strong blue for damp: water, and apart from the isotherm's green. */
+        const val MOISTURE_COLOUR = 0xFF1E6BFF.toInt()
     }
 
     /** Forgets the rolling contrast bounds, e.g. after the shutter recalibrates. */

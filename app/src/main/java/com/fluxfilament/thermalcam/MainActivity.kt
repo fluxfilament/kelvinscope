@@ -118,6 +118,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_ISOTHERM_2 = "isothermC2"
         const val PREF_ALARM_MODE = "alarmMode"
         const val PREF_ALARM_C = "alarmC"
+        const val PREF_MOISTURE_LIMIT = "moistureLimit"
+        const val PREF_MOISTURE_AIR = "moistureAirC"
+        const val PREF_MOISTURE_RH = "moistureRh"
+
+        /** Air temperature slider from here, one degree a step; humidity from 10 %. */
+        const val MOISTURE_AIR_FROM_C = -10
+        const val MOISTURE_RH_FROM = 10
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
         const val REQUEST_COUNTS = 42
@@ -266,6 +273,16 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var alarmModes: LinearLayout
     private lateinit var alarmSeek: SeekBar
     private val alarm = TemperatureAlarm()
+    private lateinit var moistureSummary: TextView
+    private lateinit var moistureModes: LinearLayout
+    private lateinit var moistureInputs: View
+    private lateinit var moistureAirLabel: TextView
+    private lateinit var moistureRhLabel: TextView
+
+    /** Surface humidity limit in percent: 0 off, 100 condensation, 80 mould. */
+    private var moistureLimit = 0
+    private var moistureAirC = 20
+    private var moistureRh = 50
 
     /** Made on first use and kept: creating one per beep is slow and can fail. */
     private var tone: android.media.ToneGenerator? = null
@@ -637,6 +654,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         alarmSummary = findViewById(R.id.alarmSummary)
         alarmModes = findViewById(R.id.alarmModes)
         alarmSeek = findViewById(R.id.alarmSeek)
+        moistureSummary = findViewById(R.id.moistureSummary)
+        moistureModes = findViewById(R.id.moistureModes)
+        moistureInputs = findViewById(R.id.moistureInputs)
+        moistureAirLabel = findViewById(R.id.moistureAirLabel)
+        moistureRhLabel = findViewById(R.id.moistureRhLabel)
         themeOptions = findViewById(R.id.themeOptions)
         paletteStrip = findViewById(R.id.paletteStrip)
         areaOptions = findViewById(R.id.areaOptions)
@@ -795,6 +817,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             refreshAlarmSummary()
         }, { prefs.edit().putInt(PREF_ALARM_C, alarm.limitC.toInt()).apply() }))
         buildAlarmModes()
+        setUpMoisture()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
@@ -1186,6 +1209,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 null
             }
         if (::isothermSummary.isInitialized) applyIsotherm()
+        if (::moistureSummary.isInitialized) applyMoisture()
     }
 
     // --- emissivity ---------------------------------------------------------------
@@ -2157,6 +2181,101 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
+    /** The overlays as a card names them. */
+    private fun overlayNotes(): List<String> {
+        val notes = mutableListOf<String>()
+        isothermC?.let { c ->
+            val (lo, hi) = Isotherm(isothermMode, c, isothermC2).celsiusBand()
+            notes += when (isothermMode) {
+                IsothermMode.ABOVE -> getString(R.string.card_iso_above, lo.toString())
+                IsothermMode.BELOW -> getString(R.string.card_iso_below, hi.toString())
+                IsothermMode.BETWEEN -> getString(R.string.card_iso_between, lo.toString(), hi.toString())
+            }
+        }
+        if (moistureLimit != 0) {
+            val limitC = Humidity.surfaceLimit(moistureAirC.toDouble(), moistureRh.toDouble(), moistureLimit.toDouble())
+            notes += getString(R.string.card_moisture, moistureLimit, dec(limitC), moistureAirC.toString(), moistureRh)
+        }
+        return notes
+    }
+
+    // --- condensation and mould risk --------------------------------------------
+
+    private fun setUpMoisture() {
+        moistureLimit = prefs.getInt(PREF_MOISTURE_LIMIT, 0)
+        moistureAirC = prefs.getInt(PREF_MOISTURE_AIR, 20)
+        moistureRh = prefs.getInt(PREF_MOISTURE_RH, 50)
+        findViewById<SeekBar>(R.id.moistureAirSeek).apply {
+            progress = moistureAirC - MOISTURE_AIR_FROM_C
+            setOnSeekBarChangeListener(seekListener({ p ->
+                moistureAirC = MOISTURE_AIR_FROM_C + p
+                applyMoisture()
+            }, { prefs.edit().putInt(PREF_MOISTURE_AIR, moistureAirC).apply() }))
+        }
+        findViewById<SeekBar>(R.id.moistureRhSeek).apply {
+            progress = moistureRh - MOISTURE_RH_FROM
+            setOnSeekBarChangeListener(seekListener({ p ->
+                moistureRh = MOISTURE_RH_FROM + p
+                applyMoisture()
+            }, { prefs.edit().putInt(PREF_MOISTURE_RH, moistureRh).apply() }))
+        }
+        buildMoistureModes()
+    }
+
+    private fun buildMoistureModes() {
+        moistureModes.removeAllViews()
+        listOf(
+            0 to R.string.moisture_mode_off,
+            100 to R.string.moisture_mode_condensation,
+            80 to R.string.moisture_mode_mould,
+        ).forEachIndexed { index, (limit, label) ->
+            val selected = limit == moistureLimit
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                setText(label)
+                textSize = 12f
+                letterSpacing = 0.04f
+                gravity = Gravity.CENTER
+                minHeight = dp(40)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener {
+                    moistureLimit = limit
+                    prefs.edit().putInt(PREF_MOISTURE_LIMIT, limit).apply()
+                    buildMoistureModes()
+                }
+            }
+            moistureModes.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(8) },
+            )
+        }
+        applyMoisture()
+    }
+
+    /** Works out the limit surface temperature and hands it to the renderer as counts. */
+    private fun applyMoisture() {
+        moistureAirLabel.text = getString(R.string.moisture_air, moistureAirC.toString())
+        moistureRhLabel.text = getString(R.string.moisture_rh, moistureRh)
+        moistureInputs.visibility = if (moistureLimit == 0) View.GONE else View.VISIBLE
+        if (moistureLimit == 0) {
+            renderer.moisture = null
+            moistureSummary.text = getString(R.string.moisture_off)
+            return
+        }
+        val air = moistureAirC.toDouble()
+        val rh = moistureRh.toDouble()
+        val dew = Humidity.dewPoint(air, rh)
+        val limitC = Humidity.surfaceLimit(air, rh, moistureLimit.toDouble())
+        val raw = planck.celsiusToRaw(limitC)
+        renderer.moisture = if (raw.isNaN()) null else IsothermBand(null, raw.toFloat())
+        moistureSummary.text = if (moistureLimit == 100) {
+            getString(R.string.moisture_on_condensation, dec(dew))
+        } else {
+            getString(R.string.moisture_on_mould, dec(dew), dec(limitC))
+        }
+    }
+
     private fun refreshAlarmSummary() {
         val limit = alarm.limitC.toInt().toString()
         alarmSummary.text = when (alarm.mode) {
@@ -2427,6 +2546,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 extremes = if (showExtremes) extremeLabels(frame) else emptyList(),
                 areas = areaLabels(frame),
                 line = lineLabel(frame),
+                overlayNotes = overlayNotes(),
             ),
         )
         // The thermal layer alone, not the composed one: the original is there to be

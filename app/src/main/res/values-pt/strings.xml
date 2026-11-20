@@ -297,4 +297,19 @@
     <string name="line_on">Ligada: uma linha com Máx, média e Mín ao longo dela e um gráfico de perfil sob a imagem. Arraste as pontas. Toque para desligar.</string>
     <string name="line_off">Desligada. Toque para uma linha que mede Máx, média e Mín ao longo de um cano ou radiador, com gráfico de perfil.</string>
     <string name="line_readings">Máx %1$s · Méd %2$s · Mín %3$s</string>
+    <string name="row_moisture">Risco de condensação e mofo</string>
+    <string name="moisture_off">Desligado. Informe a temperatura e a umidade do cômodo, e as superfícies frias o bastante para umidade ficam azuis.</string>
+    <string name="moisture_on_condensation">Ponto de orvalho %1$s °C: as superfícies nessa temperatura ou abaixo, onde a água condensa, ficam azuis.</string>
+    <string name="moisture_on_mould">Ponto de orvalho %1$s °C. As superfícies a %2$s °C ou menos, onde o ar junto a elas chega a 80 %% e pode crescer mofo, ficam azuis.</string>
+    <string name="moisture_mode_off">Não</string>
+    <string name="moisture_air">Ar do cômodo %1$s °C</string>
+    <string name="moisture_rh">Umidade relativa %1$d %%</string>
+    <string name="moisture_air_description">Temperatura do ar do cômodo</string>
+    <string name="moisture_rh_description">Umidade relativa do cômodo</string>
+    <string name="moisture_mode_condensation">Orvalho 100 %</string>
+    <string name="moisture_mode_mould">Mofo 80 %</string>
+    <string name="card_iso_above">VERDE > %1$s °C</string>
+    <string name="card_iso_below">VERDE &lt; %1$s °C</string>
+    <string name="card_iso_between">VERDE %1$s…%2$s °C</string>
+    <string name="card_moisture">AZUL: %1$d %% UR ≤ %2$s °C (ar %3$s °C, %4$d %%)</string>
 </resources>

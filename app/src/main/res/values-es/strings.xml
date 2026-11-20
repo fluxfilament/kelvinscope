@@ -297,4 +297,19 @@
     <string name="line_on">Activada: una línea con Máx, media y Mín a lo largo y un gráfico de perfil bajo la imagen. Arrastra sus extremos. Toca para desactivar.</string>
     <string name="line_off">Desactivada. Toca para una línea que mide Máx, media y Mín a lo largo de una tubería o un radiador, con gráfico de perfil.</string>
     <string name="line_readings">Máx %1$s · Med %2$s · Mín %3$s</string>
+    <string name="row_moisture">Riesgo de condensación y moho</string>
+    <string name="moisture_off">Desactivado. Indica la temperatura y la humedad de la habitación, y las superficies lo bastante frías para la humedad se pintan de azul.</string>
+    <string name="moisture_on_condensation">Punto de rocío %1$s °C: las superficies a esa temperatura o menos, donde el agua se condensa, se pintan de azul.</string>
+    <string name="moisture_on_mould">Punto de rocío %1$s °C. Las superficies a %2$s °C o menos, donde el aire junto a ellas llega al 80 %% y puede crecer moho, se pintan de azul.</string>
+    <string name="moisture_mode_off">No</string>
+    <string name="moisture_air">Aire de la habitación %1$s °C</string>
+    <string name="moisture_rh">Humedad relativa %1$d %%</string>
+    <string name="moisture_air_description">Temperatura del aire de la habitación</string>
+    <string name="moisture_rh_description">Humedad relativa de la habitación</string>
+    <string name="moisture_mode_condensation">Rocío 100 %</string>
+    <string name="moisture_mode_mould">Moho 80 %</string>
+    <string name="card_iso_above">VERDE > %1$s °C</string>
+    <string name="card_iso_below">VERDE &lt; %1$s °C</string>
+    <string name="card_iso_between">VERDE %1$s…%2$s °C</string>
+    <string name="card_moisture">AZUL: %1$d %% HR ≤ %2$s °C (aire %3$s °C, %4$d %%)</string>
 </resources>
