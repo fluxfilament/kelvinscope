@@ -311,4 +311,11 @@
     <string name="card_iso_below">GRÜN &lt; %1$s °C</string>
     <string name="card_iso_between">GRÜN %1$s…%2$s °C</string>
     <string name="card_moisture">BLAU: %1$d %% rF ≤ %2$s °C (Luft %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Dämmung (Temperaturfaktor)</string>
+    <string name="insulation_off">Aus. Mit Raum- und Außentemperatur werden Wandstellen, die zu wenig Raumwärme halten, magenta gefärbt. Braucht seit Stunden einige Grad Unterschied.</string>
+    <string name="insulation_on">Wandflächen unter %1$d %% des Wegs von außen zur Raumtemperatur, also %2$s °C oder kälter, sind magenta gefärbt.</string>
+    <string name="insulation_no_difference">Der Raum muss mindestens 5 °C wärmer sein als draußen, sonst sagt der Faktor nichts.</string>
+    <string name="insulation_outside">Draußen %1$s °C</string>
+    <string name="insulation_outside_description">Außentemperatur</string>
+    <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (innen %3$s °C, außen %4$s °C)</string>
 </resources>

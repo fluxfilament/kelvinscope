@@ -311,4 +311,11 @@
     <string name="card_iso_below">ЗЕЛЁНЫМ &lt; %1$s °C</string>
     <string name="card_iso_between">ЗЕЛЁНЫМ %1$s…%2$s °C</string>
     <string name="card_moisture">СИНИМ: %1$d %% RH ≤ %2$s °C (воздух %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Утепление (тепловой индекс)</string>
+    <string name="insulation_off">Выкл. По температуре в комнате и на улице места стены, которые держат слишком мало тепла комнаты, закрашиваются пурпурным. Нужна разница в несколько градусов в течение нескольких часов.</string>
+    <string name="insulation_on">Поверхности стены ниже %1$d %% пути от уличной температуры к комнатной, то есть %2$s °C и холоднее, закрашены пурпурным.</string>
+    <string name="insulation_no_difference">В комнате должно быть хотя бы на 5 °C теплее, чем на улице, иначе индекс ничего не значит.</string>
+    <string name="insulation_outside">На улице %1$s °C</string>
+    <string name="insulation_outside_description">Температура на улице</string>
+    <string name="card_insulation">ПУРПУРНЫМ: TI &lt; %1$d %% ≤ %2$s °C (внутри %3$s °C, снаружи %4$s °C)</string>
 </resources>

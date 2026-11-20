@@ -312,4 +312,11 @@
     <string name="card_iso_below">VERT &lt; %1$s °C</string>
     <string name="card_iso_between">VERT %1$s…%2$s °C</string>
     <string name="card_moisture">BLEU : %1$d %% HR ≤ %2$s °C (air %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Isolation (indice thermique)</string>
+    <string name="insulation_off">Désactivé. Avec les températures intérieure et extérieure, les zones de mur qui gardent trop peu de chaleur de la pièce sont colorées en magenta. Il faut quelques degrés d\'écart depuis des heures.</string>
+    <string name="insulation_on">Les surfaces de mur sous %1$d %% de l\'écart entre dehors et la pièce, soit %2$s °C ou moins, sont colorées en magenta.</string>
+    <string name="insulation_no_difference">La pièce doit être au moins 5 °C plus chaude que dehors pour que l\'indice ait un sens.</string>
+    <string name="insulation_outside">Dehors %1$s °C</string>
+    <string name="insulation_outside_description">Température extérieure</string>
+    <string name="card_insulation">MAGENTA : TI &lt; %1$d %% ≤ %2$s °C (int. %3$s °C, ext. %4$s °C)</string>
 </resources>

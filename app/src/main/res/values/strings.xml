@@ -313,4 +313,11 @@
     <string name="card_iso_below">GREEN &lt; %1$s °C</string>
     <string name="card_iso_between">GREEN %1$s…%2$s °C</string>
     <string name="card_moisture">BLUE: %1$d %% RH ≤ %2$s °C (air %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Insulation (thermal index)</string>
+    <string name="insulation_off">Off. With the room and outdoor temperatures, wall areas that keep too little of the room\'s warmth are painted magenta. Needs a few degrees\' difference for hours.</string>
+    <string name="insulation_on">Wall surfaces under %1$d %% of the way from outdoors to the room, %2$s °C or colder, are painted magenta.</string>
+    <string name="insulation_no_difference">The room must be at least 5 °C warmer than outdoors for the index to mean anything.</string>
+    <string name="insulation_outside">Outdoors %1$s °C</string>
+    <string name="insulation_outside_description">Outdoor temperature</string>
+    <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (in %3$s °C, out %4$s °C)</string>
 </resources>

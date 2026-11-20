@@ -125,6 +125,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         /** Air temperature slider from here, one degree a step; humidity from 10 %. */
         const val MOISTURE_AIR_FROM_C = -10
         const val MOISTURE_RH_FROM = 10
+        const val PREF_INSULATION = "insulationIndex"
+        const val PREF_INSULATION_OUT = "insulationOutsideC"
+        const val INSULATION_OUT_FROM_C = -30
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
         const val REQUEST_COUNTS = 42
@@ -283,6 +286,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private var moistureLimit = 0
     private var moistureAirC = 20
     private var moistureRh = 50
+    private lateinit var insulationSummary: TextView
+    private lateinit var insulationModes: LinearLayout
+    private lateinit var insulationOutsideLabel: TextView
+    private lateinit var insulationOutsideSeek: SeekBar
+
+    /** Thermal index limit in percent, 0 when off. */
+    private var insulationIndex = 0
+    private var outsideC = -5
 
     /** Made on first use and kept: creating one per beep is slow and can fail. */
     private var tone: android.media.ToneGenerator? = null
@@ -659,6 +670,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         moistureInputs = findViewById(R.id.moistureInputs)
         moistureAirLabel = findViewById(R.id.moistureAirLabel)
         moistureRhLabel = findViewById(R.id.moistureRhLabel)
+        insulationSummary = findViewById(R.id.insulationSummary)
+        insulationModes = findViewById(R.id.insulationModes)
+        insulationOutsideLabel = findViewById(R.id.insulationOutsideLabel)
+        insulationOutsideSeek = findViewById(R.id.insulationOutsideSeek)
         themeOptions = findViewById(R.id.themeOptions)
         paletteStrip = findViewById(R.id.paletteStrip)
         areaOptions = findViewById(R.id.areaOptions)
@@ -2196,6 +2211,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             val limitC = Humidity.surfaceLimit(moistureAirC.toDouble(), moistureRh.toDouble(), moistureLimit.toDouble())
             notes += getString(R.string.card_moisture, moistureLimit, dec(limitC), moistureAirC.toString(), moistureRh)
         }
+        insulationLimitC()?.let { limitC ->
+            notes += getString(
+                R.string.card_insulation, insulationIndex, dec(limitC),
+                moistureAirC.toString(), outsideC.toString(),
+            )
+        }
         return notes
     }
 
@@ -2219,8 +2240,48 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 applyMoisture()
             }, { prefs.edit().putInt(PREF_MOISTURE_RH, moistureRh).apply() }))
         }
+        insulationIndex = prefs.getInt(PREF_INSULATION, 0)
+        outsideC = prefs.getInt(PREF_INSULATION_OUT, -5)
+        insulationOutsideSeek.progress = outsideC - INSULATION_OUT_FROM_C
+        insulationOutsideSeek.setOnSeekBarChangeListener(seekListener({ p ->
+            outsideC = INSULATION_OUT_FROM_C + p
+            applyMoisture()
+        }, { prefs.edit().putInt(PREF_INSULATION_OUT, outsideC).apply() }))
+        buildInsulationModes()
         buildMoistureModes()
     }
+
+    private fun buildInsulationModes() {
+        insulationModes.removeAllViews()
+        listOf(0, 60, 70, 80).forEachIndexed { index, limit ->
+            val selected = limit == insulationIndex
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                text = if (limit == 0) getString(R.string.moisture_mode_off) else "$limit %"
+                textSize = 12f
+                letterSpacing = 0.04f
+                gravity = Gravity.CENTER
+                minHeight = dp(40)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener {
+                    insulationIndex = limit
+                    prefs.edit().putInt(PREF_INSULATION, limit).apply()
+                    buildInsulationModes()
+                    applyMoisture()
+                }
+            }
+            insulationModes.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(8) },
+            )
+        }
+    }
+
+    /** The wall-surface temperature under which the thermal index is below the limit. */
+    private fun insulationLimitC(): Double? =
+        if (insulationIndex == 0) null
+        else Insulation.surfaceLimit(moistureAirC.toDouble(), outsideC.toDouble(), insulationIndex.toDouble())
 
     private fun buildMoistureModes() {
         moistureModes.removeAllViews()
@@ -2253,11 +2314,38 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         applyMoisture()
     }
 
+    private fun applyInsulation() {
+        insulationOutsideLabel.text = getString(R.string.insulation_outside, outsideC.toString())
+        val outsideVisibility = if (insulationIndex == 0) View.GONE else View.VISIBLE
+        insulationOutsideLabel.visibility = outsideVisibility
+        insulationOutsideSeek.visibility = outsideVisibility
+        if (insulationIndex == 0) {
+            renderer.insulation = null
+            insulationSummary.text = getString(R.string.insulation_off)
+            return
+        }
+        val limitC = insulationLimitC()
+        if (limitC == null) {
+            renderer.insulation = null
+            insulationSummary.text = getString(R.string.insulation_no_difference)
+            return
+        }
+        val raw = planck.celsiusToRaw(limitC)
+        renderer.insulation = if (raw.isNaN()) null else IsothermBand(null, raw.toFloat())
+        insulationSummary.text = getString(R.string.insulation_on, insulationIndex, dec(limitC))
+    }
+
     /** Works out the limit surface temperature and hands it to the renderer as counts. */
     private fun applyMoisture() {
         moistureAirLabel.text = getString(R.string.moisture_air, moistureAirC.toString())
         moistureRhLabel.text = getString(R.string.moisture_rh, moistureRh)
-        moistureInputs.visibility = if (moistureLimit == 0) View.GONE else View.VISIBLE
+        // Room air serves both checks; humidity only the damp one, outdoors only insulation.
+        moistureInputs.visibility =
+            if (moistureLimit == 0 && insulationIndex == 0) View.GONE else View.VISIBLE
+        val rhVisibility = if (moistureLimit == 0) View.GONE else View.VISIBLE
+        moistureRhLabel.visibility = rhVisibility
+        findViewById<View>(R.id.moistureRhSeek).visibility = rhVisibility
+        applyInsulation()
         if (moistureLimit == 0) {
             renderer.moisture = null
             moistureSummary.text = getString(R.string.moisture_off)

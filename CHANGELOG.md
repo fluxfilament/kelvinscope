@@ -22,6 +22,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Condensation and mould risk: from the room's air temperature and relative
   humidity, surfaces at or below the dew point (100 %) or where the air at
   them reaches 80 % (mould) are painted blue, as building thermography does.
+- Insulation check: from the room and outdoor temperatures, wall areas whose
+  thermal index is under 60, 70 or 80 % are painted magenta, as FLIR's
+  insulation alarm does. Needs the room at least 5 °C warmer than outdoors.
 - Cards now say what the overlays painted: the isotherm's band and the damp
   limit with the air it was worked out for.
 - Export a snapshot as CSV: a saved `.pgm` becomes a table of degrees,

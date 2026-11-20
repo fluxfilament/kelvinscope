@@ -312,4 +312,11 @@
     <string name="card_iso_below">VERDE &lt; %1$s °C</string>
     <string name="card_iso_between">VERDE %1$s…%2$s °C</string>
     <string name="card_moisture">AZUL: %1$d %% HR ≤ %2$s °C (aire %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Aislamiento (índice térmico)</string>
+    <string name="insulation_off">Desactivado. Con las temperaturas interior y exterior, las zonas de pared que conservan muy poco calor de la habitación se pintan de magenta. Necesita varios grados de diferencia durante horas.</string>
+    <string name="insulation_on">Las superficies de pared por debajo del %1$d %% entre la temperatura exterior y la de la habitación, %2$s °C o menos, se pintan de magenta.</string>
+    <string name="insulation_no_difference">La habitación debe estar al menos 5 °C más caliente que el exterior para que el índice signifique algo.</string>
+    <string name="insulation_outside">Exterior %1$s °C</string>
+    <string name="insulation_outside_description">Temperatura exterior</string>
+    <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (dentro %3$s °C, fuera %4$s °C)</string>
 </resources>

@@ -149,6 +149,13 @@ class ThermalRenderer {
     @Volatile
     var moisture: IsothermBand? = null
 
+    /**
+     * Counts of wall surfaces with a thermal index under the limit, painted
+     * [INSULATION_COLOUR]; see [Insulation]. Under the isotherm and the damp.
+     */
+    @Volatile
+    var insulation: IsothermBand? = null
+
     private var bitmap: Bitmap? = null
     private var argb = IntArray(0)
 
@@ -203,11 +210,13 @@ class ThermalRenderer {
         val raw = frame.raw
         val iso = isotherm
         val wet = moisture
+        val cold = insulation
         for (i in into.indices) {
             val v = (((raw[i] - lo) / span) * 255f).toInt().coerceIn(0, 255)
             into[i] = when {
                 iso != null && iso.contains(raw[i]) -> ISOTHERM_COLOUR
                 wet != null && wet.contains(raw[i]) -> MOISTURE_COLOUR
+                cold != null && cold.contains(raw[i]) -> INSULATION_COLOUR
                 else -> lut[v]
             }
         }
@@ -219,6 +228,9 @@ class ThermalRenderer {
 
         /** A strong blue for damp: water, and apart from the isotherm's green. */
         const val MOISTURE_COLOUR = 0xFF1E6BFF.toInt()
+
+        /** Magenta for poor insulation: unlike the green, the blue and every palette. */
+        const val INSULATION_COLOUR = 0xFFFF2BD6.toInt()
     }
 
     /** Forgets the rolling contrast bounds, e.g. after the shutter recalibrates. */

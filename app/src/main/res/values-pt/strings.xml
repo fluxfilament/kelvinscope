@@ -312,4 +312,11 @@
     <string name="card_iso_below">VERDE &lt; %1$s °C</string>
     <string name="card_iso_between">VERDE %1$s…%2$s °C</string>
     <string name="card_moisture">AZUL: %1$d %% UR ≤ %2$s °C (ar %3$s °C, %4$d %%)</string>
+    <string name="row_insulation">Isolamento (índice térmico)</string>
+    <string name="insulation_off">Desligado. Com as temperaturas interna e externa, as áreas de parede que retêm pouco calor do cômodo ficam magenta. Precisa de alguns graus de diferença por horas.</string>
+    <string name="insulation_on">As superfícies de parede abaixo de %1$d %% do caminho entre a temperatura externa e a do cômodo, %2$s °C ou menos, ficam magenta.</string>
+    <string name="insulation_no_difference">O cômodo precisa estar pelo menos 5 °C mais quente que o exterior para o índice ter sentido.</string>
+    <string name="insulation_outside">Exterior %1$s °C</string>
+    <string name="insulation_outside_description">Temperatura externa</string>
+    <string name="card_insulation">MAGENTA: TI &lt; %1$d %% ≤ %2$s °C (dentro %3$s °C, fora %4$s °C)</string>
 </resources>

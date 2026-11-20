@@ -565,6 +565,42 @@
                         android:contentDescription="@string/moisture_rh_description"
                         android:max="90" />
                 </LinearLayout>
+
+                <TextView
+                    style="@style/Ff.RowTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/row_insulation" />
+
+                <TextView
+                    android:id="@+id/insulationSummary"
+                    style="@style/Ff.RowSub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp" />
+
+                <LinearLayout
+                    android:id="@+id/insulationModes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal" />
+
+                <TextView
+                    android:id="@+id/insulationOutsideLabel"
+                    style="@style/Ff.RowSub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
+                <SeekBar
+                    android:id="@+id/insulationOutsideSeek"
+                    style="@style/Ff.Seek"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/insulation_outside_description"
+                    android:max="50" />
             </LinearLayout>
 
             <View
