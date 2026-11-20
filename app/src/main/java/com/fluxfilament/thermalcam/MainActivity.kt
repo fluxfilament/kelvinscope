@@ -110,6 +110,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_ISOTHERM_MODE = "isothermMode"
         const val PREF_ISOTHERM_2 = "isothermC2"
+        const val PREF_ALARM_MODE = "alarmMode"
+        const val PREF_ALARM_C = "alarmC"
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
         const val REQUEST_COUNTS = 42
@@ -242,6 +244,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private var isothermC2 = 60
     private lateinit var isothermModes: LinearLayout
     private lateinit var isothermSeek2: SeekBar
+    private lateinit var alarmSummary: TextView
+    private lateinit var alarmModes: LinearLayout
+    private lateinit var alarmSeek: SeekBar
+    private val alarm = TemperatureAlarm()
+
+    /** Made on first use and kept: creating one per beep is slow and can fail. */
+    private var tone: android.media.ToneGenerator? = null
 
     /** The temperature log being recorded, or null. Fed on the camera thread. */
     @Volatile
@@ -600,6 +609,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         isothermSummary = findViewById(R.id.isothermSummary)
         isothermModes = findViewById(R.id.isothermModes)
         isothermSeek2 = findViewById(R.id.isothermSeek2)
+        alarmSummary = findViewById(R.id.alarmSummary)
+        alarmModes = findViewById(R.id.alarmModes)
+        alarmSeek = findViewById(R.id.alarmSeek)
         themeOptions = findViewById(R.id.themeOptions)
         paletteStrip = findViewById(R.id.paletteStrip)
         areaOptions = findViewById(R.id.areaOptions)
@@ -745,6 +757,16 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }, { prefs.edit().putInt(PREF_ISOTHERM_2, isothermC2).apply() }))
         buildIsothermModes()
         applyIsotherm()
+        alarm.mode = prefs.getString(PREF_ALARM_MODE, null)
+            ?.let { saved -> TemperatureAlarm.Mode.entries.firstOrNull { it.name == saved } }
+            ?: TemperatureAlarm.Mode.OFF
+        alarm.limitC = prefs.getInt(PREF_ALARM_C, 60).toDouble()
+        alarmSeek.progress = alarm.limitC.toInt() - ISOTHERM_FROM_C
+        alarmSeek.setOnSeekBarChangeListener(seekListener({ p ->
+            alarm.limitC = (ISOTHERM_FROM_C + p).toDouble()
+            refreshAlarmSummary()
+        }, { prefs.edit().putInt(PREF_ALARM_C, alarm.limitC.toInt()).apply() }))
+        buildAlarmModes()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
         findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
@@ -843,6 +865,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val stamp: Int
         val colour: Int
         when {
+            alarm.active && review == null -> {
+                state = R.string.state_alarm
+                stamp = R.drawable.bg_stamp_done
+                colour = R.color.ff_accent
+            }
             review != null -> {
                 state = R.string.state_review
                 stamp = R.drawable.bg_stamp_done
@@ -1826,6 +1853,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     override fun onDestroy() {
         // A log still recording is saved rather than lost with the activity.
         if (spotLog != null) toggleSpotLog()
+        tone?.release()
+        tone = null
         super.onDestroy()
         camera.stop()
         unregisterReceiver(usbReceiver)
@@ -1930,7 +1959,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
         val labels = spotLabels(frame)
         // The log is a record of the camera over time; a re-read snapshot is not.
-        if (reviewing == null) feedSpotLog(frame)
+        if (reviewing == null) {
+            feedSpotLog(frame)
+            feedAlarm(frame)
+        }
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
@@ -1994,6 +2026,75 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 IsothermMode.BETWEEN -> getString(R.string.isotherm_on_between, lo.toString(), hi.toString())
             }
         }
+    }
+
+    private fun refreshAlarmSummary() {
+        val limit = alarm.limitC.toInt().toString()
+        alarmSummary.text = when (alarm.mode) {
+            TemperatureAlarm.Mode.OFF -> getString(R.string.alarm_off)
+            TemperatureAlarm.Mode.MAX_ABOVE -> getString(R.string.alarm_on_max, limit)
+            TemperatureAlarm.Mode.MIN_BELOW -> getString(R.string.alarm_on_min, limit)
+        }
+        alarmSeek.visibility = if (alarm.mode == TemperatureAlarm.Mode.OFF) View.GONE else View.VISIBLE
+    }
+
+    private fun buildAlarmModes() {
+        alarmModes.removeAllViews()
+        listOf(
+            TemperatureAlarm.Mode.OFF to R.string.alarm_mode_off,
+            TemperatureAlarm.Mode.MAX_ABOVE to R.string.alarm_mode_max,
+            TemperatureAlarm.Mode.MIN_BELOW to R.string.alarm_mode_min,
+        ).forEachIndexed { index, (mode, label) ->
+            val selected = mode == alarm.mode
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                setText(label)
+                textSize = 12f
+                letterSpacing = 0.06f
+                gravity = Gravity.CENTER
+                minHeight = dp(40)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener {
+                    alarm.mode = mode
+                    prefs.edit().putString(PREF_ALARM_MODE, mode.name).apply()
+                    buildAlarmModes()
+                    refreshTopBar()
+                }
+            }
+            alarmModes.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { if (index > 0) marginStart = dp(8) },
+            )
+        }
+        refreshAlarmSummary()
+    }
+
+    /** One frame's worth of alarm: decided here on the camera thread, sounded on the UI one. */
+    private fun feedAlarm(frame: ThermalFrame) {
+        if (alarm.mode == TemperatureAlarm.Mode.OFF) return
+        val wasActive = alarm.active
+        val e = Extremes.of(frame)
+        val calibration = planck
+        val sound = alarm.update(
+            calibration.rawToCelsius(e.hotRaw), calibration.rawToCelsius(e.coldRaw),
+            System.currentTimeMillis(),
+        )
+        if (sound || wasActive != alarm.active) {
+            runOnUiThread {
+                if (sound) beep()
+                refreshTopBar()
+            }
+        }
+    }
+
+    private fun beep() {
+        val generator = tone ?: runCatching {
+            android.media.ToneGenerator(android.media.AudioManager.STREAM_ALARM, 90)
+        }.getOrNull()?.also { tone = it }
+        generator?.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 400)
+        // A haptic tick needs no VIBRATE permission, unlike the Vibrator service.
+        thermalView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
     }
 
     private fun buildIsothermModes() {

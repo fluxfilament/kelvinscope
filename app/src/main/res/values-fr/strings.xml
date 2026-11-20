@@ -258,4 +258,12 @@
     <string name="isotherm_mode_below">Dessous</string>
     <string name="isotherm_mode_between">Entre</string>
     <string name="isotherm_upper_description">Limite haute de l\'isotherme</string>
+    <string name="row_alarm">Alarme</string>
+    <string name="alarm_off">Désactivée. Bip quand le point le plus chaud dépasse une limite, ou que le plus froid passe en dessous.</string>
+    <string name="alarm_on_max">Bip tant que le point le plus chaud est à %1$s °C ou plus.</string>
+    <string name="alarm_on_min">Bip tant que le point le plus froid est à %1$s °C ou moins.</string>
+    <string name="alarm_mode_off">Non</string>
+    <string name="alarm_mode_max">Max ≥</string>
+    <string name="alarm_mode_min">Min ≤</string>
+    <string name="state_alarm">[ALARME]</string>
 </resources>

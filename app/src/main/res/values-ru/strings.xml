@@ -257,4 +257,12 @@
     <string name="isotherm_mode_below">Ниже</string>
     <string name="isotherm_mode_between">Между</string>
     <string name="isotherm_upper_description">Верхняя граница изотермы</string>
+    <string name="row_alarm">Тревога</string>
+    <string name="alarm_off">Выкл. Сигнал, когда самое горячее место поднимется выше порога или самое холодное опустится ниже.</string>
+    <string name="alarm_on_max">Сигнал, пока самое горячее место — %1$s °C и выше.</string>
+    <string name="alarm_on_min">Сигнал, пока самое холодное место — %1$s °C и ниже.</string>
+    <string name="alarm_mode_off">Выкл</string>
+    <string name="alarm_mode_max">Max ≥</string>
+    <string name="alarm_mode_min">Min ≤</string>
+    <string name="state_alarm">[ТРЕВОГА]</string>
 </resources>

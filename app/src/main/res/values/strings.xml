@@ -259,4 +259,12 @@
     <string name="isotherm_mode_below">Below</string>
     <string name="isotherm_mode_between">Between</string>
     <string name="isotherm_upper_description">Upper end of the isotherm band</string>
+    <string name="row_alarm">Alarm</string>
+    <string name="alarm_off">Off. Beep when the hottest place gets above a limit, or the coldest below one.</string>
+    <string name="alarm_on_max">Beeps while the hottest place is at %1$s °C or above.</string>
+    <string name="alarm_on_min">Beeps while the coldest place is at %1$s °C or below.</string>
+    <string name="alarm_mode_off">Off</string>
+    <string name="alarm_mode_max">Max ≥</string>
+    <string name="alarm_mode_min">Min ≤</string>
+    <string name="state_alarm">[ALARM]</string>
 </resources>

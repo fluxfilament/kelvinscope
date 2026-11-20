@@ -258,4 +258,12 @@
     <string name="isotherm_mode_below">Abaixo</string>
     <string name="isotherm_mode_between">Entre</string>
     <string name="isotherm_upper_description">Limite superior da isoterma</string>
+    <string name="row_alarm">Alarme</string>
+    <string name="alarm_off">Desligado. Apita quando o ponto mais quente passar de um limite ou o mais frio ficar abaixo dele.</string>
+    <string name="alarm_on_max">Apita enquanto o ponto mais quente estiver a %1$s °C ou mais.</string>
+    <string name="alarm_on_min">Apita enquanto o ponto mais frio estiver a %1$s °C ou menos.</string>
+    <string name="alarm_mode_off">Não</string>
+    <string name="alarm_mode_max">Máx ≥</string>
+    <string name="alarm_mode_min">Mín ≤</string>
+    <string name="state_alarm">[ALARME]</string>
 </resources>

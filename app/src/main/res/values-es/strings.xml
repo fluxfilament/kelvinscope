@@ -258,4 +258,12 @@
     <string name="isotherm_mode_below">Debajo</string>
     <string name="isotherm_mode_between">Entre</string>
     <string name="isotherm_upper_description">Extremo superior de la isoterma</string>
+    <string name="row_alarm">Alarma</string>
+    <string name="alarm_off">Desactivada. Pita cuando el punto más caliente supera un límite o el más frío baja de él.</string>
+    <string name="alarm_on_max">Pita mientras el punto más caliente esté a %1$s °C o más.</string>
+    <string name="alarm_on_min">Pita mientras el punto más frío esté a %1$s °C o menos.</string>
+    <string name="alarm_mode_off">No</string>
+    <string name="alarm_mode_max">Máx ≥</string>
+    <string name="alarm_mode_min">Mín ≤</string>
+    <string name="state_alarm">[ALARMA]</string>
 </resources>

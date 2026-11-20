@@ -257,4 +257,12 @@
     <string name="isotherm_mode_below">Unter</string>
     <string name="isotherm_mode_between">Zwischen</string>
     <string name="isotherm_upper_description">Oberes Ende der Isotherme</string>
+    <string name="row_alarm">Alarm</string>
+    <string name="alarm_off">Aus. Signalton, wenn die heißeste Stelle über eine Grenze steigt oder die kälteste darunter fällt.</string>
+    <string name="alarm_on_max">Signalton, solange die heißeste Stelle %1$s °C oder mehr hat.</string>
+    <string name="alarm_on_min">Signalton, solange die kälteste Stelle %1$s °C oder weniger hat.</string>
+    <string name="alarm_mode_off">Aus</string>
+    <string name="alarm_mode_max">Max ≥</string>
+    <string name="alarm_mode_min">Min ≤</string>
+    <string name="state_alarm">[ALARM]</string>
 </resources>
