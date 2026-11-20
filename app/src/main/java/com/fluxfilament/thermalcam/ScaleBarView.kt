@@ -53,11 +53,11 @@ class ScaleBarView @JvmOverloads constructor(
     private val barBorder = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = density
-        color = BORDER
+        color = context.getColor(R.color.ff_border)
     }
-    private val tickPaint = Paint().apply { color = MUTED }
+    private val tickPaint = Paint().apply { color = context.getColor(R.color.ff_muted) }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = MUTED
+        color = context.getColor(R.color.ff_muted)
         textSize = 10.5f * density
         typeface = Fonts.mono(context)
     }
@@ -102,7 +102,5 @@ class ScaleBarView @JvmOverloads constructor(
 
     private companion object {
         const val STOPS = 33
-        const val MUTED = 0xFFA69A85.toInt()
-        const val BORDER = 0xFF453A2C.toInt()
     }
 }

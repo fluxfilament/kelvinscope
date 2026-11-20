@@ -238,4 +238,8 @@
     <string name="row_isotherm">Isotherm</string>
     <string name="isotherm_off">Off. Slide to paint everything above a temperature green.</string>
     <string name="isotherm_on">Everything above %1$s °C is painted green.</string>
+    <string name="field_theme">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">System</string>
 </resources>

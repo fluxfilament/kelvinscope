@@ -237,4 +237,8 @@
     <string name="row_isotherm">Изотерма</string>
     <string name="isotherm_off">Выкл. Сдвиньте, чтобы закрашивать зелёным всё, что горячее заданной температуры.</string>
     <string name="isotherm_on">Всё, что горячее %1$s °C, закрашено зелёным.</string>
+    <string name="field_theme">Тема</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_system">Как в системе</string>
 </resources>

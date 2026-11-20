@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The light side of the F&F palette: warm cream instead of warm charcoal, from the
+    same design book as values/colors.xml. Used when the theme setting says Light,
+    or says System and the phone is in light mode; Dark, the default, never gets here.
+-->
+<resources>
+    <color name="ff_bg">#F0E9DA</color>
+    <color name="ff_surface">#FFFFFF</color>
+    <color name="ff_text">#262220</color>
+    <color name="ff_text_soft">#3E3833</color>
+    <color name="ff_muted">#6B6560</color>
+    <color name="ff_border">#DED4C2</color>
+    <color name="ff_accent">#B85E2C</color>
+    <color name="ff_accent2">#1E93B4</color>
+    <!-- The picture still sits in a dark well: a thermal image reads against dark,
+         and a cream frame around it would glare. -->
+    <color name="ff_well">#2A231B</color>
+    <color name="ff_code_bg">#1C2429</color>
+    <color name="ff_on_accent">#FFFFFF</color>
+    <color name="ff_scrim">#66262220</color>
+</resources>

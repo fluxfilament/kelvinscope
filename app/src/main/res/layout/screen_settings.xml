@@ -107,6 +107,26 @@
                 android:background="@color/ff_border" />
 
             <TextView
+                style="@style/Ff.RowTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/field_theme" />
+
+            <LinearLayout
+                android:id="@+id/themeOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ff_border" />
+
+            <TextView
                 style="@style/Ff.Eyebrow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

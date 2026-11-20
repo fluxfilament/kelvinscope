@@ -23,6 +23,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Importing camera constants from a FLIR JPEG also shows FLIR's own overlay
   alignment from it (`Real2IR`, `OffsetX`, `OffsetY`); `tools/fff_parse.py`
   prints the same ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+- A light theme, in the cream of the same palette, chosen in Settings:
+  dark (still the default), light, or following the system.
 - F-Droid metadata in `fastlane/`, in English and Russian.
 
 ### Changed

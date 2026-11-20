@@ -24,4 +24,6 @@
     <color name="ff_code_bg">#161C20</color>
     <color name="ff_on_accent">#0B1A1F</color>
     <color name="ff_scrim">#80140B07</color>
+    <!-- Text laid over the picture's well, which stays dark in both themes. -->
+    <color name="ff_on_well">#EFE7D8</color>
 </resources>

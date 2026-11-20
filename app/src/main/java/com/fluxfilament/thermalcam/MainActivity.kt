@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -107,6 +108,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_PALETTE = "palette"
         const val PREF_EXTREMES = "extremes"
         const val PREF_ISOTHERM = "isothermC"
+        const val PREF_THEME = "theme"
+        const val STATE_IN_SETTINGS = "inSettings"
+        const val THEME_DARK = "dark"
+        const val THEME_LIGHT = "light"
+        const val THEME_SYSTEM = "system"
 
         /** The isotherm slider: 0 is off, then one step per degree from here. */
         const val ISOTHERM_FROM_C = -20
@@ -218,6 +224,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var extremesSummary: TextView
     private lateinit var spotLogSummary: TextView
     private lateinit var isothermSummary: TextView
+    private lateinit var themeOptions: LinearLayout
 
     /** The isotherm threshold in degrees, or null when off. */
     private var isothermC: Int? = null
@@ -424,6 +431,29 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
+    /**
+     * The theme setting, applied by overriding the night bit of the configuration
+     * before any resource is read: values/ holds the dark colours, values-notnight/
+     * the light ones. Dark stays the default whatever the phone is set to, as it has
+     * been since the first version.
+     */
+    override fun attachBaseContext(newBase: Context) {
+        val mode = newBase.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(PREF_THEME, THEME_DARK)
+        val night = when (mode) {
+            THEME_LIGHT -> Configuration.UI_MODE_NIGHT_NO
+            THEME_SYSTEM -> null
+            else -> Configuration.UI_MODE_NIGHT_YES
+        }
+        if (night == null) {
+            super.attachBaseContext(newBase)
+            return
+        }
+        val config = Configuration(newBase.resources.configuration)
+        config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or night
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -457,6 +487,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         setUpOverlayControls()
         buildPaletteOptions()
         buildRotationOptions()
+        buildThemeOptions()
         buildPresetRows()
         metalSwatch.background = metalSwatchDrawable()
 
@@ -486,6 +517,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 "Camera not attached. Plug in the FLIR One and re-open the app, or it " +
                         "should auto-launch via the USB_DEVICE_ATTACHED intent filter."
             )
+
+        // Back where the theme was changed from, not dropped on the live view.
+        if (savedInstanceState?.getBoolean(STATE_IN_SETTINGS) == true) go(Screen.SETTINGS)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_IN_SETTINGS, screen == Screen.SETTINGS)
     }
 
     private fun bindViews() {
@@ -530,6 +569,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         extremesSummary = findViewById(R.id.extremesSummary)
         spotLogSummary = findViewById(R.id.spotLogSummary)
         isothermSummary = findViewById(R.id.isothermSummary)
+        themeOptions = findViewById(R.id.themeOptions)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -1310,6 +1350,43 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 },
             )
         }
+    }
+
+    private fun buildThemeOptions() {
+        themeOptions.removeAllViews()
+        val current = prefs.getString(PREF_THEME, THEME_DARK)
+        listOf(
+            THEME_DARK to R.string.theme_dark,
+            THEME_LIGHT to R.string.theme_light,
+            THEME_SYSTEM to R.string.theme_system,
+        ).forEachIndexed { index, (mode, label) ->
+            val selected = mode == current
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                setText(label)
+                textSize = 12f
+                letterSpacing = 0.06f
+                gravity = Gravity.CENTER
+                minHeight = dp(48)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener { pickTheme(mode) }
+            }
+            themeOptions.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply {
+                    if (index > 0) marginStart = dp(8)
+                },
+            )
+        }
+    }
+
+    @android.annotation.SuppressLint("ApplySharedPref") // see the comment inside
+    private fun pickTheme(mode: String) {
+        if (mode == prefs.getString(PREF_THEME, THEME_DARK)) return
+        // commit, not apply: recreate() reads it back in attachBaseContext at once.
+        prefs.edit().putString(PREF_THEME, mode).commit()
+        recreate()
     }
 
     private fun pickRotation(degrees: Int) {
