@@ -243,4 +243,8 @@
     <string name="theme_light">Light</string>
     <string name="theme_system">System</string>
     <string name="palette_chip_description">%1$s palette</string>
+    <string name="field_areas">Measurement areas</string>
+    <string name="areas_note">Rectangles on the picture with Max, Min and the average inside. Drag one to move it, its corner dot to resize it.</string>
+    <string name="area_readings">Max %1$s\nAvg %2$s\nMin %3$s</string>
+    <string name="areas_off">Off</string>
 </resources>

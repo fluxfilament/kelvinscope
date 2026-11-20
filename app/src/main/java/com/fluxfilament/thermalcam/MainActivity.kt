@@ -109,6 +109,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_EXTREMES = "extremes"
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_THEME = "theme"
+        const val PREF_AREAS = "areaCount"
         const val STATE_IN_SETTINGS = "inSettings"
         const val THEME_DARK = "dark"
         const val THEME_LIGHT = "light"
@@ -226,6 +227,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var isothermSummary: TextView
     private lateinit var themeOptions: LinearLayout
     private lateinit var paletteStrip: LinearLayout
+    private lateinit var areaOptions: LinearLayout
+    private val measureAreas = MeasureAreas()
 
     /** The isotherm threshold in degrees, or null when off. */
     private var isothermC: Int? = null
@@ -490,6 +493,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         buildPaletteStrip()
         buildRotationOptions()
         buildThemeOptions()
+        measureAreas.setCount(prefs.getInt(PREF_AREAS, 0))
+        buildAreaOptions()
         buildPresetRows()
         metalSwatch.background = metalSwatchDrawable()
 
@@ -573,6 +578,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         isothermSummary = findViewById(R.id.isothermSummary)
         themeOptions = findViewById(R.id.themeOptions)
         paletteStrip = findViewById(R.id.paletteStrip)
+        areaOptions = findViewById(R.id.areaOptions)
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
@@ -786,6 +792,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         spotMinusButton.setOnClickListener { if (spotMeter.remove()) updateSpotCount() }
         spotPlusButton.setOnClickListener { if (spotMeter.add()) updateSpotCount() }
         thermalView.onSpotMoved = { index, u, v -> spotMeter.move(index, u, v) }
+        thermalView.onAreaMoved = { index, du, dv -> measureAreas.move(index, du, dv) }
+        thermalView.onAreaResized = { index, u, v -> measureAreas.resize(index, u, v) }
         findViewById<View>(R.id.rangeLowButton).setOnClickListener { openSheet(SheetTarget.LOW) }
         findViewById<View>(R.id.rangeHighButton).setOnClickListener { openSheet(SheetTarget.HIGH) }
         lockButton.setOnClickListener { toggleLock() }
@@ -1381,6 +1389,51 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         }
     }
 
+    private fun buildAreaOptions() {
+        areaOptions.removeAllViews()
+        for (n in 0..MeasureAreas.MAX) {
+            val selected = measureAreas.count == n
+            val option = TextView(this, null, 0, R.style.Ff_Mono).apply {
+                text = if (n == 0) getString(R.string.areas_off) else n.toString()
+                textSize = 12f
+                letterSpacing = 0.06f
+                gravity = Gravity.CENTER
+                minHeight = dp(48)
+                setBackgroundResource(if (selected) R.drawable.bg_opt_on else R.drawable.bg_opt)
+                if (selected) setTextColor(getColor(R.color.ff_accent))
+                isClickable = true
+                setOnClickListener {
+                    measureAreas.setCount(n)
+                    prefs.edit().putInt(PREF_AREAS, n).apply()
+                    buildAreaOptions()
+                }
+            }
+            areaOptions.addView(
+                option,
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply {
+                    if (n > 0) marginStart = dp(8)
+                },
+            )
+        }
+    }
+
+    /** Each area's readings, worked out on the camera thread with the frame in hand. */
+    private fun areaLabels(frame: ThermalFrame): List<AreaLabel> {
+        val calibration = planck
+        return measureAreas.positions().mapIndexed { index, area ->
+            val st = MeasureAreas.stats(frame, area)
+            AreaLabel(
+                area, index + 1,
+                getString(
+                    R.string.area_readings,
+                    "${dec(calibration.rawToCelsius(st.maxRaw))}°C",
+                    "${dec(calibration.rawToCelsius(st.meanRaw.roundToInt()))}°C",
+                    "${dec(calibration.rawToCelsius(st.minRaw))}°C",
+                ),
+            )
+        }
+    }
+
     private fun buildThemeOptions() {
         themeOptions.removeAllViews()
         val current = prefs.getString(PREF_THEME, THEME_DARK)
@@ -1750,12 +1803,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val labels = spotLabels(frame)
         feedSpotLog(frame)
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
+        val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
         if (repaintPending.compareAndSet(false, true)) {
             runOnUiThread {
                 repaintPending.set(false)
                 thermalView.spots = labels
                 thermalView.extremes = marks
+                thermalView.areas = areaMarks
                 thermalView.setImage(bitmap, viewRotation, mirrored)
                 if (screen == Screen.FOV) updateFovPreview(thermal)
                 if (screen == Screen.CALIBRATION) calibration.onFrame(thermal, viewRotation, mirrored, zone)
@@ -1931,6 +1986,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 rangeFixed = rangeFixed,
                 takenAt = takenAt,
                 extremes = if (showExtremes) extremeLabels(frame) else emptyList(),
+                areas = areaLabels(frame),
             ),
         )
         // The thermal layer alone, not the composed one: the original is there to be

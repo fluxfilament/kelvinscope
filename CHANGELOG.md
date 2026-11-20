@@ -13,6 +13,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   picture and on the snapshot card, found on 3x3 means. Off by default,
   in Settings.
 - Isotherm: everything above a chosen temperature is painted green.
+- Measurement areas: up to three rectangles on the picture, each with Max,
+  Min and the average inside; drag to move, drag the corner dot to resize.
+  Also drawn on snapshot cards.
+- A strip of palettes over the scale bar on the main screen, one tap to
+  switch.
 - Temperature log: every spot, Max and Min once a second to a CSV file in
   `Download/Kelvinscope`, started and stopped in Settings.
 - Each snapshot also keeps the sensor's 16-bit counts as a PGM in

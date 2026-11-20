@@ -19,6 +19,7 @@ package com.fluxfilament.thermalcam
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
@@ -52,6 +53,8 @@ class CardScene(
     val takenAt: Date,
     /** Max/Min markers, when they were on screen; empty otherwise. */
     val extremes: List<ExtremeLabel> = emptyList(),
+    /** Measurement areas with their readings, as on screen. */
+    val areas: List<AreaLabel> = emptyList(),
 )
 
 /**
@@ -126,7 +129,7 @@ object SnapshotCard {
 
         canvas.save()
         canvas.translate(pad, pad)
-        drawPicture(canvas, scene, pictureW, pictureH, unit)
+        drawPicture(canvas, scene, pictureW, pictureH, unit, mono)
         canvas.restore()
 
         canvas.save()
@@ -149,6 +152,7 @@ object SnapshotCard {
         pictureW: Int,
         pictureH: Int,
         unit: Float,
+        mono: Typeface,
     ) {
         val src = scene.picture
         val matrix = ViewTransform.matrixFor(
@@ -172,6 +176,44 @@ object SnapshotCard {
         val margin = 5f * unit
         val bounds = RectF(margin, margin, pictureW - margin, pictureH - margin)
         val point = FloatArray(2)
+        if (scene.areas.isNotEmpty()) {
+            val outline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 1.5f * unit
+                color = Color.WHITE
+                pathEffect = android.graphics.DashPathEffect(floatArrayOf(6f * unit, 4f * unit), 0f)
+            }
+            val shadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 3.5f * unit
+                color = 0x99000000.toInt()
+            }
+            val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textSize = 11.5f * unit
+                isFakeBoldText = true
+                typeface = mono
+            }
+            val textShadow = Paint(text).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 3f * unit
+                color = 0xC8000000.toInt()
+            }
+            val r = RectF()
+            for (label in scene.areas) {
+                val a = label.area
+                r.set(a.left * src.width, a.top * src.height, a.right * src.width, a.bottom * src.height)
+                matrix.mapRect(r)
+                canvas.drawRect(r, shadow)
+                canvas.drawRect(r, outline)
+                var y = r.top + 4f * unit + text.textSize
+                for (line in ("A${label.number}\n" + label.text).split('\n')) {
+                    canvas.drawText(line, r.left + 4f * unit, y, textShadow)
+                    canvas.drawText(line, r.left + 4f * unit, y, text)
+                    y += text.textSize * 1.15f
+                }
+            }
+        }
         for (mark in scene.extremes) {
             point[0] = mark.u * src.width
             point[1] = mark.v * src.height
