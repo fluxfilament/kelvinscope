@@ -41,6 +41,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   Also drawn on snapshot cards.
 - A strip of palettes over the scale bar on the main screen, one tap to
   switch.
+- While the temperature log records, a graph of the last ten minutes runs
+  across the top of the picture: Max red, Min blue, each spot in its own
+  colour, on one scale.
 - Temperature log: every spot, Max and Min once a second to a CSV file in
   `Download/Kelvinscope`, started and stopped in Settings.
 - Each snapshot also keeps the sensor's 16-bit counts as a PGM in
@@ -67,6 +70,8 @@ versions follow [Semantic Versioning](https://semver.org/).
   system fonts.
 
 ### Fixed
+- The Field of view screen gives the visible camera's own resolution, not the
+  half-size it is decoded at for the overlay.
 - The Field of view screen gave the resolutions as 80×60 and 1440×1080
   whatever the camera; it now reads them off the frames, so a FLIR ONE Pro
   shows 160×120 ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).

@@ -298,6 +298,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     /** Made on first use and kept: creating one per beep is slow and can fail. */
     private var tone: android.media.ToneGenerator? = null
 
+    /** The log's recent run for the on-screen graph, and the last copy taken of it. */
+    private val trendBuffer = TrendBuffer()
+
+    @Volatile
+    private var trendSnapshot: Array<FloatArray?>? = null
+
     /** The temperature log being recorded, or null. Fed on the camera thread. */
     @Volatile
     private var spotLog: SpotLog? = null
@@ -1951,7 +1957,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // Read off the frames themselves: a FLIR ONE Pro sends 160x120, and a fixed
         // "80x60" here once made a Pro owner suspect the overlay offset came from it.
         fovResThermal.text = getString(R.string.fov_res_thermal, thermal.width, thermal.height)
-        fovResVisible.text = visible?.let { getString(R.string.fov_res_visible, it.width, it.height) }
+        fovResVisible.text = visible?.let {
+            // Decoded at a fraction of its size; the label is about the camera.
+            getString(
+                R.string.fov_res_visible,
+                it.width * Compositor.VISIBLE_SAMPLE, it.height * Compositor.VISIBLE_SAMPLE,
+            )
+        }
             ?: getString(R.string.fov_res_visible_none)
         placeCropRect()
     }
@@ -2132,6 +2144,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
         val lineMark = if (showing == Screen.LIVE) lineLabel(frame) else null
+        val trendMark = if (showing == Screen.LIVE && spotLog != null && reviewing == null) trendSnapshot else null
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
         if (repaintPending.compareAndSet(false, true)) {
             runOnUiThread {
@@ -2140,6 +2153,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 thermalView.extremes = marks
                 thermalView.areas = areaMarks
                 thermalView.line = lineMark
+                thermalView.trend = trendMark
                 thermalView.setImage(bitmap, viewRotation, mirrored)
                 if (screen == Screen.FOV) updateFovPreview(thermal)
                 if (screen == Screen.CALIBRATION) calibration.onFrame(thermal, viewRotation, mirrored, zone)
@@ -2476,6 +2490,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             val now = Date()
             spotLogStartedAt = now
             spotLog = SpotLog(now.time)
+            trendBuffer.clear()
+            trendSnapshot = null
             toast(getString(R.string.spot_log_started))
             refreshSpotLogSummary()
             return
@@ -2514,6 +2530,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             calibration.rawToCelsius(e.hotRaw), calibration.rawToCelsius(e.coldRaw),
             calibration.emissivity,
         )
+        if (added) {
+            trendBuffer.add(calibration.rawToCelsius(e.hotRaw), calibration.rawToCelsius(e.coldRaw), spots)
+            // Copied once a row, not once a frame: the graph only changes that often.
+            trendSnapshot = trendBuffer.snapshot()
+        }
         if (added && screen == Screen.SETTINGS) runOnUiThread { refreshSpotLogSummary() }
     }
 

@@ -73,6 +73,12 @@ class ThermalView @JvmOverloads constructor(
     /** Measurement areas, drawn under everything else on the picture. */
     var areas: List<AreaLabel> = emptyList()
 
+    /**
+     * The temperature log's recent run, series as [TrendBuffer.snapshot] gives them,
+     * or null when no log is recording. Drawn as a strip across the top.
+     */
+    var trend: Array<FloatArray?>? = null
+
     /** The measuring line, or null when it is off. */
     var line: LineLabel? = null
 
@@ -220,6 +226,7 @@ class ThermalView @JvmOverloads constructor(
         zone?.let { drawZone(canvas, bmp, it) }
         for (area in areas) drawArea(canvas, bmp, area)
         line?.let { drawLine(canvas, bmp, it) }
+        trend?.let { drawTrend(canvas, it) }
         for (mark in extremes) drawExtreme(canvas, bmp, mark)
         for (spot in spots) drawSpot(canvas, bmp, spot)
     }
@@ -304,6 +311,77 @@ class ThermalView @JvmOverloads constructor(
         canvas.drawPath(graphPath, graphPaint)
         canvas.drawText(label.maxText, left + 4f * density, plotTop + areaTextPaint.textSize, areaTextPaint)
         canvas.drawText(label.minText, left + 4f * density, plotBottom, areaTextPaint)
+    }
+
+    /**
+     * The log's graph across the top of the view: Max red, Min blue, spots in their
+     * own colours, all on one shared scale so they can be read against each other.
+     */
+    private fun drawTrend(canvas: Canvas, series: Array<FloatArray?>) {
+        var lo = Float.POSITIVE_INFINITY
+        var hi = Float.NEGATIVE_INFINITY
+        var count = 0
+        for (values in series) {
+            if (values == null) continue
+            count = maxOf(count, values.size)
+            for (v in values) {
+                if (v.isNaN()) continue
+                if (v < lo) lo = v
+                if (v > hi) hi = v
+            }
+        }
+        if (count < 2 || lo > hi) return
+        if (hi - lo < 1f) {
+            val mid = (hi + lo) / 2f
+            lo = mid - 0.5f
+            hi = mid + 0.5f
+        }
+        val pad = 8f * density
+        val graphH = 72f * density
+        val top = pad
+        canvas.drawRect(pad, top, width - pad, top + graphH, graphBackground)
+        val hiText = String.format(context.uiLocale(), "%.1f°", hi)
+        val loText = String.format(context.uiLocale(), "%.1f°", lo)
+        val textW = maxOf(areaTextPaint.measureText(hiText), areaTextPaint.measureText(loText))
+        val plotLeft = pad + textW + 10f * density
+        val plotRight = width - pad - 6f * density
+        val plotTop = top + 6f * density
+        val plotBottom = top + graphH - 6f * density
+        for ((s, values) in series.withIndex()) {
+            if (values == null) continue
+            trendPaint.color = TREND_COLOURS[s % TREND_COLOURS.size]
+            graphPath.reset()
+            var pen = false
+            for (i in values.indices) {
+                val v = values[i]
+                if (v.isNaN()) {
+                    pen = false
+                    continue
+                }
+                val x = plotLeft + (plotRight - plotLeft) * i / (count - 1)
+                val y = plotBottom - (plotBottom - plotTop) * (v - lo) / (hi - lo)
+                if (pen) graphPath.lineTo(x, y) else graphPath.moveTo(x, y)
+                pen = true
+            }
+            canvas.drawPath(graphPath, trendPaint)
+        }
+        canvas.drawText(hiText, pad + 4f * density, plotTop + areaTextPaint.textSize, areaTextPaint)
+        canvas.drawText(loText, pad + 4f * density, plotBottom, areaTextPaint)
+    }
+
+    private val trendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.6f * density
+        strokeJoin = Paint.Join.ROUND
+    }
+
+    private companion object {
+        /** Max, Min, then spots 1-9. */
+        val TREND_COLOURS = intArrayOf(
+            0xFFFF5A4A.toInt(), 0xFF4FC3E0.toInt(),
+            0xFFFFFFFF.toInt(), 0xFFFFD54F.toInt(), 0xFF8BC34A.toInt(), 0xFFFF8AD8.toInt(),
+            0xFFB39DDB.toInt(), 0xFFFFAB40.toInt(), 0xFF80CBC4.toInt(), 0xFFBCAAA4.toInt(), 0xFFE0E0E0.toInt(),
+        )
     }
 
     /** The area's rectangle on screen, through the picture's own matrix. */

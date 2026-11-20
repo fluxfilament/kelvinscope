@@ -113,7 +113,7 @@ class Compositor {
     private val decodeOptions = BitmapFactory.Options().apply {
         // Half resolution is still far more detail than the 80x60 thermal frame it is
         // being mixed with, at a quarter of the decode cost per frame.
-        inSampleSize = 2
+        inSampleSize = VISIBLE_SAMPLE
         inPreferredConfig = Bitmap.Config.ARGB_8888
     }
 
@@ -212,6 +212,12 @@ class Compositor {
     }
 
     companion object {
+        /**
+         * The visible JPEG is decoded at 1/this of its size; anything reporting the
+         * camera's own resolution multiplies back by it.
+         */
+        const val VISIBLE_SAMPLE = 2
+
         /**
          * Output is a multiple of the thermal frame so the visible layer has somewhere
          * to put its detail: compositing at 80x60 would throw away the very thing the
