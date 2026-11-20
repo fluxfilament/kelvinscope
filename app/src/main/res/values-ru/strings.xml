@@ -246,4 +246,9 @@
     <string name="areas_note">Прямоугольники на кадре: Max, Min и среднее внутри. Перетащите область, чтобы сдвинуть, а точку в углу — чтобы изменить размер.</string>
     <string name="area_readings">Max %1$s\nСр %2$s\nMin %3$s</string>
     <string name="areas_off">Выкл</string>
+    <string name="state_review">[СНИМОК]</string>
+    <string name="row_open_snapshot">Открыть снимок</string>
+    <string name="open_snapshot_note">Выберите .pgm из Pictures/Kelvinscope/raw, чтобы измерить его заново: точки, области, палитра и излучательная способность работают на нём. «Назад» возвращает к камере.</string>
+    <string name="review_started">Снимок открыт; сохранён с ε %1$s. «Назад» возвращает к камере.</string>
+    <string name="review_failed">Не удалось открыть снимок: %1$s</string>
 </resources>

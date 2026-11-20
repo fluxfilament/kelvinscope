@@ -110,6 +110,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_ISOTHERM = "isothermC"
         const val PREF_THEME = "theme"
         const val PREF_AREAS = "areaCount"
+        const val REQUEST_COUNTS = 42
+        const val REVIEW_REFRESH_MS = 120L
         const val STATE_IN_SETTINGS = "inSettings"
         const val THEME_DARK = "dark"
         const val THEME_LIGHT = "light"
@@ -394,6 +396,18 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
      */
     @Volatile
     private var planck = Planck.DEVELOPMENT_UNIT
+
+    /**
+     * A saved snapshot being looked at again instead of the camera, or null for the
+     * live view. Everything that works on a live frame - spots, areas, markers,
+     * palettes, emissivity, the shutter - works on this one, which is the whole
+     * point of keeping the counts: the picture can be measured afresh later.
+     */
+    @Volatile
+    private var review: ThermalFrame? = null
+
+    /** The live conversion, put back when the review ends. */
+    private var planckBeforeReview: Planck? = null
 
     private lateinit var calibration: CalibrationScreen
     private lateinit var calibrationSummary: TextView
@@ -714,6 +728,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         applyIsotherm()
         refreshSpotLogSummary()
         findViewById<View>(R.id.rowSpotLog).setOnClickListener { toggleSpotLog() }
+        findViewById<View>(R.id.rowOpenSnapshot).setOnClickListener { pickCounts() }
         findViewById<View>(R.id.rowExtremes).setOnClickListener {
             showExtremes = !showExtremes
             prefs.edit().putBoolean(PREF_EXTREMES, showExtremes).apply()
@@ -752,6 +767,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private fun handleBack(): Boolean {
         if (sheetLayer.visibility == View.VISIBLE) {
             closeSheet()
+            return true
+        }
+        if (screen == Screen.LIVE && review != null) {
+            endReview()
             return true
         }
         val previous = backStack.removeLastOrNull() ?: return false
@@ -805,6 +824,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val stamp: Int
         val colour: Int
         when {
+            review != null -> {
+                state = R.string.state_review
+                stamp = R.drawable.bg_stamp_done
+                colour = R.color.ff_accent
+            }
             calibrating -> {
                 state = R.string.state_calibrating
                 stamp = R.drawable.bg_stamp_done
@@ -1125,9 +1149,88 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     @Deprecated("Activity has no result API of its own; this is still the way for it")
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_COUNTS) {
+            val uri = data?.data
+            if (resultCode == RESULT_OK && uri != null) openCounts(uri)
+            return
+        }
         if (!calibration.onActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    // --- reviewing a saved snapshot ------------------------------------------------
+
+    private fun pickCounts() {
+        // Any type: phones disagree on what to call a .pgm, and a filter on it would
+        // hide the very files this is for.
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+        @Suppress("DEPRECATION")
+        startActivityForResult(intent, REQUEST_COUNTS)
+    }
+
+    private fun openCounts(uri: android.net.Uri) {
+        thread(name = "flir-open") {
+            val outcome = runCatching {
+                val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    ?: throw java.io.IOException("empty")
+                val decoded = RawCounts.decode(bytes)
+                val saved = RawCounts.planckOf(decoded.meta)
+                    ?: throw IllegalArgumentException("no conversion in the file")
+                decoded to saved
+            }
+            runOnUiThread {
+                outcome.fold(
+                    onSuccess = { (decoded, saved) -> startReview(decoded, saved) },
+                    onFailure = { e ->
+                        toast(getString(R.string.review_failed, e.message ?: e.javaClass.simpleName))
+                    },
+                )
+            }
+        }
+    }
+
+    private fun startReview(decoded: RawCounts.Decoded, saved: Planck) {
+        val frame = ThermalFrame(
+            width = decoded.width,
+            height = decoded.height,
+            raw = decoded.raw,
+            min = decoded.raw.min(),
+            max = decoded.raw.max(),
+            status = FrameStatus("{}"),
+            jpeg = null,
+        )
+        if (planckBeforeReview == null) planckBeforeReview = planck
+        // The file's camera and correction, with the emissivity as currently set:
+        // re-reading with another emissivity is what the review is for, and the
+        // slider stays the one control for it. The saved value is shown once.
+        planck = saved.copy(emissivity = planck.emissivity)
+        renderer.resetBounds()
+        review = frame
+        toast(getString(R.string.review_started, dec(saved.emissivity, 2)))
+        backStack.clear()
+        show(Screen.LIVE)
+        refreshTopBar()
+        refreshLegend()
+        // A saved frame never arrives again by itself, so it is re-fed on a timer:
+        // dragging a spot or moving the emissivity has to redraw the readings.
+        thread(name = "flir-review") {
+            while (review === frame) {
+                onFrame(frame)
+                Thread.sleep(REVIEW_REFRESH_MS)
+            }
+        }
+    }
+
+    private fun endReview() {
+        review = null
+        planckBeforeReview?.let { planck = it.copy(emissivity = planck.emissivity) }
+        planckBeforeReview = null
+        renderer.resetBounds()
+        refreshTopBar()
+        refreshLegend()
     }
 
     /** A correction moves what every count means in degrees, just as emissivity does. */
@@ -1722,6 +1825,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     /** Says why the picture is empty, or hides itself once frames come in. */
     private fun refreshEmptyHint() {
+        if (review != null) {
+            emptyHint.visibility = View.GONE
+            return
+        }
         val device = findFlirDevice()
         val diagnosis = EmptyDiagnosis.of(
             devicePresent = device != null,
@@ -1784,6 +1891,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     }
 
     override fun onFrame(frame: ThermalFrame) {
+        val reviewing = review
+        if (reviewing != null && frame !== reviewing) return
         // Colourising is CPU work on a small array; do it here rather than hopping to
         // the UI thread with raw counts, and coalesce repaints so a slow frame does
         // not queue up behind a backlog of invalidates.
@@ -1801,7 +1910,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             runOnUiThread { refreshTopBar() }
         }
         val labels = spotLabels(frame)
-        feedSpotLog(frame)
+        // The log is a record of the camera over time; a re-read snapshot is not.
+        if (reviewing == null) feedSpotLog(frame)
         val marks = if (showExtremes && showing == Screen.LIVE) extremeLabels(frame) else emptyList()
         val areaMarks = if (showing == Screen.LIVE) areaLabels(frame) else emptyList()
         val zone = if (showing == Screen.CALIBRATION) calibration.zoneCelsius(frame) else Double.NaN
@@ -1952,7 +2062,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
      * view at the exact moment the user is holding the camera still.
      */
     private fun saveSnapshot() {
-        val frame = camera.lastFrame
+        val frame = review ?: camera.lastFrame
         if (frame == null) {
             toast(getString(R.string.nothing_to_save))
             return

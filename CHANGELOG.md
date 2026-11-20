@@ -23,6 +23,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Each snapshot also keeps the sensor's 16-bit counts as a PGM in
   `Pictures/Kelvinscope/raw`, with the conversion parameters in its header,
   so a picture can be measured again later.
+- Open a snapshot: Settings → Open a snapshot loads a saved `.pgm` in place
+  of the camera, and spots, areas, markers, palettes and emissivity all work
+  on it; the shutter saves a new card from it. Back returns to the camera.
 - When the picture is empty, the app says why: no camera, no USB access
   (tap to ask again), waiting for frames, or the stream stopped.
 - Importing camera constants from a FLIR JPEG also shows FLIR's own overlay

@@ -247,4 +247,9 @@
     <string name="areas_note">Rectangles on the picture with Max, Min and the average inside. Drag one to move it, its corner dot to resize it.</string>
     <string name="area_readings">Max %1$s\nAvg %2$s\nMin %3$s</string>
     <string name="areas_off">Off</string>
+    <string name="state_review">[SNAPSHOT]</string>
+    <string name="row_open_snapshot">Open a snapshot</string>
+    <string name="open_snapshot_note">Pick a .pgm from Pictures/Kelvinscope/raw to measure it again: spots, areas, palette and emissivity all work on it. Back returns to the camera.</string>
+    <string name="review_started">Snapshot open; it was saved with emissivity %1$s. Back returns to the camera.</string>
+    <string name="review_failed">Could not open the snapshot: %1$s</string>
 </resources>
