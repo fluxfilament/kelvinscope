@@ -800,10 +800,15 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             }
             insets
         }
-        // Light glyphs in the status bar: everything behind them is dark.
+        // Status bar glyphs follow the theme: light on the dark one, dark on the
+        // cream one. The night bit here is the one attachBaseContext chose, not
+        // necessarily the system's.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val lightBackground = (resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_NO
             window.insetsController?.setSystemBarsAppearance(
-                0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                if (lightBackground) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
             )
         }
     }
