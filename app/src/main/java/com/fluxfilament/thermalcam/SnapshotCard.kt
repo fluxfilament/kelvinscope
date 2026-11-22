@@ -122,7 +122,7 @@ object SnapshotCard {
             textSize = 10.5f * unit
             typeface = mono
         }
-        val lines = wrap(data, dataPaint, pictureW.toFloat())
+        val lines = wrap(data) { dataPaint.measureText(it) <= pictureW }
 
         val width = (pad * 2 + pictureW).roundToInt()
         val height = (
@@ -395,33 +395,43 @@ object SnapshotCard {
     }
 
     /**
-     * Breaks the data line at its separators so it fits [width], keeping whole tokens
-     * together - a date split across two lines reads as two different dates.
+     * Breaks the data line at its separators so every line [fits], keeping whole
+     * tokens together - a date split across two lines reads as two different dates.
+     * A token wider than a line on its own (the overlay notes, which name the air
+     * they were worked out for) is broken at its spaces, but never between a number
+     * and its unit.
      */
-    private fun wrap(text: String, paint: Paint, width: Float): List<String> {
-        if (paint.measureText(text) <= width) return listOf(text)
+    internal fun wrap(text: String, fits: (String) -> Boolean): List<String> {
+        if (fits(text)) return listOf(text)
+        return pack(text.split(SEPARATOR), SEPARATOR, fits)
+            .flatMap { if (fits(it)) listOf(it) else pack(it.split(WORD_BREAK), " ", fits) }
+    }
+
+    private fun pack(parts: List<String>, glue: String, fits: (String) -> Boolean): List<String> {
         val lines = mutableListOf<String>()
-        var current = StringBuilder()
-        for (token in text.split(SEPARATOR)) {
-            val candidate = if (current.isEmpty()) token else "$current$SEPARATOR$token"
-            if (current.isNotEmpty() && paint.measureText(candidate) > width) {
-                lines += current.toString()
-                current = StringBuilder(token)
+        var current = ""
+        for (part in parts) {
+            val candidate = if (current.isEmpty()) part else "$current$glue$part"
+            if (current.isNotEmpty() && !fits(candidate)) {
+                lines += current
+                current = part
             } else {
-                current = StringBuilder(candidate)
+                current = candidate
             }
         }
-        if (current.isNotEmpty()) lines += current.toString()
+        if (current.isNotEmpty()) lines += current
         return lines
     }
 
     private fun celsius(value: Double): String =
         if (value.isNaN()) EMPTY else String.format(locale, "%.1f°C", value)
 
-    /** Shown for a window auto-gain has not settled on yet. */
     /** Stands in for a window auto-gain has not settled on yet. */
     private const val EMPTY = "—"
     private const val SEPARATOR = " · "
+
+    /** A space, unless a unit follows it: "21 °C" and "80 %" stay on one line. */
+    private val WORD_BREAK = Regex(" (?![°%])")
     private const val STOPS = 33
 
     // The F&F palette, matching res/values/colors.xml. Hard-coded rather than looked
