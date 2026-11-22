@@ -203,11 +203,6 @@ object SnapshotCard {
                 isFakeBoldText = true
                 typeface = mono
             }
-            val textShadow = Paint(text).apply {
-                style = Paint.Style.STROKE
-                strokeWidth = 3f * unit
-                color = 0xC8000000.toInt()
-            }
             val r = RectF()
             for (label in scene.areas) {
                 val a = label.area
@@ -215,12 +210,14 @@ object SnapshotCard {
                 matrix.mapRect(r)
                 canvas.drawRect(r, shadow)
                 canvas.drawRect(r, outline)
-                var y = r.top + 4f * unit + text.textSize
-                for (line in ("A${label.number}\n" + label.text).split('\n')) {
-                    canvas.drawText(line, r.left + 4f * unit, y, textShadow)
-                    canvas.drawText(line, r.left + 4f * unit, y, text)
-                    y += text.textSize * 1.15f
-                }
+                // Outside the frame, as on screen - see LabelPlacement.
+                val lines = ("A${label.number}\n" + label.text).split('\n')
+                val at = LabelPlacement.areaBlock(
+                    r.left, r.top, r.bottom,
+                    glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), 3f * unit,
+                    bounds.left, bounds.top, bounds.right, bounds.bottom,
+                )
+                glyphs.drawBlock(canvas, lines, text, at[0], at[1])
             }
         }
         scene.line?.let { line ->
@@ -240,11 +237,6 @@ object SnapshotCard {
                 isFakeBoldText = true
                 typeface = mono
             }
-            val textShadow = Paint(text).apply {
-                style = Paint.Style.STROKE
-                strokeWidth = 3f * unit
-                color = 0xC8000000.toInt()
-            }
             val ends = floatArrayOf(
                 line.start.u * src.width, line.start.v * src.height,
                 line.end.u * src.width, line.end.v * src.height,
@@ -252,11 +244,14 @@ object SnapshotCard {
             matrix.mapPoints(ends)
             canvas.drawLine(ends[0], ends[1], ends[2], ends[3], shadow)
             canvas.drawLine(ends[0], ends[1], ends[2], ends[3], stroke)
-            val w = text.measureText(line.text)
-            val x = ((ends[0] + ends[2]) / 2f - w / 2f).coerceIn(bounds.left, bounds.right - w)
-            val y = ((ends[1] + ends[3]) / 2f - 8f * unit).coerceIn(bounds.top + text.textSize, bounds.bottom)
-            canvas.drawText(line.text, x, y, textShadow)
-            canvas.drawText(line.text, x, y, text)
+            val lines = listOf(line.text)
+            val w = glyphs.blockWidth(lines, text)
+            val h = glyphs.blockHeight(lines, text)
+            val c = LabelPlacement.lineBlock(
+                ends[0], ends[1], ends[2], ends[3], w, h, 3f * unit,
+                bounds.left, bounds.top, bounds.right, bounds.bottom,
+            )
+            glyphs.drawBlock(canvas, lines, text, c[0] - w / 2f, c[1] - h / 2f)
         }
         for (mark in scene.extremes) {
             point[0] = mark.u * src.width

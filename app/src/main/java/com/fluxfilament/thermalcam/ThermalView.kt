@@ -145,6 +145,8 @@ class ThermalView @JvmOverloads constructor(
     /** Scratch for placing labels in the turned frame; reused to keep onDraw allocation-free. */
     private val labelMatrix = Matrix()
     private val labelBounds = RectF()
+    private val viewInLabel = RectF()
+    private val lineInLabel = FloatArray(4)
 
     private val imagePaint = Paint().apply {
         // 80x60 blown up to a phone screen: interpolation just smears the pixels, and
@@ -211,11 +213,6 @@ class ThermalView @JvmOverloads constructor(
         textSize = 11.5f * density
         isFakeBoldText = true
     }
-    private val areaTextShadow = Paint(areaTextPaint).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = 3f * density
-        color = 0xC8000000.toInt()
-    }
 
     fun setImage(bitmap: Bitmap, rotation: Int, mirrored: Boolean) {
         this.bitmap = bitmap
@@ -279,15 +276,24 @@ class ThermalView @JvmOverloads constructor(
             canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, lineShadow)
             canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, linePaint)
         }
-        // Readings at the middle, upright for the reader like every other label.
+        // Readings beside the middle, upright for the reader like every other label,
+        // and clear of the line rather than struck through by it.
         val cx = (ax + bx) / 2f
         val cy = (ay + by) / 2f
         canvas.save()
         canvas.rotate(-labelRotation.toFloat(), cx, cy)
-        val y = cy - 8f * density
-        val x = cx - areaTextPaint.measureText(label.text) / 2f
-        canvas.drawText(label.text, x, y, areaTextShadow)
-        canvas.drawText(label.text, x, y, areaTextPaint)
+        boundsInLabelFrame(cx, cy, viewInLabel)
+        System.arraycopy(lineEnds, 0, lineInLabel, 0, 4)
+        labelMatrix.setRotate(labelRotation.toFloat(), cx, cy)
+        labelMatrix.mapPoints(lineInLabel)
+        val lines = listOf(label.text)
+        val w = glyphs.blockWidth(lines, areaTextPaint)
+        val h = glyphs.blockHeight(lines, areaTextPaint)
+        val c = LabelPlacement.lineBlock(
+            lineInLabel[0], lineInLabel[1], lineInLabel[2], lineInLabel[3], w, h, 3f * density,
+            viewInLabel.left, viewInLabel.top, viewInLabel.right, viewInLabel.bottom,
+        )
+        glyphs.drawBlock(canvas, lines, areaTextPaint, c[0] - w / 2f, c[1] - h / 2f)
         canvas.restore()
         drawProfile(canvas, label)
     }
@@ -420,21 +426,23 @@ class ThermalView @JvmOverloads constructor(
         canvas.drawCircle(point[0], point[1], 5f * density, areaShadow)
         canvas.drawCircle(point[0], point[1], 5f * density, handlePaint)
 
-        // The readings inside the top-left corner as the reader sees it.
+        // The readings above the frame as the reader sees it, or below it: inside, a
+        // spot placed in the area would write over them.
         val cx = areaRect.centerX()
         val cy = areaRect.centerY()
         canvas.save()
         canvas.rotate(-labelRotation.toFloat(), cx, cy)
+        boundsInLabelFrame(cx, cy, viewInLabel)
         labelMatrix.setRotate(labelRotation.toFloat(), cx, cy)
         labelBounds.set(areaRect)
         labelMatrix.mapRect(labelBounds)
         val lines = ("A${label.number}\n" + label.text).split('\n')
-        var y = labelBounds.top + 4f * density + areaTextPaint.textSize
-        for (line in lines) {
-            canvas.drawText(line, labelBounds.left + 4f * density, y, areaTextShadow)
-            canvas.drawText(line, labelBounds.left + 4f * density, y, areaTextPaint)
-            y += areaTextPaint.textSize * 1.15f
-        }
+        val at = LabelPlacement.areaBlock(
+            labelBounds.left, labelBounds.top, labelBounds.bottom,
+            glyphs.blockWidth(lines, areaTextPaint), glyphs.blockHeight(lines, areaTextPaint), 3f * density,
+            viewInLabel.left, viewInLabel.top, viewInLabel.right, viewInLabel.bottom,
+        )
+        glyphs.drawBlock(canvas, lines, areaTextPaint, at[0], at[1])
         canvas.restore()
     }
 

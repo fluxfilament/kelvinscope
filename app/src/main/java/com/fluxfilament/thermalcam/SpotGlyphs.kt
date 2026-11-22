@@ -162,4 +162,36 @@ class SpotGlyphs(private val unit: Float) {
         canvas.drawText(text, x, y, outline)
         canvas.drawText(text, x, y, fill)
     }
+
+    private val platePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(166, 0, 0, 0) }
+    private val plateRect = RectF()
+    private val platePad: Float get() = 4f * unit
+
+    /** Width of [lines] in [paint] on their plate - see [drawBlock]. */
+    fun blockWidth(lines: List<String>, paint: Paint): Float =
+        lines.maxOf { paint.measureText(it) } + 2 * platePad
+
+    /** Height of [lines] in [paint] on their plate - see [drawBlock]. */
+    fun blockHeight(lines: List<String>, paint: Paint): Float =
+        paint.textSize * (1 + (lines.size - 1) * LINE_SPACING) + paint.descent() + 2 * platePad
+
+    /**
+     * Lines of readings on a dark plate, top-left at ([left], [top]). For the blocks
+     * of the areas and the line, placed by [LabelPlacement]: they can land on
+     * anything - a bright picture, a dashed frame, a marker - and have to read over
+     * all of it, which an outline round the letters alone did not manage.
+     */
+    fun drawBlock(canvas: Canvas, lines: List<String>, paint: Paint, left: Float, top: Float) {
+        plateRect.set(left, top, left + blockWidth(lines, paint), top + blockHeight(lines, paint))
+        canvas.drawRoundRect(plateRect, 3f * unit, 3f * unit, platePaint)
+        var y = top + platePad + paint.textSize
+        for (line in lines) {
+            canvas.drawText(line, left + platePad, y, paint)
+            y += paint.textSize * LINE_SPACING
+        }
+    }
+
+    private companion object {
+        const val LINE_SPACING = 1.15f
+    }
 }
