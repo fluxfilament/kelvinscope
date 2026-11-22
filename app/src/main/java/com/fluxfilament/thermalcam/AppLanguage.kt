@@ -16,6 +16,7 @@
  */
 package com.fluxfilament.thermalcam
 
+import android.annotation.SuppressLint
 import android.app.LocaleManager
 import android.content.Context
 import android.content.SharedPreferences
@@ -33,7 +34,11 @@ import java.util.Locale
  * system recreates the activity when it changes. Before 13 there is no such setting:
  * the choice is kept in the app's preferences and laid over the configuration in
  * attachBaseContext, the way the theme is.
+ *
+ * Lint's AppBundleLocaleChanges is about Play's split APKs, which leave out the
+ * languages a phone was not set to; this app ships as one APK with all six.
  */
+@SuppressLint("AppBundleLocaleChanges")
 object AppLanguage {
 
     /** The languages there are strings for, in the order the picker lists them. */
@@ -54,6 +59,7 @@ object AppLanguage {
      * Switches the interface to [tag], or back to the phone's language for null.
      * True when the caller has to recreate the activity itself (before Android 13).
      */
+    @SuppressLint("ApplySharedPref") // see the comment inside
     fun pick(context: Context, prefs: SharedPreferences, tag: String?): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.getSystemService(LocaleManager::class.java).applicationLocales =
