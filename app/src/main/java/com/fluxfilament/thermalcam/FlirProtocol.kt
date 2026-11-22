@@ -76,6 +76,30 @@ object FlirProtocol {
     const val VOSPI_PACKET_HEADER_BYTES = 4
     const val VOSPI_PIXELS_PER_PACKET = 80
 
+    /** The sensor's counts are 14-bit: anything above this is not a reading. */
+    const val MAX_COUNT = 0x3FFF
+
+    /** Past one value in this many above [MAX_COUNT], a frame is not a picture. */
+    private const val IMPLAUSIBLE_ONE_IN = 20
+
+    /**
+     * Whether [pixels] look like sensor counts at all.
+     *
+     * On 2026-11-22 one frame of 107 in a time-lapse carried text where its thermal
+     * payload should have been - the byte pairs read as status JSON - while every
+     * size in its header added up. Its values ran to 65038, the time-lapse's shared
+     * scale stretched to fit them, and every other frame came out black. Live it
+     * only flickers for a ninth of a second, but the alarm, the log and a snapshot
+     * would take it as a reading. ASCII letters read as 16-bit words land above 14
+     * bits, so such a frame shows up as values a sensor cannot produce; a share
+     * rather than any single one, so that one bad value does not cost a frame.
+     */
+    fun plausibleCounts(pixels: IntArray): Boolean {
+        var over = 0
+        for (v in pixels) if (v > MAX_COUNT) over++
+        return over * IMPLAUSIBLE_ONE_IN <= pixels.size
+    }
+
     /**
      * VoSPI packets left over after the image rows: Lepton telemetry. Counted in
      * packets, not rows - at 80 wide the two are the same, but how a 160-wide sensor

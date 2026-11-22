@@ -134,4 +134,24 @@ class FrameDecodeTest {
         assertEquals("FFC_PROGRESS", closed.ffcState)
         assertEquals("304.5", closed.shutterTemperature)
     }
+
+    @Test
+    fun sensorCountsArePlausible() =
+        assertTrue(FlirProtocol.plausibleCounts(IntArray(80 * 60) { 3650 + it % 530 }))
+
+    @Test
+    fun textInThePayloadIsNot() {
+        // Status JSON read as little-endian 16-bit words, as it came on 2026-11-22.
+        val json = "{\"shutterState\":\"ON\",\"shutterTemperature\":308.2,\"ffcState\":\"FFC_VALID_RAD\"}"
+            .repeat(200).toByteArray()
+        val words = IntArray(80 * 60) { (json[2 * it].toInt() and 0xff) or ((json[2 * it + 1].toInt() and 0xff) shl 8) }
+        assertFalse(FlirProtocol.plausibleCounts(words))
+    }
+
+    @Test
+    fun aFewOutOfRangeValuesDoNotCostTheFrame() {
+        val pixels = IntArray(80 * 60) { 4000 }
+        for (i in 0 until 48) pixels[i * 100] = 65000
+        assertTrue(FlirProtocol.plausibleCounts(pixels))
+    }
 }

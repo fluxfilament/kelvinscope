@@ -208,6 +208,7 @@ class FlirOneCamera(
         var droppedFfc = 0
         var decodeFailures = 0
         var deliveryFailures = 0
+        var implausible = 0
 
         val telemetry = TelemetryAssembler(
             log = listener::onLog,
@@ -263,6 +264,13 @@ class FlirOneCamera(
                             "Thermal payload is $thermalSize bytes, too short for " +
                                     "${info.width}x${info.height} (needs " +
                                     "${FlirProtocol.imageBytes(info.width, info.height)}) - not rendering."
+                        )
+                    }
+                } else if (!FlirProtocol.plausibleCounts(pixels)) {
+                    if (implausible++ == 0) {
+                        listener.onLog(
+                            "Frame with counts beyond 14 bits (not sensor data) - dropped. " +
+                                    "Further ones are dropped without a log line."
                         )
                     }
                 } else {
