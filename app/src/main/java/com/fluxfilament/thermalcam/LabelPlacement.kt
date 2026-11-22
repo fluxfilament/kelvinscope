@@ -105,11 +105,13 @@ object LabelPlacement {
      * The block of [w] by [h] for the line from ([ax], [ay]) to ([bx], [by]): beside
      * its middle, then beside a quarter of the way from either end, upper side first
      * (right-hand for an upright line); then past either end. Each far enough from
-     * the line that no corner comes within [gap] of it.
+     * the line that no corner comes within [gap] of it. Covering one of the areas'
+     * [frames] costs, as for an area's own block.
      */
     fun lineBlock(
         ax: Float, ay: Float, bx: Float, by: Float,
         w: Float, h: Float, gap: Float, bounds: Box, taken: List<Box>,
+        frames: List<Box> = emptyList(),
     ): Box {
         var dx = bx - ax
         var dy = by - ay
@@ -141,7 +143,7 @@ object LabelPlacement {
         }
         candidates += (ax - dx * along - hw) to (ay - dy * along - hh)
         candidates += (bx + dx * along - hw) to (by + dy * along - hh)
-        return choose(candidates, w, h, gap, bounds, taken, emptyList(), floatArrayOf(ax, ay, bx, by))
+        return choose(candidates, w, h, gap, bounds, taken, frames, floatArrayOf(ax, ay, bx, by))
     }
 
     /**

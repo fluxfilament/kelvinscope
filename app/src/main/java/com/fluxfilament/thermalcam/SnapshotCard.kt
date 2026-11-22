@@ -257,7 +257,7 @@ object SnapshotCard {
             val lines = scene.line.text.split('\n')
             val box = LabelPlacement.lineBlock(
                 ends[0], ends[1], ends[2], ends[3],
-                glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), gap, within, taken,
+                glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), gap, within, taken, frames,
             )
             glyphs.drawBlock(canvas, lines, text, box.left, box.top)
             taken += box

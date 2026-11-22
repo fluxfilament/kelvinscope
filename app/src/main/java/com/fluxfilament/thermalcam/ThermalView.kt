@@ -317,6 +317,11 @@ class ThermalView @JvmOverloads constructor(
         val gap = 3f * density
         canvas.save()
         canvas.rotate(-labelRotation.toFloat(), cx, cy)
+        val frames = areas.map {
+            mapArea(bmp, it.area, labelBounds)
+            labelMatrix.mapRect(labelBounds)
+            Box(labelBounds.left, labelBounds.top, labelBounds.right, labelBounds.bottom)
+        }
         var ends: FloatArray? = null
         if (line != null) {
             mapLineEnds(bmp, line)
@@ -327,15 +332,10 @@ class ThermalView @JvmOverloads constructor(
             val box = LabelPlacement.lineBlock(
                 lineInLabel[0], lineInLabel[1], lineInLabel[2], lineInLabel[3],
                 glyphs.blockWidth(lines, areaTextPaint), glyphs.blockHeight(lines, areaTextPaint),
-                gap, within, taken,
+                gap, within, taken, frames,
             )
             glyphs.drawBlock(canvas, lines, areaTextPaint, box.left, box.top)
             taken += box
-        }
-        val frames = areas.map {
-            mapArea(bmp, it.area, labelBounds)
-            labelMatrix.mapRect(labelBounds)
-            Box(labelBounds.left, labelBounds.top, labelBounds.right, labelBounds.bottom)
         }
         for ((i, label) in areas.withIndex()) {
             val lines = ("A${label.number}\n" + label.text).split('\n')
