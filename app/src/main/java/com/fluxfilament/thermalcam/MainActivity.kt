@@ -173,6 +173,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         /** MIN/MAX readouts while the frame behind them is no longer live. */
         const val STALE_ALPHA = 0.4f
 
+        /** The alarm's vibration: off, on, off, on, in milliseconds. */
+        val ALARM_BUZZ_MS = longArrayOf(0, 250, 150, 250)
+
         /** How close to a preset counts as being on it. */
         const val PRESET_TOLERANCE = 0.025
 
@@ -2503,8 +2506,40 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             android.media.ToneGenerator(android.media.AudioManager.STREAM_ALARM, 90)
         }.getOrNull()?.also { tone = it }
         generator?.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 400)
-        // A haptic tick needs no VIBRATE permission, unlike the Vibrator service.
-        thermalView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        buzz()
+    }
+
+    /**
+     * Two pulses with the alarm's usage, so neither the touch-feedback strength nor
+     * its switch turns them down. A haptic tick was tried first: it needs no
+     * permission, but it could not be felt with the camera in hand.
+     */
+    private fun buzz() {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager)
+                .defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+        }
+        if (!vibrator.hasVibrator()) return
+        val effect = android.os.VibrationEffect.createWaveform(ALARM_BUZZ_MS, -1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            vibrator.vibrate(
+                effect,
+                android.os.VibrationAttributes.createForUsage(
+                    android.os.VibrationAttributes.USAGE_ALARM,
+                ),
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(
+                effect,
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                    .build(),
+            )
+        }
     }
 
     private fun buildIsothermShow() {

@@ -7,6 +7,6 @@
 <li>Sobreposição com a imagem visível da segunda lente, com ajuste de campo de visão e alinhamento.</li>
 <li>Capturas salvas como cartão com a imagem, os pontos, a escala e as configurações, mais os dados de 16 bits para medir de novo.</li>
 <li>Registro de temperatura em CSV, calibração com gelo, água fervendo ou termômetro de contato.</li>
-<li>Sem permissões e sem rede.</li>
+<li>Sem rede; a única permissão é a vibração do alarme.</li>
 </ul>
 <p>Testado em uma FLIR ONE gen 3; usuários relatam que também funciona na FLIR ONE Pro. Modelos para iPhone e Lightning não são suportados.</p>

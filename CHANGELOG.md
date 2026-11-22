@@ -14,9 +14,10 @@ versions follow [Semantic Versioning](https://semver.org/).
   in Settings.
 - Isotherm: everything above, below or between chosen temperatures is
   painted green.
-- Alarm: a beep and a haptic tick while the hottest place is above a limit,
-  or the coldest below one, with `[ALARM]` in the status bar. Still no
-  permissions: no VIBRATE needed for the tick.
+- Alarm: a beep and a vibration while the hottest place is above a limit,
+  or the coldest below one, with `[ALARM]` in the status bar. The vibration
+  brings the app's first permission, VIBRATE, granted at install without a
+  prompt: a haptic tick, which needs none, could not be felt.
 - Measuring line: Max, average and Min along a segment you drag, with a
   profile graph of the temperature along it under the picture; also on cards.
 - Condensation and mould risk: from the room's air temperature and relative

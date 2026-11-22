@@ -4,6 +4,14 @@
     <uses-feature android:name="android.hardware.usb.host" android:required="true" />
 
     <!--
+        The alarm's vibration, the app's only permission: a normal one, granted at
+        install without a prompt. performHapticFeedback needs none, but phones play
+        it as a 7 ms touch tick scaled down by the touch-feedback setting, and with
+        the camera in hand it could not be felt.
+    -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
         Backup: no cloud copy of the settings, but a direct transfer to a new phone
         carries them, so the camera's constants and calibration are not lost. The
         rules differ by Android version; see res/xml/data_extraction_rules.xml.

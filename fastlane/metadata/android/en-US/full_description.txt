@@ -8,6 +8,6 @@
 <li>Snapshots saved as a card with the picture, spots, scale and settings on it, plus the 16-bit counts to measure them again later.</li>
 <li>Temperature log to CSV; calibration against melting ice, boiling water or a contact thermometer.</li>
 <li>Interface in English, German, Spanish, French, Portuguese and Russian.</li>
-<li>No permissions and no network.</li>
+<li>No network; the only permission is vibration, for the alarm.</li>
 </ul>
 <p>Tested on a FLIR ONE gen 3 and reported working on a FLIR ONE Pro. iPhone and Lightning models are not supported.</p>

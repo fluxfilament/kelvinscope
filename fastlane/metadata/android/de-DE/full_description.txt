@@ -7,6 +7,6 @@
 <li>Überlagerung mit dem sichtbaren Bild der zweiten Linse, mit Einstellung von Sichtfeld und Ausrichtung.</li>
 <li>Aufnahmen als Karte mit Bild, Messpunkten, Skala und Einstellungen, dazu die 16-Bit-Rohdaten zum erneuten Messen.</li>
 <li>Temperaturprotokoll als CSV, Kalibrierung mit Eis, kochendem Wasser oder Kontaktthermometer.</li>
-<li>Keine Berechtigungen, kein Netzwerk.</li>
+<li>Kein Netzwerk; die einzige Berechtigung ist die Vibration für den Alarm.</li>
 </ul>
 <p>Getestet auf einer FLIR ONE gen 3; Nutzer berichten, dass sie auch auf der FLIR ONE Pro läuft. Modelle für iPhone und Lightning werden nicht unterstützt.</p>

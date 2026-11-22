@@ -34,7 +34,8 @@ camera the app works with.
 - Palettes: grayscale, iron, rainbow, arctic and lava. Interface in English,
   Russian, German, Spanish, French and Portuguese (the last four
   machine-assisted and not yet reviewed by native speakers; corrections welcome).
-- **No permissions and no network.** Snapshots go through the system
+- **No network, and one permission: vibration**, for the alarm (granted
+  at install, no prompt). Snapshots go through the system
   media store, and a JPEG for calibration is opened through the system
   file picker, one file at a time. Settings are left out of the cloud
   backup; a direct transfer to a new phone carries them.

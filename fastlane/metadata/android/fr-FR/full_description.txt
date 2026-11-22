@@ -7,6 +7,6 @@
 <li>Superposition de l’image visible du second objectif, avec réglage du champ de vision et de l’alignement.</li>
 <li>Captures enregistrées sous forme de carte avec l’image, les points, l’échelle et les réglages, plus les données 16 bits pour mesurer à nouveau.</li>
 <li>Journal de température en CSV, calibrage avec glace, eau bouillante ou thermomètre de contact.</li>
-<li>Aucune autorisation, aucun réseau.</li>
+<li>Aucun réseau ; seule autorisation : le vibreur, pour l’alarme.</li>
 </ul>
 <p>Testée sur une FLIR ONE gen 3 ; des utilisateurs signalent qu’elle fonctionne aussi sur la FLIR ONE Pro. Les modèles iPhone et Lightning ne sont pas pris en charge.</p>
