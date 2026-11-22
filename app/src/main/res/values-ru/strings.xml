@@ -341,4 +341,5 @@
     <string name="shift_label">Shift %1$s</string>
     <string name="shift_description">Совмещение слоёв поперёк, постоянное для камеры</string>
     <string name="fov_turn_divider">Повернуть границу</string>
+    <string name="timelapse_too_short">Таймлапс не сохранён: меньше двух кадров</string>
 </resources>

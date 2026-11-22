@@ -339,4 +339,5 @@
     <string name="shift_label">Shift %1$s</string>
     <string name="shift_description">Ebenenausrichtung quer dazu, fest für die Kamera</string>
     <string name="fov_turn_divider">Trennlinie drehen</string>
+    <string name="timelapse_too_short">Zeitraffer nicht gespeichert: weniger als zwei Bilder</string>
 </resources>

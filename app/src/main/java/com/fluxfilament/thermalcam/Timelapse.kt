@@ -39,6 +39,15 @@ class Timelapse(val intervalMillis: Long, private val maxFrames: Int = 2000) {
 
     val full: Boolean @Synchronized get() = frames.size >= maxFrames
 
+    /**
+     * Whether stopping should save it. One frame is a snapshot, not a time-lapse,
+     * and the first is kept the moment a run starts, so a run that only lived
+     * between two taps on the interval buttons used to leave a one-frame GIF and
+     * folder behind - four of them in two seconds on 2026-11-22, two under the same
+     * name, since names go by the second.
+     */
+    val worthSaving: Boolean @Synchronized get() = frames.size >= MIN_FRAMES
+
     /** Keeps a copy of [frame] if one is due; true when it did. */
     @Synchronized
     fun offer(nowMillis: Long, frame: ThermalFrame): Boolean {
@@ -55,6 +64,9 @@ class Timelapse(val intervalMillis: Long, private val maxFrames: Int = 2000) {
     fun frames(): List<Frame> = ArrayList(frames)
 
     companion object {
+        /** Fewest frames a run needs to be saved - see [worthSaving]. */
+        const val MIN_FRAMES = 2
+
         /** Playback speed of the GIF: ten frames a second. */
         const val GIF_DELAY_CS = 10
 

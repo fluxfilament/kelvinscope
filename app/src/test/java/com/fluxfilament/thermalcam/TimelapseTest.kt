@@ -65,4 +65,14 @@ class TimelapseTest {
         assertEquals(0x000000, a.getRGB(10, 10) and 0xFFFFFF)
         assertEquals(0xFFFFFF, b.getRGB(10, 10) and 0xFFFFFF)
     }
+
+    @Test
+    fun aRunOfOneFrameIsNotWorthSaving() {
+        val t = Timelapse(intervalMillis = 1000)
+        assertFalse(t.worthSaving)
+        t.offer(0, frame(1))
+        assertFalse(t.worthSaving)
+        t.offer(1000, frame(2))
+        assertTrue(t.worthSaving)
+    }
 }

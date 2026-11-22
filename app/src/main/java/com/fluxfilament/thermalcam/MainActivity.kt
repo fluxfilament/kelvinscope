@@ -2717,7 +2717,10 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val running = timelapse
         if (running != null && running.intervalMillis == interval) return
         timelapse = null
-        if (running != null && running.count > 0) saveTimelapse(running)
+        if (running != null) {
+            if (running.worthSaving) saveTimelapse(running)
+            else toast(getString(R.string.timelapse_too_short))
+        }
         if (interval > 0) {
             timelapseStartedAt = Date()
             timelapse = Timelapse(interval)
