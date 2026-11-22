@@ -6,6 +6,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-22
+
 ### Added
 - Rainbow, Arctic and Lava palettes, with a line under the palette choice
   on what the selected one is good and bad at.
@@ -174,7 +176,8 @@ First public release.
   never been run.
 - No gallery yet: snapshots are opened from the phone's own gallery.
 
-[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/fluxfilament/kelvinscope/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/fluxfilament/kelvinscope/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/fluxfilament/kelvinscope/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/fluxfilament/kelvinscope/releases/tag/v0.1.0
