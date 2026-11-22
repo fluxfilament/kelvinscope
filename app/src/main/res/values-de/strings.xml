@@ -108,7 +108,7 @@
     <string name="fov_reset">Standard</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">Standard 0,77</string>
-    <string name="fov_note">Die Linie auf eine Kante des Objekts ziehen, dann FOV und Align verschieben, bis die Kante auf beiden Seiten übereinstimmt.</string>
+    <string name="fov_note">Die Linie auf eine Kante des Objekts ziehen, dann FOV und Align verschieben, bis die Kante auf beiden Seiten übereinstimmt. Shift korrigiert die andere Achse, falls die Kamera es braucht: Die Linie dreht sich, um sie zu zeigen.</string>
     <string name="fov_tag_thermal">IR</string>
     <string name="fov_tag_visible">SICHTBAR</string>
     <string name="fov_split_description">Trennlinie des Kameravergleichs</string>
@@ -337,4 +337,7 @@
     <string name="state_stopped">[GESTOPPT]</string>
     <string name="field_language">Sprache</string>
     <string name="language_system">Systemsprache</string>
+    <string name="shift_label">Shift %1$s</string>
+    <string name="shift_description">Ebenenausrichtung quer dazu, fest für die Kamera</string>
+    <string name="fov_turn_divider">Trennlinie drehen</string>
 </resources>

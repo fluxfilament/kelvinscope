@@ -108,7 +108,7 @@
     <string name="fov_reset">Сброс</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">по умолчанию 0,77</string>
-    <string name="fov_note">Поставьте линию на край предмета и двигайте FOV и Align, пока край не сойдётся по обе стороны линии.</string>
+    <string name="fov_note">Поставьте линию на край предмета и двигайте FOV и Align, пока край не сойдётся по обе стороны линии. Shift поправляет другую ось, если камере это нужно: линия повернётся, чтобы её было видно.</string>
     <string name="fov_tag_thermal">ИК</string>
     <string name="fov_tag_visible">ВИДИМАЯ</string>
     <string name="fov_split_description">Граница сравнения камер</string>
@@ -339,4 +339,7 @@
     <string name="state_stopped">[ОСТАНОВЛЕНО]</string>
     <string name="field_language">Язык</string>
     <string name="language_system">Как в системе</string>
+    <string name="shift_label">Shift %1$s</string>
+    <string name="shift_description">Совмещение слоёв поперёк, постоянное для камеры</string>
+    <string name="fov_turn_divider">Повернуть границу</string>
 </resources>

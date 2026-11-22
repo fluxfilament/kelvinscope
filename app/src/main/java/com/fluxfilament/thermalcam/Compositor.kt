@@ -106,6 +106,19 @@ class Compositor {
      */
     var parallax: Float = DEFAULT_PARALLAX
 
+    /**
+     * Correction across [parallax], as a fraction of the visible frame's height,
+     * along the source frame's y axis.
+     *
+     * With the lenses side by side along x, nothing about distance moves the
+     * pictures along y, so on this unit it stays at 0. But a camera's two sensors
+     * need not sit exactly level: a FLIR ONE Pro owner (issue #1) saw an offset
+     * that Align could not take out, because it was across it. Unlike [parallax]
+     * this is fixed for the camera, so it is set once beside the field of view and
+     * not on the main screen.
+     */
+    var parallaxY: Float = 0f
+
     private var output: Bitmap? = null
     private var visible: Bitmap? = null
     private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
@@ -196,7 +209,7 @@ class Compositor {
         val cropW = vis.width * fovRatio
         val cropH = vis.height * fovRatio
         val left = vis.width / 2f + parallax * vis.width - cropW / 2f
-        val top = vis.height / 2f - cropH / 2f
+        val top = vis.height / 2f + parallaxY * vis.height - cropH / 2f
         return placement.apply {
             reset()
             postTranslate(-left, -top)

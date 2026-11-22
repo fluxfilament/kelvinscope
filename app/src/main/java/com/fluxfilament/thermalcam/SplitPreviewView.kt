@@ -54,8 +54,22 @@ class SplitPreviewView @JvmOverloads constructor(
     private var rotation = ViewTransform.DEFAULT_ROTATION
     private var mirrored = true
 
-    /** Where the dividing line sits, as a fraction of the view's width. */
+    /** Where the dividing line sits, as a fraction of the view's width (or height). */
     private var split = 0.5f
+
+    /**
+     * A line across rather than upright: thermal above, visible below. An upright
+     * line shows the layers slipping up and down past each other and nothing of a
+     * slip sideways, which only a line across can show - so each alignment axis has
+     * its line, see [showAxis].
+     */
+    var horizontal = false
+        set(value) {
+            if (field == value) return
+            field = value
+            split = 0.5f
+            invalidate()
+        }
 
     private val display = Matrix()
     private val combined = Matrix()
@@ -93,6 +107,17 @@ class SplitPreviewView @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * Turns the line to the one that shows misalignment along the source frame's x
+     * axis ([sensorX], the Align direction) or its y axis (Shift). Which of those is
+     * upright on screen depends on how the picture is turned.
+     */
+    fun showAxis(sensorX: Boolean) {
+        val sourceXIsUpright = rotation % 180 != 0
+        // A slip along an axis shows across a line parallel to it.
+        horizontal = sensorX != sourceXIsUpright
+    }
+
     override fun onDraw(canvas: Canvas) {
         val thermalBitmap = thermal ?: return
         if (width == 0 || height == 0) return
@@ -107,37 +132,51 @@ class SplitPreviewView @JvmOverloads constructor(
         )
         canvas.drawBitmap(thermalBitmap, display, imagePaint)
 
-        val dividerX = split * width
+        val w = width.toFloat()
+        val h = height.toFloat()
+        val at = split * if (horizontal) h else w
         val visibleBitmap = visible
         if (haveVisible && visibleBitmap != null) {
             canvas.save()
-            canvas.clipRect(dividerX, 0f, width.toFloat(), height.toFloat())
+            if (horizontal) canvas.clipRect(0f, at, w, h) else canvas.clipRect(at, 0f, w, h)
             combined.set(visToThermal)
             combined.postConcat(display)
             canvas.drawBitmap(visibleBitmap, combined, smoothPaint)
             canvas.restore()
         }
 
-        canvas.drawRect(dividerX - density, 0f, dividerX + density, height.toFloat(), dividerPaint)
-        gripRect.set(
-            dividerX - 10f * density,
-            height / 2f - 22f * density,
-            dividerX + 10f * density,
-            height / 2f + 22f * density,
-        )
-        canvas.drawRoundRect(gripRect, 2f * density, 2f * density, gripPaint)
-        canvas.drawLine(dividerX - 2f * density, height / 2f - 6f * density, dividerX - 2f * density, height / 2f + 6f * density, gripLine)
-        canvas.drawLine(dividerX + 2f * density, height / 2f - 6f * density, dividerX + 2f * density, height / 2f + 6f * density, gripLine)
+        val long = 22f * density
+        val short = 10f * density
+        val tick = 6f * density
+        val apart = 2f * density
+        if (horizontal) {
+            canvas.drawRect(0f, at - density, w, at + density, dividerPaint)
+            gripRect.set(w / 2f - long, at - short, w / 2f + long, at + short)
+            canvas.drawRoundRect(gripRect, apart, apart, gripPaint)
+            canvas.drawLine(w / 2f - tick, at - apart, w / 2f + tick, at - apart, gripLine)
+            canvas.drawLine(w / 2f - tick, at + apart, w / 2f + tick, at + apart, gripLine)
+        } else {
+            canvas.drawRect(at - density, 0f, at + density, h, dividerPaint)
+            gripRect.set(at - short, h / 2f - long, at + short, h / 2f + long)
+            canvas.drawRoundRect(gripRect, apart, apart, gripPaint)
+            canvas.drawLine(at - apart, h / 2f - tick, at - apart, h / 2f + tick, gripLine)
+            canvas.drawLine(at + apart, h / 2f - tick, at + apart, h / 2f + tick, gripLine)
+        }
 
-        drawTag(canvas, context.getString(R.string.fov_tag_thermal), 8f * density, true)
-        drawTag(canvas, context.getString(R.string.fov_tag_visible), width - 8f * density, false)
+        val edge = 8f * density
+        drawTag(canvas, context.getString(R.string.fov_tag_thermal), edge, true, edge)
+        if (horizontal) {
+            drawTag(canvas, context.getString(R.string.fov_tag_visible), edge, true, h - edge - TAG_HEIGHT * density)
+        } else {
+            drawTag(canvas, context.getString(R.string.fov_tag_visible), w - edge, false, edge)
+        }
     }
 
-    private fun drawTag(canvas: Canvas, text: String, edge: Float, leftAligned: Boolean) {
+    private fun drawTag(canvas: Canvas, text: String, edge: Float, leftAligned: Boolean, top: Float) {
         val textWidth = tagText.measureText(text)
         val padding = 7f * density
         val left = if (leftAligned) edge else edge - textWidth - 2 * padding
-        tagRect.set(left, 8f * density, left + textWidth + 2 * padding, 8f * density + 20f * density)
+        tagRect.set(left, top, left + textWidth + 2 * padding, top + TAG_HEIGHT * density)
         canvas.drawRoundRect(tagRect, density, density, tagBackground)
         canvas.drawText(text, left + padding, tagRect.bottom - 6f * density, tagText)
     }
@@ -146,7 +185,7 @@ class SplitPreviewView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
-                split = (event.x / width).coerceIn(0f, 1f)
+                split = (if (horizontal) event.y / height else event.x / width).coerceIn(0f, 1f)
                 invalidate()
                 return true
             }
@@ -159,5 +198,6 @@ class SplitPreviewView @JvmOverloads constructor(
         const val ON_ACCENT = 0xFF0B1A1F.toInt()
         const val TEXT = 0xFFEFE7D8.toInt()
         const val TAG_BG = 0xB8140B07.toInt()
+        const val TAG_HEIGHT = 20f
     }
 }

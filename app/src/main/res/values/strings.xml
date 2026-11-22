@@ -110,7 +110,7 @@
     <string name="fov_reset">Reset</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">default 0.77</string>
-    <string name="fov_note">Drag the line onto an edge of the object, then move FOV and Align until the edge lines up on both sides of it.</string>
+    <string name="fov_note">Drag the line onto an edge of the object, then move FOV and Align until the edge lines up on both sides of it. Shift corrects the other axis, if the camera needs it: the line turns to show it.</string>
     <string name="fov_tag_thermal">IR</string>
     <string name="fov_tag_visible">VISIBLE</string>
     <string name="fov_split_description">Camera comparison divider</string>
@@ -339,4 +339,7 @@
     <string name="state_stopped">[STOPPED]</string>
     <string name="field_language">Language</string>
     <string name="language_system">System default</string>
+    <string name="shift_label">Shift %1$s</string>
+    <string name="shift_description">Layer alignment across, fixed for the camera</string>
+    <string name="fov_turn_divider">Turn the divider</string>
 </resources>

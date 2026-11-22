@@ -108,7 +108,7 @@
     <string name="fov_reset">Redefinir</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">padrão 0,77</string>
-    <string name="fov_note">Arraste a linha até uma borda do objeto e ajuste FOV e Align até a borda coincidir dos dois lados.</string>
+    <string name="fov_note">Arraste a linha até uma borda do objeto e ajuste FOV e Align até a borda coincidir dos dois lados. Shift corrige o outro eixo, se a câmera precisar: a linha gira para mostrá-lo.</string>
     <string name="fov_tag_thermal">IR</string>
     <string name="fov_tag_visible">VISÍVEL</string>
     <string name="fov_split_description">Divisor da comparação das câmeras</string>
@@ -339,4 +339,7 @@
     <string name="state_stopped">[PARADO]</string>
     <string name="field_language">Idioma</string>
     <string name="language_system">Idioma do sistema</string>
+    <string name="shift_label">Shift %1$s</string>
+    <string name="shift_description">Alinhamento transversal das camadas, fixo para a câmera</string>
+    <string name="fov_turn_divider">Girar a linha divisória</string>
 </resources>

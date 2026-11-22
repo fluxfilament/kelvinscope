@@ -108,7 +108,7 @@
     <string name="fov_reset">Rétablir</string>
     <string name="fov_value">FOV</string>
     <string name="fov_default">par défaut 0,77</string>
-    <string name="fov_note">Faites glisser la ligne sur un bord de l\'objet, puis réglez FOV et Align jusqu\'à ce que le bord coïncide des deux côtés.</string>
+    <string name="fov_note">Faites glisser la ligne sur un bord de l\'objet, puis réglez FOV et Align jusqu\'à ce que le bord coïncide des deux côtés. Shift corrige l\'autre axe si la caméra en a besoin : la ligne tourne pour le montrer.</string>
     <string name="fov_tag_thermal">IR</string>
     <string name="fov_tag_visible">VISIBLE</string>
     <string name="fov_split_description">Séparateur de comparaison des caméras</string>
@@ -339,4 +339,7 @@
     <string name="state_stopped">[ARRÊTÉ]</string>
     <string name="field_language">Langue</string>
     <string name="language_system">Langue du système</string>
+    <string name="shift_label">Shift %1$s</string>
+    <string name="shift_description">Alignement transversal des calques, fixe pour la caméra</string>
+    <string name="fov_turn_divider">Tourner la ligne de séparation</string>
 </resources>

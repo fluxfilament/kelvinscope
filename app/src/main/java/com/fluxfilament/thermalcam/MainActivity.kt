@@ -98,6 +98,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         const val PREF_EMISSIVITY = "emissivity"
         const val PREF_FOV_RATIO = "fovRatio"
         const val PREF_PARALLAX = "parallax"
+        const val PREF_PARALLAX_Y = "parallaxY"
         const val PREF_BLEND_MIX = "blendMix"
         const val PREF_ROTATION = "rotation"
         const val INTERFACE_TURN_MS = 250L
@@ -360,6 +361,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var fovValue: TextView
     private lateinit var fovSeek: SeekBar
     private lateinit var fovAlignLabel: TextView
+    private lateinit var fovShiftLabel: TextView
+    private lateinit var fovShiftSeek: SeekBar
     private lateinit var fovAlignSeek: SeekBar
     private lateinit var fovResThermal: TextView
     private lateinit var fovResVisible: TextView
@@ -735,6 +738,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         fovValue = findViewById(R.id.fovValue)
         fovSeek = findViewById(R.id.fovSeek)
         fovAlignLabel = findViewById(R.id.fovAlignLabel)
+        fovShiftLabel = findViewById(R.id.fovShiftLabel)
+        fovShiftSeek = findViewById(R.id.fovShiftSeek)
         fovAlignSeek = findViewById(R.id.fovAlignSeek)
         fovResThermal = findViewById(R.id.fovResThermal)
         fovResVisible = findViewById(R.id.fovResVisible)
@@ -1858,16 +1863,19 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     // --- field of view ------------------------------------------------------------
 
     /**
-     * The two alignment controls. Both are remembered: the field-of-view crop is a
-     * property of this camera's optics that only needs finding once, and the parallax
-     * setting is usually left wherever the user's typical working distance puts it.
+     * The alignment controls. All are remembered: the field-of-view crop and the
+     * shift across are properties of this camera's optics that only need finding
+     * once, and the parallax setting is usually left wherever the user's typical
+     * working distance puts it.
      */
     private fun setUpOverlayControls() {
         compositor.fovRatio = prefs.getFloat(PREF_FOV_RATIO, Compositor.DEFAULT_FOV_RATIO)
         compositor.parallax = prefs.getFloat(PREF_PARALLAX, Compositor.DEFAULT_PARALLAX)
+        compositor.parallaxY = prefs.getFloat(PREF_PARALLAX_Y, 0f)
         fovSeek.progress = (compositor.fovRatio * 100).roundToInt()
         alignSeek.progress = alignProgress()
         fovAlignSeek.progress = alignProgress()
+        fovShiftSeek.progress = shiftProgress()
         updateFovLabels()
 
         fovSeek.setOnSeekBarChangeListener(seekListener({ progress ->
@@ -1880,7 +1888,16 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         for (seek in listOf(alignSeek, fovAlignSeek)) {
             seek.setOnSeekBarChangeListener(seekListener({ progress ->
                 compositor.parallax = (progress / 100f - 1f) * ALIGN_RANGE
-            }, { prefs.edit().putFloat(PREF_PARALLAX, compositor.parallax).apply() }))
+            }, { prefs.edit().putFloat(PREF_PARALLAX, compositor.parallax).apply() },
+                // On the comparison screen the line turns to show what this one moves.
+                onStart = { if (seek === fovAlignSeek) splitPreview.showAxis(sensorX = true) }))
+        }
+        fovShiftSeek.setOnSeekBarChangeListener(seekListener({ progress ->
+            compositor.parallaxY = (progress / 100f - 1f) * ALIGN_RANGE
+        }, { prefs.edit().putFloat(PREF_PARALLAX_Y, compositor.parallaxY).apply() },
+            onStart = { splitPreview.showAxis(sensorX = false) }))
+        findViewById<View>(R.id.splitTurn).setOnClickListener {
+            splitPreview.horizontal = !splitPreview.horizontal
         }
 
         mixPercent = prefs.getInt(PREF_BLEND_MIX, Blend.DEFAULT_MIX).coerceIn(Blend.MIN_MIX, 100)
@@ -1899,22 +1916,29 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             }
         })
 
+        // The two settings fixed for the camera; Align follows the subject, not this.
         findViewById<View>(R.id.fovReset).setOnClickListener {
             fovSeek.progress = (Compositor.DEFAULT_FOV_RATIO * 100).roundToInt()
-            prefs.edit().putFloat(PREF_FOV_RATIO, compositor.fovRatio).apply()
+            compositor.parallaxY = 0f
+            fovShiftSeek.progress = shiftProgress()
+            prefs.edit()
+                .putFloat(PREF_FOV_RATIO, compositor.fovRatio)
+                .putFloat(PREF_PARALLAX_Y, compositor.parallaxY)
+                .apply()
         }
     }
 
     private fun seekListener(
         onChange: (Int) -> Unit,
         onCommit: () -> Unit,
+        onStart: () -> Unit = {},
     ) = object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(bar: SeekBar, progress: Int, fromUser: Boolean) {
             onChange(progress)
             updateFovLabels()
         }
 
-        override fun onStartTrackingTouch(bar: SeekBar) = Unit
+        override fun onStartTrackingTouch(bar: SeekBar) = onStart()
 
         override fun onStopTrackingTouch(bar: SeekBar) = onCommit()
     }
@@ -1924,6 +1948,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val align = getString(R.string.align_label, signed(compositor.parallax.toDouble()))
         alignLabel.text = align
         fovAlignLabel.text = align
+        fovShiftLabel.text = getString(R.string.shift_label, signed(compositor.parallaxY.toDouble()))
+        fovShiftSeek.progress = shiftProgress()
         // Whichever of the two Align sliders moved, the other follows. Setting a
         // slider to the position it already has does nothing, so this does not loop.
         alignSeek.progress = alignProgress()
@@ -1935,10 +1961,14 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private fun alignProgress(): Int =
         ((compositor.parallax / ALIGN_RANGE + 1f) * 100f).roundToInt()
 
+    private fun shiftProgress(): Int =
+        ((compositor.parallaxY / ALIGN_RANGE + 1f) * 100f).roundToInt()
+
     private fun refreshFovScreen() {
         // Both screens share one crop, so the preview has to start from the live ones.
         previewCompositor.fovRatio = compositor.fovRatio
         previewCompositor.parallax = compositor.parallax
+        previewCompositor.parallaxY = compositor.parallaxY
         updateFovLabels()
     }
 
@@ -1965,9 +1995,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val cropWidth = compositor.fovRatio * imageWidth
         val cropHeight = compositor.fovRatio * imageHeight
         // Parallax shifts along the sensor's own x axis, which is the axis the two
-        // lenses are separated in - see Compositor.parallax.
+        // lenses are separated in - see Compositor.parallax; the shift across, along y.
         val centreX = left + (0.5f + compositor.parallax) * imageWidth
-        val centreY = top + imageHeight / 2f
+        val centreY = top + (0.5f + compositor.parallaxY) * imageHeight
         (cropRect.layoutParams as FrameLayout.LayoutParams).let {
             it.width = cropWidth.roundToInt().coerceAtLeast(1)
             it.height = cropHeight.roundToInt().coerceAtLeast(1)
@@ -1981,6 +2011,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private fun updateFovPreview(thermal: Bitmap) {
         previewCompositor.fovRatio = compositor.fovRatio
         previewCompositor.parallax = compositor.parallax
+        previewCompositor.parallaxY = compositor.parallaxY
         val frame = camera.lastFrame
         val visible = frame?.let { previewCompositor.decodeVisible(it) }
         val placement = visible?.let {
@@ -2862,6 +2893,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val thermal = renderer.snapshot(frame)
         snapshotCompositor.fovRatio = compositor.fovRatio
         snapshotCompositor.parallax = compositor.parallax
+        snapshotCompositor.parallaxY = compositor.parallaxY
         // Read once, so the picture and the card's label cannot disagree if the
         // slider moves in between.
         val blend = blend

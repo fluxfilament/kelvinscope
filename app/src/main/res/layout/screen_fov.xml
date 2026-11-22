@@ -56,15 +56,30 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <com.fluxfilament.thermalcam.SplitPreviewView
-        android:id="@+id/splitPreview"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_well_outline"
-        android:contentDescription="@string/fov_split_description" />
+        android:layout_marginEnd="16dp">
+
+        <com.fluxfilament.thermalcam.SplitPreviewView
+            android:id="@+id/splitPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_well_outline"
+            android:contentDescription="@string/fov_split_description" />
+
+        <ImageButton
+            android:id="@+id/splitTurn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_tool"
+            android:contentDescription="@string/fov_turn_divider"
+            android:src="@drawable/ic_split_turn" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -222,6 +237,37 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:contentDescription="@string/align_description"
+            android:max="200" />
+    </LinearLayout>
+
+    <!-- Across Align: fixed for the camera, so only here - see Compositor.parallaxY. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp">
+
+        <TextView
+            android:id="@+id/fovShiftLabel"
+            style="@style/Ff.Mono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:maxLines="1"
+            android:letterSpacing="0.06"
+            android:textColor="@color/ff_muted"
+            android:textSize="11sp" />
+
+        <SeekBar
+            android:id="@+id/fovShiftSeek"
+            style="@style/Ff.Seek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/shift_description"
             android:max="200" />
     </LinearLayout>
 
