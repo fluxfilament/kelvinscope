@@ -77,7 +77,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     @Volatile
     private var screen = Screen.LIVE
 
-    private enum class Screen { LIVE, SETTINGS, EMISSIVITY, FOV, CALIBRATION, LOG }
+    private enum class Screen { LIVE, SETTINGS, EMISSIVITY, FOV, CALIBRATION, LOG, LANGUAGE }
 
     /** Which end of the scale the sheet is editing, or null when it is closed. */
     private enum class SheetTarget { LOW, HIGH }
@@ -332,6 +332,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     private lateinit var fovSummary: TextView
     private lateinit var logSummary: TextView
 
+    // language screen
+    private lateinit var screenLanguage: View
+    private lateinit var languageRows: LinearLayout
+    private lateinit var languageSummary: TextView
+
     // emissivity screen
     private lateinit var screenEmissivity: View
     private lateinit var emissivityHeader: View
@@ -391,6 +396,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             Screen.FOV to screenFov,
             Screen.CALIBRATION to screenCalibration,
             Screen.LOG to screenLog,
+            Screen.LANGUAGE to screenLanguage,
         )
     }
 
@@ -545,20 +551,19 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
      * been since the first version.
      */
     override fun attachBaseContext(newBase: Context) {
-        val mode = newBase.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(PREF_THEME, THEME_DARK)
-        val night = when (mode) {
+        val prefs = newBase.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val config = Configuration(newBase.resources.configuration)
+        var changed = AppLanguage.applyTo(config, prefs)
+        val night = when (prefs.getString(PREF_THEME, THEME_DARK)) {
             THEME_LIGHT -> Configuration.UI_MODE_NIGHT_NO
             THEME_SYSTEM -> null
             else -> Configuration.UI_MODE_NIGHT_YES
         }
-        if (night == null) {
-            super.attachBaseContext(newBase)
-            return
+        if (night != null) {
+            config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or night
+            changed = true
         }
-        val config = Configuration(newBase.resources.configuration)
-        config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or night
-        super.attachBaseContext(newBase.createConfigurationContext(config))
+        super.attachBaseContext(if (changed) newBase.createConfigurationContext(config) else newBase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -706,6 +711,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         fovSummary = findViewById(R.id.fovSummary)
         logSummary = findViewById(R.id.logSummary)
 
+        screenLanguage = findViewById(R.id.screenLanguage)
+        languageRows = findViewById(R.id.languageRows)
+        languageSummary = findViewById(R.id.languageSummary)
         screenEmissivity = findViewById(R.id.screenEmissivity)
         emissivityHeader = findViewById(R.id.emissivityHeader)
         emissivityBig = findViewById(R.id.emissivityBig)
@@ -829,6 +837,8 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         findViewById<View>(R.id.fovBack).setOnClickListener { handleBack() }
         findViewById<View>(R.id.calibrationBack).setOnClickListener { handleBack() }
         findViewById<View>(R.id.logBack).setOnClickListener { handleBack() }
+        findViewById<View>(R.id.languageBack).setOnClickListener { handleBack() }
+        findViewById<View>(R.id.rowLanguage).setOnClickListener { go(Screen.LANGUAGE) }
         findViewById<View>(R.id.rowEmissivity).setOnClickListener { go(Screen.EMISSIVITY) }
         showExtremes = prefs.getBoolean(PREF_EXTREMES, false)
         refreshExtremesSummary()
@@ -914,6 +924,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             Screen.FOV -> refreshFovScreen()
             Screen.LOG -> refreshStats()
             Screen.CALIBRATION -> calibration.refreshAll()
+            Screen.LANGUAGE -> buildLanguageRows()
             else -> Unit
         }
     }
@@ -1471,16 +1482,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
             background = rippleBackground()
             setOnClickListener { pickEmissivity(preset.emissivity) }
         }
-        val radio = FrameLayout(this).apply {
-            setBackgroundResource(if (selected) R.drawable.bg_radio_on else R.drawable.bg_radio)
-            addView(
-                View(context).apply {
-                    if (selected) setBackgroundResource(R.drawable.bg_radio_dot)
-                },
-                FrameLayout.LayoutParams(dp(8), dp(8), Gravity.CENTER),
-            )
-        }
-        row.addView(radio, LinearLayout.LayoutParams(dp(20), dp(20)))
+        row.addView(radio(selected), LinearLayout.LayoutParams(dp(20), dp(20)))
         row.addView(
             View(this).apply { background = glossSwatch(preset.gloss) },
             LinearLayout.LayoutParams(dp(32), dp(32)).apply { marginStart = dp(12) },
@@ -1832,6 +1834,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
     }
 
     private fun refreshSummaries() {
+        languageSummary.text = languageName(AppLanguage.current(this, prefs))
         val eps = planck.emissivity
         val nearest = nearestPreset(eps)
         emissivitySummary.text = getString(
@@ -2944,6 +2947,53 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun signed(value: Double): String =
         (if (value < 0) "−" else "+") + String.format(locale, "%.3f", abs(value))
+
+    /** The round choice mark of the lists, filled when [selected]. */
+    private fun radio(selected: Boolean): View = FrameLayout(this).apply {
+        setBackgroundResource(if (selected) R.drawable.bg_radio_on else R.drawable.bg_radio)
+        addView(
+            View(context).apply {
+                if (selected) setBackgroundResource(R.drawable.bg_radio_dot)
+            },
+            FrameLayout.LayoutParams(dp(8), dp(8), Gravity.CENTER),
+        )
+    }
+
+    private fun languageName(tag: String?): String =
+        if (tag == null) getString(R.string.language_system) else AppLanguage.nativeName(tag)
+
+    /** The phone's language first, then each translation under its own name. */
+    private fun buildLanguageRows() {
+        languageRows.removeAllViews()
+        val current = AppLanguage.current(this, prefs)
+        for (tag in listOf(null) + AppLanguage.TAGS) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                minimumHeight = dp(56)
+                isClickable = true
+                background = rippleBackground()
+                setOnClickListener { pickLanguage(tag) }
+            }
+            row.addView(radio(tag == current), LinearLayout.LayoutParams(dp(20), dp(20)))
+            row.addView(
+                TextView(this, null, 0, R.style.Ff_RowTitle).apply { text = languageName(tag) },
+                LinearLayout.LayoutParams(0, WRAP, 1f).apply { marginStart = dp(12) },
+            )
+            languageRows.addView(row)
+            languageRows.addView(separator())
+        }
+    }
+
+    /**
+     * Back on the settings first, so the activity the new language recreates comes
+     * back there (see onSaveInstanceState), not on this list or the live view.
+     */
+    private fun pickLanguage(tag: String?) {
+        handleBack()
+        if (tag == AppLanguage.current(this, prefs)) return
+        if (AppLanguage.pick(this, prefs, tag)) recreate()
+    }
 
     private fun separator(): View = View(this).apply {
         setBackgroundColor(getColor(R.color.ff_border))

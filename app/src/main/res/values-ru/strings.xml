@@ -337,4 +337,6 @@
     <string name="card_fusion">ФОТО + ТЕПЛО, %1$s</string>
     <string name="state_no_access">[НЕТ ДОСТУПА]</string>
     <string name="state_stopped">[ОСТАНОВЛЕНО]</string>
+    <string name="field_language">Язык</string>
+    <string name="language_system">Как в системе</string>
 </resources>

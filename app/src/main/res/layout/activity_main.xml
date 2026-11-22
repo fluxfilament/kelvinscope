@@ -21,6 +21,7 @@
     <include layout="@layout/screen_fov" />
     <include layout="@layout/screen_calibration" />
     <include layout="@layout/screen_log" />
+    <include layout="@layout/screen_language" />
 
     <!--
         The sheet sits above the legend and the bottom bar rather than over them: the

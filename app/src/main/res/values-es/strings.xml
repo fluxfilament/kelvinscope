@@ -337,4 +337,6 @@
     <string name="card_fusion">FOTO + CALOR, %1$s</string>
     <string name="state_no_access">[SIN ACCESO]</string>
     <string name="state_stopped">[DETENIDO]</string>
+    <string name="field_language">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
 </resources>
