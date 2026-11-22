@@ -131,7 +131,7 @@
     <string name="consts_msg_applied_clean">Constants loaded.</string>
     <string name="consts_msg_not_flir">This file has no FLIR radiometric data. It needs a JPEG saved by the official FLIR ONE app, not recompressed or edited.</string>
     <string name="consts_msg_read_failed">Could not read the file: %1$s</string>
-    <string name="consts_msg_pip">FLIR overlay alignment in this snapshot: Real2IR %1$.4f · offset %2$d, %3$d px in %4$d×%5$d</string>
+    <string name="consts_msg_pip">FLIR overlay alignment in this snapshot: Real2IR %1$.4f · offset %2$s, %3$s px in %4$d×%5$d</string>
     <string name="calib_section_correction">Reading correction</string>
     <string name="calib_none">None</string>
     <string name="calib_summary_none">no correction</string>

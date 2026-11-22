@@ -278,7 +278,10 @@ class CalibrationScreen(
                             showConstantsMessage(
                                 constsMessage.text.toString() + "\n" + activity.getString(
                                     R.string.consts_msg_pip,
-                                    pip.real2Ir, pip.offsetX, pip.offsetY, pip.width, pip.height,
+                                    pip.real2Ir,
+                                    pip.offsetX.toString().replace('-', '−'),
+                                    pip.offsetY.toString().replace('-', '−'),
+                                    pip.width, pip.height,
                                 ),
                             )
                         }

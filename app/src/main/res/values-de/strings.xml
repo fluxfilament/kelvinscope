@@ -129,7 +129,7 @@
     <string name="consts_msg_applied_clean">Konstanten geladen.</string>
     <string name="consts_msg_not_flir">Diese Datei enthält keine radiometrischen FLIR-Daten. Nötig ist ein JPEG, das von der offiziellen FLIR ONE App gespeichert und nicht neu komprimiert oder bearbeitet wurde.</string>
     <string name="consts_msg_read_failed">Datei konnte nicht gelesen werden: %1$s</string>
-    <string name="consts_msg_pip">FLIR-Ausrichtung in dieser Aufnahme: Real2IR %1$.4f · Versatz %2$d, %3$d px bei %4$d×%5$d</string>
+    <string name="consts_msg_pip">FLIR-Ausrichtung in dieser Aufnahme: Real2IR %1$.4f · Versatz %2$s, %3$s px bei %4$d×%5$d</string>
     <string name="calib_section_correction">Messwertkorrektur</string>
     <string name="calib_none">Keine</string>
     <string name="calib_summary_none">keine Korrektur</string>

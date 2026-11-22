@@ -129,7 +129,7 @@
     <string name="consts_msg_applied_clean">Константы загружены.</string>
     <string name="consts_msg_not_flir">В этом файле нет радиометрических данных FLIR. Нужен JPEG, сохранённый официальным приложением FLIR ONE, без пересжатия и редактирования.</string>
     <string name="consts_msg_read_failed">Не удалось прочитать файл: %1$s</string>
-    <string name="consts_msg_pip">Совмещение FLIR в этом снимке: Real2IR %1$.4f · сдвиг %2$d, %3$d пикс. в кадре %4$d×%5$d</string>
+    <string name="consts_msg_pip">Совмещение FLIR в этом снимке: Real2IR %1$.4f · сдвиг %2$s, %3$s пикс. в кадре %4$d×%5$d</string>
     <string name="calib_section_correction">Поправка показаний</string>
     <string name="calib_none">Нет</string>
     <string name="calib_summary_none">нет поправки</string>
