@@ -124,11 +124,13 @@ class LabelPlacementTest {
     }
 
     @Test
-    fun lineInsideASmallAreaHasItsBlockOutsideIt() {
-        // The second card of 2026-11-22: a short line inside a small area.
+    fun lineInsideASmallAreaHasItsBlockPastAnEnd() {
+        // The second card of 2026-11-22: a short line inside a small area. Beside
+        // the line the block covers half the area; past the bottom end, a sliver.
         val frame = Box(250f, 200f, 380f, 340f)
         val b = LabelPlacement.lineBlock(330f, 220f, 330f, 330f, 130f, 70f, 4f, picture, emptyList(), listOf(frame))
-        assertEquals(0f, b.overlap(frame), 0.01f)
+        assertTrue(b.top > 330f)
+        assertTrue(b.overlap(frame) < 130f * 70f / 4f)
         assertFalse(b.crossedBy(330f, 220f, 330f, 330f))
     }
 
