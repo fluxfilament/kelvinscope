@@ -75,9 +75,12 @@
         android:paddingTop="12dp"
         android:paddingEnd="16dp">
 
+        <!-- Columns as wide as their label, at least the thumbnail: "VIS 1440×1080"
+             is wider than 72 dp and used to wrap onto a second line. -->
         <LinearLayout
-            android:layout_width="72dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="72dp"
             android:orientation="vertical">
 
             <FrameLayout
@@ -96,6 +99,7 @@
             <TextView
                 android:id="@+id/fovResThermal"
                 style="@style/Ff.Mono"
+                android:maxLines="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -106,9 +110,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="72dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:minWidth="72dp"
             android:orientation="vertical">
 
             <FrameLayout
@@ -134,6 +139,7 @@
             <TextView
                 android:id="@+id/fovResVisible"
                 style="@style/Ff.Mono"
+                android:maxLines="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
