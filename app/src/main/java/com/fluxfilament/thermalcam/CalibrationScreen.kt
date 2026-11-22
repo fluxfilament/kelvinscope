@@ -239,7 +239,13 @@ class CalibrationScreen(
     }
 
     private fun sourceLabel(): String =
-        points.sortedBy { it.reference }.joinToString(" + ") { kindLabel(it) }
+        CorrectionSource.encode(points.sortedBy { it.reference }.map { it.kind })
+
+    /** The stored source in today's language; text it cannot read is shown as it is. */
+    private fun sourceText(stored: String?): String {
+        if (stored == null) return EMPTY
+        return CorrectionSource.decode(stored)?.joinToString(" + ") { kindLabel(it) } ?: stored
+    }
 
     // --- camera constants ---------------------------------------------------------
 
@@ -377,7 +383,7 @@ class CalibrationScreen(
         val date = if (at == 0L) EMPTY
             else DateFormat.getDateInstance(DateFormat.MEDIUM, ru).format(Date(at))
         statusSub.text = activity.getString(
-            R.string.calib_applied_sub, prefs.getString(PREF_SOURCE, null) ?: EMPTY, date,
+            R.string.calib_applied_sub, sourceText(prefs.getString(PREF_SOURCE, null)), date,
         )
     }
 
@@ -495,8 +501,10 @@ class CalibrationScreen(
         return row
     }
 
-    private fun kindLabel(point: ReferencePoint): String = activity.getString(
-        when (point.kind) {
+    private fun kindLabel(point: ReferencePoint): String = kindLabel(point.kind)
+
+    private fun kindLabel(kind: ReferenceKind): String = activity.getString(
+        when (kind) {
             ReferenceKind.ICE -> R.string.calib_ref_ice_short
             ReferenceKind.BOILING -> R.string.calib_ref_boiling_short
             ReferenceKind.CUSTOM -> R.string.calib_ref_custom_short

@@ -89,6 +89,38 @@ data class ReferencePoint(
 
 enum class ReferenceKind { ICE, BOILING, CUSTOM }
 
+/**
+ * Which references an applied correction was fitted on, as kept in the settings:
+ * "ICE+BOILING", worded only when shown, in the language of the moment.
+ *
+ * Up to 0.2.0 the label was stored already worded ("ice + boiling water",
+ * "лёд + кипяток"), so after a change of language the calibration screen went on
+ * showing the old one. Those versions spoke only English and Russian, so such a
+ * label is read back by its words.
+ */
+object CorrectionSource {
+
+    fun encode(kinds: List<ReferenceKind>): String = kinds.joinToString("+") { it.name }
+
+    /** The kinds in [stored], or null when it cannot be read - then show it as it is. */
+    fun decode(stored: String): List<ReferenceKind>? {
+        val kinds = stored.split('+').map { part ->
+            val word = part.trim()
+            ReferenceKind.entries.firstOrNull { it.name == word } ?: LEGACY[word.lowercase()] ?: return null
+        }
+        return kinds.ifEmpty { null }
+    }
+
+    private val LEGACY = mapOf(
+        "ice" to ReferenceKind.ICE,
+        "лёд" to ReferenceKind.ICE,
+        "boiling water" to ReferenceKind.BOILING,
+        "кипяток" to ReferenceKind.BOILING,
+        "own reference" to ReferenceKind.CUSTOM,
+        "свой эталон" to ReferenceKind.CUSTOM,
+    )
+}
+
 sealed interface FitResult {
     data class Ok(val correction: Correction) : FitResult
     data object NoPoints : FitResult

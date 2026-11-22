@@ -77,4 +77,19 @@ class CorrectionTest {
             assertEquals(celsius, correction.invert(correction.apply(celsius)), 1e-9)
         }
     }
+
+    @Test
+    fun sourceRoundTrips() = assertEquals(
+        listOf(ReferenceKind.ICE, ReferenceKind.BOILING),
+        CorrectionSource.decode(CorrectionSource.encode(listOf(ReferenceKind.ICE, ReferenceKind.BOILING))),
+    )
+
+    @Test
+    fun sourceStoredWordedBefore030IsReadBack() {
+        assertEquals(listOf(ReferenceKind.ICE, ReferenceKind.BOILING), CorrectionSource.decode("ice + boiling water"))
+        assertEquals(listOf(ReferenceKind.ICE, ReferenceKind.CUSTOM), CorrectionSource.decode("лёд + свой эталон"))
+    }
+
+    @Test
+    fun unreadableSourceIsLeftAlone() = assertEquals(null, CorrectionSource.decode("something else"))
 }
