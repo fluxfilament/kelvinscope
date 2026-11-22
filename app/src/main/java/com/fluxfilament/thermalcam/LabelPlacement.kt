@@ -76,7 +76,9 @@ object LabelPlacement {
 
     /**
      * The block of [w] by [h] for an area with [frame]: above it, below it, beside
-     * it, and only as a last resort inside, where it hides what the area measures.
+     * it; then the same a half and a whole block further out, for when the nearest
+     * places are taken (the line's block lying right under the frame); and only as
+     * a last resort inside, where it hides what the area measures.
      * [frames] are all the areas' frames, this one included; covering one costs, but
      * less than covering a label. [line] is the measuring line's ends, if shown.
      */
@@ -86,24 +88,26 @@ object LabelPlacement {
     ): Box {
         val above = frame.top - gap - h
         val below = frame.bottom + gap
-        val candidates = listOf(
-            frame.left to above,
-            frame.right - w to above,
-            frame.left to below,
-            frame.right - w to below,
-            frame.right + gap to frame.top,
-            frame.left - gap - w to frame.top,
-            frame.left - gap - w to frame.bottom - h,
-            frame.right + gap to frame.bottom - h,
-            frame.left + gap to frame.top + gap,
-            frame.left + gap to frame.bottom - gap - h,
-        )
+        val candidates = ArrayList<Pair<Float, Float>>()
+        for (step in floatArrayOf(0f, h / 2f, h)) {
+            candidates += frame.left to above - step
+            candidates += frame.right - w to above - step
+            candidates += frame.left to below + step
+            candidates += frame.right - w to below + step
+            candidates += frame.right + gap to frame.top + step
+            candidates += frame.left - gap - w to frame.top + step
+            candidates += frame.left - gap - w to frame.bottom - h - step
+            candidates += frame.right + gap to frame.bottom - h - step
+        }
+        candidates += frame.left + gap to frame.top + gap
+        candidates += frame.left + gap to frame.bottom - gap - h
         return choose(candidates, w, h, gap, bounds, taken, frames, line)
     }
 
     /**
      * The block of [w] by [h] for the line from ([ax], [ay]) to ([bx], [by]): beside
-     * its middle, then beside a quarter of the way from either end, upper side first
+     * its middle, then beside a quarter and a tenth of the way from either end, upper
+     * side first
      * (right-hand for an upright line); then past either end. Each far enough from
      * the line that no corner comes within [gap] of it. Covering one of the areas'
      * [frames] costs, as for an area's own block.
@@ -135,7 +139,7 @@ object LabelPlacement {
         val across = hw * abs(nx) + hh * abs(ny) + gap
         val along = hw * abs(dx) + hh * abs(dy) + gap
         val candidates = ArrayList<Pair<Float, Float>>()
-        for (t in floatArrayOf(0.5f, 0.25f, 0.75f)) {
+        for (t in floatArrayOf(0.5f, 0.25f, 0.75f, 0.1f, 0.9f)) {
             val px = ax + (bx - ax) * t
             val py = ay + (by - ay) * t
             candidates += (px + nx * across - hw) to (py + ny * across - hh)

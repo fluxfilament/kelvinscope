@@ -70,6 +70,21 @@ class LabelPlacementTest {
         assertEquals(0f, second.overlap(first), 0.01f)
     }
 
+    @Test
+    fun areaBlockSlidesPastTheLineBlockUnderItsFrame() {
+        // The fused card of 2026-11-22: an area near the top edge, so no room above;
+        // the line's block right under the frame; a spot's reading inside it.
+        val frame = Box(470f, 100f, 690f, 340f)
+        val lineBlock = Box(410f, 330f, 565f, 430f)
+        val spot = Box(540f, 160f, 670f, 200f)
+        val spot3 = Box(380f, 160f, 510f, 205f)
+        val taken = listOf(lineBlock, spot, spot3)
+        val b = LabelPlacement.areaBlock(frame, 155f, 130f, 4f, Box(0f, 0f, 760f, 960f), taken, listOf(frame), null)
+        for (other in taken) assertEquals(0f, b.overlap(other), 0.01f)
+        assertEquals(0f, b.overlap(frame), 0.01f)
+        assertTrue(b.top < frame.bottom + 4f + 130f + 0.01f)
+    }
+
     private fun line(ax: Float, ay: Float, bx: Float, by: Float, w: Float = 130f, h: Float = 70f, bounds: Box = picture) =
         LabelPlacement.lineBlock(ax, ay, bx, by, w, h, 4f, bounds, emptyList())
 
