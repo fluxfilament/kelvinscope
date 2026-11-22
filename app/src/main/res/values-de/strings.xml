@@ -295,7 +295,6 @@
     <string name="row_line">Messlinie</string>
     <string name="line_on">An: eine Linie mit Max, Mittel und Min entlang und ein Profilgraph unter dem Bild. Enden ziehen. Tippen zum Ausschalten.</string>
     <string name="line_off">Aus. Tippen für eine Linie, die Max, Mittel und Min entlang eines Rohrs oder Heizkörpers misst, mit Profilgraph.</string>
-    <string name="line_readings">Max %1$s · Mittel %2$s · Min %3$s</string>
     <string name="row_moisture">Kondensat- und Schimmelrisiko</string>
     <string name="moisture_off">Aus. Raumtemperatur und Luftfeuchte angeben, dann werden Flächen, die kalt genug für Feuchte sind, blau gefärbt.</string>
     <string name="moisture_on_condensation">Taupunkt %1$s °C: Flächen auf oder unter ihm, an denen Wasser kondensiert, sind blau gefärbt.</string>

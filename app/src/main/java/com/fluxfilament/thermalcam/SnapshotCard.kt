@@ -185,6 +185,10 @@ object SnapshotCard {
         val margin = 5f * unit
         val bounds = RectF(margin, margin, pictureW - margin, pictureH - margin)
         val point = FloatArray(2)
+        // Frames and the line first, their reading blocks over them, markers and spots
+        // on top. The blocks are laid out around the spots and markers - see
+        // LabelPlacement - so they go in after those are measured, before drawn.
+        val frames = ArrayList<Box>()
         if (scene.areas.isNotEmpty()) {
             val outline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.STROKE
@@ -197,12 +201,6 @@ object SnapshotCard {
                 strokeWidth = 3.5f * unit
                 color = 0x99000000.toInt()
             }
-            val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.WHITE
-                textSize = 11.5f * unit
-                isFakeBoldText = true
-                typeface = mono
-            }
             val r = RectF()
             for (label in scene.areas) {
                 val a = label.area
@@ -210,17 +208,10 @@ object SnapshotCard {
                 matrix.mapRect(r)
                 canvas.drawRect(r, shadow)
                 canvas.drawRect(r, outline)
-                // Outside the frame, as on screen - see LabelPlacement.
-                val lines = ("A${label.number}\n" + label.text).split('\n')
-                val at = LabelPlacement.areaBlock(
-                    r.left, r.top, r.bottom,
-                    glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), 3f * unit,
-                    bounds.left, bounds.top, bounds.right, bounds.bottom,
-                )
-                glyphs.drawBlock(canvas, lines, text, at[0], at[1])
+                frames += Box(r.left, r.top, r.right, r.bottom)
             }
         }
-        scene.line?.let { line ->
+        val ends = scene.line?.let { line ->
             val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.STROKE
                 strokeWidth = 2f * unit
@@ -231,28 +222,56 @@ object SnapshotCard {
                 strokeWidth = 4.5f * unit
                 color = 0x99000000.toInt()
             }
-            val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.WHITE
-                textSize = 11.5f * unit
-                isFakeBoldText = true
-                typeface = mono
-            }
-            val ends = floatArrayOf(
+            val e = floatArrayOf(
                 line.start.u * src.width, line.start.v * src.height,
                 line.end.u * src.width, line.end.v * src.height,
             )
-            matrix.mapPoints(ends)
-            canvas.drawLine(ends[0], ends[1], ends[2], ends[3], shadow)
-            canvas.drawLine(ends[0], ends[1], ends[2], ends[3], stroke)
-            val lines = listOf(line.text)
-            val w = glyphs.blockWidth(lines, text)
-            val h = glyphs.blockHeight(lines, text)
-            val c = LabelPlacement.lineBlock(
-                ends[0], ends[1], ends[2], ends[3], w, h, 3f * unit,
-                bounds.left, bounds.top, bounds.right, bounds.bottom,
-            )
-            glyphs.drawBlock(canvas, lines, text, c[0] - w / 2f, c[1] - h / 2f)
+            matrix.mapPoints(e)
+            canvas.drawLine(e[0], e[1], e[2], e[3], shadow)
+            canvas.drawLine(e[0], e[1], e[2], e[3], stroke)
+            e
         }
+
+        val taken = ArrayList<Box>()
+        for (mark in scene.extremes) {
+            point[0] = mark.u * src.width
+            point[1] = mark.v * src.height
+            matrix.mapPoints(point)
+            taken += glyphs.extremeBoxes(point[0], point[1], mark.hot, mark.text, bounds)
+        }
+        for (spot in scene.spots) {
+            point[0] = spot.u * src.width
+            point[1] = spot.v * src.height
+            matrix.mapPoints(point)
+            taken += glyphs.labelBoxes(point[0], point[1], spot.number, spot.text, bounds)
+        }
+        val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            textSize = 11.5f * unit
+            isFakeBoldText = true
+            typeface = mono
+        }
+        val within = Box(bounds.left, bounds.top, bounds.right, bounds.bottom)
+        val gap = 3f * unit
+        if (scene.line != null && ends != null) {
+            val lines = scene.line.text.split('\n')
+            val box = LabelPlacement.lineBlock(
+                ends[0], ends[1], ends[2], ends[3],
+                glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), gap, within, taken,
+            )
+            glyphs.drawBlock(canvas, lines, text, box.left, box.top)
+            taken += box
+        }
+        for ((i, label) in scene.areas.withIndex()) {
+            val lines = ("A${label.number}\n" + label.text).split('\n')
+            val box = LabelPlacement.areaBlock(
+                frames[i], glyphs.blockWidth(lines, text), glyphs.blockHeight(lines, text), gap,
+                within, taken, frames, ends,
+            )
+            glyphs.drawBlock(canvas, lines, text, box.left, box.top)
+            taken += box
+        }
+
         for (mark in scene.extremes) {
             point[0] = mark.u * src.width
             point[1] = mark.v * src.height

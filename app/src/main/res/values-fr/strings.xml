@@ -296,7 +296,6 @@
     <string name="row_line">Ligne de mesure</string>
     <string name="line_on">Activée : une ligne avec Max, moyenne et Min le long, et un profil sous l\'image. Faites glisser ses extrémités. Touchez pour désactiver.</string>
     <string name="line_off">Désactivée. Touchez pour une ligne qui mesure Max, moyenne et Min le long d\'un tuyau ou d\'un radiateur, avec un profil.</string>
-    <string name="line_readings">Max %1$s · Moy %2$s · Min %3$s</string>
     <string name="row_moisture">Risque de condensation et de moisissure</string>
     <string name="moisture_off">Désactivé. Indiquez la température et l\'humidité de la pièce : les surfaces assez froides pour l\'humidité sont colorées en bleu.</string>
     <string name="moisture_on_condensation">Point de rosée %1$s °C : les surfaces à cette température ou en dessous, où l\'eau se condense, sont colorées en bleu.</string>

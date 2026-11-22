@@ -296,7 +296,6 @@
     <string name="row_line">Linha de medição</string>
     <string name="line_on">Ligada: uma linha com Máx, média e Mín ao longo dela e um gráfico de perfil sob a imagem. Arraste as pontas. Toque para desligar.</string>
     <string name="line_off">Desligada. Toque para uma linha que mede Máx, média e Mín ao longo de um cano ou radiador, com gráfico de perfil.</string>
-    <string name="line_readings">Máx %1$s · Méd %2$s · Mín %3$s</string>
     <string name="row_moisture">Risco de condensação e mofo</string>
     <string name="moisture_off">Desligado. Informe a temperatura e a umidade do cômodo, e as superfícies frias o bastante para umidade ficam azuis.</string>
     <string name="moisture_on_condensation">Ponto de orvalho %1$s °C: as superfícies nessa temperatura ou abaixo, onde a água condensa, ficam azuis.</string>

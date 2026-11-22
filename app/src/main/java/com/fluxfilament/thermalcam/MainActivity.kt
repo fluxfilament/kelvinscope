@@ -2848,9 +2848,11 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val minC = calibration.rawToCelsius(r.minRaw)
         return LineLabel(
             a, b,
+            // Three lines like an area's: in one, the block was too wide to sit
+            // beside an upright line in a portrait picture.
             getString(
-                R.string.line_readings,
-                "${dec(maxC)}°", "${dec(calibration.rawToCelsius(r.meanRaw.roundToInt()))}°", "${dec(minC)}°",
+                R.string.area_readings,
+                "${dec(maxC)}°C", "${dec(calibration.rawToCelsius(r.meanRaw.roundToInt()))}°C", "${dec(minC)}°C",
             ),
             profile,
             "${dec(maxC)}°",

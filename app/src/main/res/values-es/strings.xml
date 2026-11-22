@@ -296,7 +296,6 @@
     <string name="row_line">Línea de medida</string>
     <string name="line_on">Activada: una línea con Máx, media y Mín a lo largo y un gráfico de perfil bajo la imagen. Arrastra sus extremos. Toca para desactivar.</string>
     <string name="line_off">Desactivada. Toca para una línea que mide Máx, media y Mín a lo largo de una tubería o un radiador, con gráfico de perfil.</string>
-    <string name="line_readings">Máx %1$s · Med %2$s · Mín %3$s</string>
     <string name="row_moisture">Riesgo de condensación y moho</string>
     <string name="moisture_off">Desactivado. Indica la temperatura y la humedad de la habitación, y las superficies lo bastante frías para la humedad se pintan de azul.</string>
     <string name="moisture_on_condensation">Punto de rocío %1$s °C: las superficies a esa temperatura o menos, donde el agua se condensa, se pintan de azul.</string>

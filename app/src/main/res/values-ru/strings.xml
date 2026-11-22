@@ -295,7 +295,6 @@
     <string name="row_line">Линия замера</string>
     <string name="line_on">Вкл: линия с Max, средним и Min вдоль неё и график профиля под кадром. Концы перетаскиваются. Нажмите, чтобы выключить.</string>
     <string name="line_off">Выкл. Нажмите, чтобы мерить Max, среднее и Min вдоль трубы или радиатора, с графиком профиля.</string>
-    <string name="line_readings">Max %1$s · Ср %2$s · Min %3$s</string>
     <string name="row_moisture">Риск конденсата и плесени</string>
     <string name="moisture_off">Выкл. Укажите температуру и влажность в комнате — поверхности, достаточно холодные для сырости, закрасятся синим.</string>
     <string name="moisture_on_condensation">Точка росы %1$s °C: поверхности с этой температурой и ниже, где выпадет конденсат, закрашены синим.</string>

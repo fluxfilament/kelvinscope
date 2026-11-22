@@ -99,23 +99,48 @@ class SpotGlyphs(private val unit: Float) {
      * turned.
      */
     fun drawLabels(canvas: Canvas, x: Float, y: Float, number: Int, reading: String, bounds: RectF) {
+        val text = number.toString()
+        val at = layOutLabels(x, y, text, reading, bounds)
+        draw(canvas, reading, at[0], at[1], textPaint, textShadow)
+        draw(canvas, text, at[2], at[3], numberPaint, numberShadow)
+    }
+
+    /**
+     * What a spot takes up - crosshair, reading, number - for laying the blocks of
+     * areas and the line out around it. Same arguments as [drawLabels].
+     */
+    fun labelBoxes(x: Float, y: Float, number: Int, reading: String, bounds: RectF): List<Box> {
+        val text = number.toString()
+        val at = layOutLabels(x, y, text, reading, bounds)
+        val r = radius * 1.7f
+        return listOf(
+            Box(x - r, y - r, x + r, y + r),
+            textBox(reading, at[0], at[1], textPaint),
+            textBox(text, at[2], at[3], numberPaint),
+        )
+    }
+
+    private val labelLayout = FloatArray(4)
+
+    /** Reading's left and baseline, then the number's, as [drawLabels] places them. */
+    private fun layOutLabels(x: Float, y: Float, number: String, reading: String, bounds: RectF): FloatArray {
         val r = radius
         val readingWidth = textPaint.measureText(reading)
-        val left = if (x + r * 2f + readingWidth < bounds.right) x + r * 2f
+        labelLayout[0] = if (x + r * 2f + readingWidth < bounds.right) x + r * 2f
         else x - r * 2f - readingWidth
-        val baseline = (y + 5f * unit).coerceIn(
+        labelLayout[1] = (y + 5f * unit).coerceIn(
             bounds.top + textPaint.textSize,
             bounds.bottom - 4f * unit,
         )
-        draw(canvas, reading, left, baseline, textPaint, textShadow)
-
-        val text = number.toString()
-        val numberWidth = numberPaint.measureText(text)
-        val numberX = (x - r * 1.5f - numberWidth)
+        val numberWidth = numberPaint.measureText(number)
+        labelLayout[2] = (x - r * 1.5f - numberWidth)
             .coerceIn(bounds.left, bounds.right - numberWidth)
-        val numberY = (y - r * 1.5f).coerceAtLeast(bounds.top + numberPaint.textSize)
-        draw(canvas, text, numberX, numberY, numberPaint, numberShadow)
+        labelLayout[3] = (y - r * 1.5f).coerceAtLeast(bounds.top + numberPaint.textSize)
+        return labelLayout
     }
+
+    private fun textBox(text: String, left: Float, baseline: Float, paint: Paint) =
+        Box(left, baseline + paint.ascent(), left + paint.measureText(text), baseline + paint.descent())
 
     private val hotFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(255, 70, 40) }
     private val coldFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(60, 170, 255) }
@@ -149,12 +174,29 @@ class SpotGlyphs(private val unit: Float) {
         canvas.drawPath(triangle, if (hot) hotFill else coldFill)
         canvas.drawPath(triangle, triangleOutline)
 
+        val at = layOutExtreme(x, y, hot, reading, bounds)
+        draw(canvas, reading, at[0], at[1], textPaint, textShadow)
+    }
+
+    /** What a Max or Min marker takes up; same arguments as [drawExtreme]. */
+    fun extremeBoxes(x: Float, y: Float, hot: Boolean, reading: String, bounds: RectF): List<Box> {
+        val s = 6f * unit
+        val at = layOutExtreme(x, y, hot, reading, bounds)
+        return listOf(
+            if (hot) Box(x - s, y - s * 1.6f, x + s, y) else Box(x - s, y, x + s, y + s * 1.6f),
+            textBox(reading, at[0], at[1], textPaint),
+        )
+    }
+
+    /** The reading's left and baseline beside a Max or Min marker. */
+    private fun layOutExtreme(x: Float, y: Float, hot: Boolean, reading: String, bounds: RectF): FloatArray {
+        val s = 6f * unit
         val width = textPaint.measureText(reading)
-        val left = (if (x + s * 1.5f + width < bounds.right) x + s * 1.5f else x - s * 1.5f - width)
+        labelLayout[0] = (if (x + s * 1.5f + width < bounds.right) x + s * 1.5f else x - s * 1.5f - width)
             .coerceIn(bounds.left, bounds.right - width)
-        val baseline = (if (hot) y - s * 0.4f else y + s * 1.6f)
+        labelLayout[1] = (if (hot) y - s * 0.4f else y + s * 1.6f)
             .coerceIn(bounds.top + textPaint.textSize, bounds.bottom - 4f * unit)
-        draw(canvas, reading, left, baseline, textPaint, textShadow)
+        return labelLayout
     }
 
     /** Outline first, then the glyphs: legible over a light scene as well as a dark one. */

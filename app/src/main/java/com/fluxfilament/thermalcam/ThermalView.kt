@@ -238,6 +238,7 @@ class ThermalView @JvmOverloads constructor(
         for (area in areas) drawArea(canvas, bmp, area)
         line?.let { drawLine(canvas, bmp, it) }
         trend?.let { drawTrend(canvas, it) }
+        drawBlocks(canvas, bmp)
         for (mark in extremes) drawExtreme(canvas, bmp, mark)
         for (spot in spots) drawSpot(canvas, bmp, spot)
         if (stale) canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), stalePaint)
@@ -276,26 +277,90 @@ class ThermalView @JvmOverloads constructor(
             canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, lineShadow)
             canvas.drawCircle(lineEnds[2 * k], lineEnds[2 * k + 1], 6f * density, linePaint)
         }
-        // Readings beside the middle, upright for the reader like every other label,
-        // and clear of the line rather than struck through by it.
-        val cx = (ax + bx) / 2f
-        val cy = (ay + by) / 2f
+        drawProfile(canvas, label)
+    }
+
+    /**
+     * The reading blocks of the line and the areas, laid out around the spots, the
+     * Max/Min markers and the graphs - see [LabelPlacement].
+     *
+     * Worked out in one frame for all of them, turned about the view's centre so
+     * the text is upright for the reader. Spots and markers are drawn turned about
+     * their own points instead, but a turn about another point is the same turn plus
+     * a shift, so their labels land in this frame exactly where they are drawn.
+     */
+    private fun drawBlocks(canvas: Canvas, bmp: Bitmap) {
+        val line = line
+        if (areas.isEmpty() && line == null) return
+        val cx = width / 2f
+        val cy = height / 2f
+        labelMatrix.setRotate(labelRotation.toFloat(), cx, cy)
+        viewInLabel.set(0f, 0f, width.toFloat(), height.toFloat())
+        labelMatrix.mapRect(viewInLabel)
+        val taken = ArrayList<Box>()
+        for (spot in spots) {
+            anchorInLabel(bmp, spot.u, spot.v)
+            taken += glyphs.labelBoxes(point[0], point[1], spot.number, spot.text, viewInLabel)
+        }
+        for (mark in extremes) {
+            anchorInLabel(bmp, mark.u, mark.v)
+            taken += glyphs.extremeBoxes(point[0], point[1], mark.hot, mark.text, viewInLabel)
+        }
+        // The graph strips, as drawProfile and drawTrend lay them out.
+        val pad = 8f * density
+        if (line != null && line.profileC.size >= 2) {
+            taken += boxInLabel(pad, height - 64f * density - pad, width - pad, height - pad)
+        }
+        if (trend != null) taken += boxInLabel(pad, pad, width - pad, pad + 72f * density)
+
+        val within = Box(viewInLabel.left, viewInLabel.top, viewInLabel.right, viewInLabel.bottom)
+        val gap = 3f * density
         canvas.save()
         canvas.rotate(-labelRotation.toFloat(), cx, cy)
-        boundsInLabelFrame(cx, cy, viewInLabel)
-        System.arraycopy(lineEnds, 0, lineInLabel, 0, 4)
-        labelMatrix.setRotate(labelRotation.toFloat(), cx, cy)
-        labelMatrix.mapPoints(lineInLabel)
-        val lines = listOf(label.text)
-        val w = glyphs.blockWidth(lines, areaTextPaint)
-        val h = glyphs.blockHeight(lines, areaTextPaint)
-        val c = LabelPlacement.lineBlock(
-            lineInLabel[0], lineInLabel[1], lineInLabel[2], lineInLabel[3], w, h, 3f * density,
-            viewInLabel.left, viewInLabel.top, viewInLabel.right, viewInLabel.bottom,
-        )
-        glyphs.drawBlock(canvas, lines, areaTextPaint, c[0] - w / 2f, c[1] - h / 2f)
+        var ends: FloatArray? = null
+        if (line != null) {
+            mapLineEnds(bmp, line)
+            System.arraycopy(lineEnds, 0, lineInLabel, 0, 4)
+            labelMatrix.mapPoints(lineInLabel)
+            ends = lineInLabel
+            val lines = line.text.split('\n')
+            val box = LabelPlacement.lineBlock(
+                lineInLabel[0], lineInLabel[1], lineInLabel[2], lineInLabel[3],
+                glyphs.blockWidth(lines, areaTextPaint), glyphs.blockHeight(lines, areaTextPaint),
+                gap, within, taken,
+            )
+            glyphs.drawBlock(canvas, lines, areaTextPaint, box.left, box.top)
+            taken += box
+        }
+        val frames = areas.map {
+            mapArea(bmp, it.area, labelBounds)
+            labelMatrix.mapRect(labelBounds)
+            Box(labelBounds.left, labelBounds.top, labelBounds.right, labelBounds.bottom)
+        }
+        for ((i, label) in areas.withIndex()) {
+            val lines = ("A${label.number}\n" + label.text).split('\n')
+            val box = LabelPlacement.areaBlock(
+                frames[i], glyphs.blockWidth(lines, areaTextPaint), glyphs.blockHeight(lines, areaTextPaint),
+                gap, within, taken, frames, ends,
+            )
+            glyphs.drawBlock(canvas, lines, areaTextPaint, box.left, box.top)
+            taken += box
+        }
         canvas.restore()
-        drawProfile(canvas, label)
+    }
+
+    /** ([u], [v]) on the picture, into [point] in the label frame of [drawBlocks]. */
+    private fun anchorInLabel(bmp: Bitmap, u: Float, v: Float) {
+        point[0] = u * bmp.width
+        point[1] = v * bmp.height
+        matrix.mapPoints(point)
+        labelMatrix.mapPoints(point)
+    }
+
+    private fun boxInLabel(left: Float, top: Float, right: Float, bottom: Float): Box {
+        labelBounds.set(left, top, right, bottom)
+        labelMatrix.mapRect(labelBounds)
+        return Box(labelBounds.left, labelBounds.top, labelBounds.right, labelBounds.bottom)
     }
 
     /**
@@ -425,25 +490,7 @@ class ThermalView @JvmOverloads constructor(
         handlePoint(bmp, label.area, point)
         canvas.drawCircle(point[0], point[1], 5f * density, areaShadow)
         canvas.drawCircle(point[0], point[1], 5f * density, handlePaint)
-
-        // The readings above the frame as the reader sees it, or below it: inside, a
-        // spot placed in the area would write over them.
-        val cx = areaRect.centerX()
-        val cy = areaRect.centerY()
-        canvas.save()
-        canvas.rotate(-labelRotation.toFloat(), cx, cy)
-        boundsInLabelFrame(cx, cy, viewInLabel)
-        labelMatrix.setRotate(labelRotation.toFloat(), cx, cy)
-        labelBounds.set(areaRect)
-        labelMatrix.mapRect(labelBounds)
-        val lines = ("A${label.number}\n" + label.text).split('\n')
-        val at = LabelPlacement.areaBlock(
-            labelBounds.left, labelBounds.top, labelBounds.bottom,
-            glyphs.blockWidth(lines, areaTextPaint), glyphs.blockHeight(lines, areaTextPaint), 3f * density,
-            viewInLabel.left, viewInLabel.top, viewInLabel.right, viewInLabel.bottom,
-        )
-        glyphs.drawBlock(canvas, lines, areaTextPaint, at[0], at[1])
-        canvas.restore()
+        // The readings come later, in drawBlocks, laid out around everything else.
     }
 
     private fun drawZone(canvas: Canvas, bmp: Bitmap, area: RectF) {

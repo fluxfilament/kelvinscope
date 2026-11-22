@@ -17,75 +17,118 @@
 package com.fluxfilament.thermalcam
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.abs
 
-/** Reading blocks of areas and the line, in a 600 x 800 picture. */
+/** Reading blocks of areas and the line, mostly in a 600 x 800 picture. */
 class LabelPlacementTest {
 
-    private fun area(top: Float, bottom: Float, left: Float = 100f) =
-        LabelPlacement.areaBlock(left, top, bottom, 120f, 60f, 4f, 0f, 0f, 600f, 800f)
+    private val picture = Box(0f, 0f, 600f, 800f)
+
+    private fun area(frame: Box, taken: List<Box> = emptyList(), line: FloatArray? = null) =
+        LabelPlacement.areaBlock(frame, 120f, 60f, 4f, picture, taken, listOf(frame), line)
 
     @Test
     fun areaBlockGoesAboveTheFrame() {
-        val (x, y) = area(top = 300f, bottom = 400f).let { it[0] to it[1] }
-        assertEquals(100f, x, 0.01f)
-        assertEquals(300f - 4f - 60f, y, 0.01f)
+        val b = area(Box(100f, 300f, 300f, 400f))
+        assertEquals(100f, b.left, 0.01f)
+        assertEquals(300f - 4f - 60f, b.top, 0.01f)
     }
 
     @Test
     fun areaAtTheTopEdgeHasItsBlockBelow() =
-        assertEquals(204f, area(top = 20f, bottom = 200f)[1], 0.01f)
-
-    @Test
-    fun areaFillingThePictureKeepsItsBlockInside() {
-        val y = area(top = 10f, bottom = 790f)[1]
-        assertTrue(y >= 10f && y + 60f <= 800f)
-    }
+        assertEquals(204f, area(Box(100f, 20f, 300f, 200f)).top, 0.01f)
 
     @Test
     fun areaBlockIsPulledInFromTheRightEdge() =
-        assertEquals(600f - 120f, area(top = 300f, bottom = 400f, left = 550f)[0], 0.01f)
+        assertEquals(600f - 120f, area(Box(550f, 300f, 590f, 400f)).left, 0.01f)
 
-    /** True when the block centred at [c] keeps [gap] clear of the infinite line a-b. */
-    private fun clearOfLine(c: FloatArray, ax: Float, ay: Float, bx: Float, by: Float, w: Float, h: Float, gap: Float): Boolean {
-        val dx = bx - ax
-        val dy = by - ay
-        val len = kotlin.math.hypot(dx, dy)
-        val corners = listOf(-1f to -1f, 1f to -1f, -1f to 1f, 1f to 1f).map { (sx, sy) ->
-            ((c[0] + sx * w / 2 - ax) * dy - (c[1] + sy * h / 2 - ay) * dx) / len
-        }
-        return corners.all { it >= gap - 0.01f } || corners.all { it <= -gap + 0.01f }
+    @Test
+    fun areaBlockStepsAsideForASpotLabel() {
+        // A spot's reading right where the block would go above the frame.
+        val spot = Box(90f, 230f, 230f, 290f)
+        val b = area(Box(100f, 300f, 300f, 400f), taken = listOf(spot))
+        assertEquals(0f, b.grown(4f).overlap(spot), 0.01f)
     }
 
-    private fun line(ax: Float, ay: Float, bx: Float, by: Float) =
-        LabelPlacement.lineBlock(ax, ay, bx, by, 200f, 30f, 4f, 0f, 0f, 600f, 800f)
+    @Test
+    fun areaBlockKeepsOffTheLine() {
+        val line = floatArrayOf(150f, 0f, 150f, 800f)
+        val b = area(Box(100f, 300f, 300f, 400f), line = line)
+        assertFalse(b.crossedBy(line[0], line[1], line[2], line[3]))
+    }
+
+    @Test
+    fun secondAreaBlockDoesNotLieOnTheFirst() {
+        // As on the card of 2026-11-22: A1 below A2, A1's block going up into A2's.
+        val a2 = Box(360f, 60f, 520f, 240f)
+        val a1 = Box(380f, 380f, 540f, 560f)
+        val frames = listOf(a2, a1)
+        val first = LabelPlacement.areaBlock(a2, 120f, 90f, 4f, picture, emptyList(), frames, null)
+        val second = LabelPlacement.areaBlock(a1, 120f, 90f, 4f, picture, listOf(first), frames, null)
+        assertEquals(0f, second.overlap(first), 0.01f)
+    }
+
+    private fun line(ax: Float, ay: Float, bx: Float, by: Float, w: Float = 130f, h: Float = 70f, bounds: Box = picture) =
+        LabelPlacement.lineBlock(ax, ay, bx, by, w, h, 4f, bounds, emptyList())
 
     @Test
     fun horizontalLineHasItsBlockAbove() {
-        val c = line(100f, 400f, 500f, 400f)
-        assertTrue(c[1] < 400f)
-        assertTrue(clearOfLine(c, 100f, 400f, 500f, 400f, 200f, 30f, 4f))
+        val b = line(100f, 400f, 500f, 400f)
+        assertTrue(b.bottom < 400f)
+        assertFalse(b.crossedBy(100f, 400f, 500f, 400f))
     }
 
     @Test
     fun uprightLineHasItsBlockBeside() {
-        val c = line(300f, 100f, 300f, 700f)
-        assertTrue(abs(c[0] - 300f) >= 100f + 4f - 0.01f)
+        val b = line(300f, 100f, 300f, 700f)
+        assertTrue(b.left >= 304f - 0.01f || b.right <= 296f + 0.01f)
+    }
+
+    @Test
+    fun blockTooWideForEitherSideGoesPastAnEnd() {
+        // The card of 2026-11-22: an upright line down the middle of a narrow picture.
+        val narrow = Box(0f, 0f, 300f, 800f)
+        val b = line(150f, 200f, 150f, 700f, w = 200f, bounds = narrow)
+        assertFalse(b.grown(3.9f).crossedBy(150f, 200f, 150f, 700f))
+    }
+
+    /** How close the nearest corner of [b] comes to the line through a and b. */
+    private fun clearance(b: Box, ax: Float, ay: Float, bx: Float, by: Float): Float {
+        val len = kotlin.math.hypot(bx - ax, by - ay)
+        return listOf(b.left to b.top, b.right to b.top, b.left to b.bottom, b.right to b.bottom)
+            .minOf { (x, y) -> kotlin.math.abs((x - ax) * (by - ay) - (y - ay) * (bx - ax)) / len }
     }
 
     @Test
     fun slantedLineIsNotStruckThroughItsBlock() {
-        // As on the card of 2026-11-22: a long line at about 60 degrees.
-        val c = line(60f, 620f, 380f, 30f)
-        assertTrue(clearOfLine(c, 60f, 620f, 380f, 30f, 200f, 30f, 4f))
+        // The cards of 2026-11-22: a long line at about 75 degrees.
+        val b = line(400f, 235f, 253f, 853f, bounds = Box(0f, 0f, 720f, 960f))
+        assertFalse(b.crossedBy(400f, 235f, 253f, 853f))
+        assertTrue(clearance(b, 400f, 235f, 253f, 853f) >= 4f - 0.01f)
     }
 
     @Test
     fun lineAlongTheTopEdgeHasItsBlockBelow() {
-        val c = line(100f, 10f, 500f, 10f)
-        assertTrue(c[1] > 10f)
-        assertTrue(clearOfLine(c, 100f, 10f, 500f, 10f, 200f, 30f, 4f))
+        val b = line(100f, 10f, 500f, 10f)
+        assertTrue(b.top > 10f)
+    }
+
+    @Test
+    fun lineBlockStepsAsideForASpotLabel() {
+        val spot = Box(300f, 300f, 460f, 360f)
+        val b = LabelPlacement.lineBlock(300f, 100f, 300f, 700f, 130f, 70f, 4f, picture, listOf(spot))
+        assertEquals(0f, b.overlap(spot), 0.01f)
+        assertFalse(b.crossedBy(300f, 100f, 300f, 700f))
+    }
+
+    @Test
+    fun segmentAndBox() {
+        val box = Box(10f, 10f, 20f, 20f)
+        assertTrue(box.crossedBy(0f, 15f, 30f, 15f))
+        assertTrue(box.crossedBy(15f, 15f, 40f, 40f))
+        assertFalse(box.crossedBy(0f, 0f, 30f, 5f))
+        assertFalse(box.crossedBy(0f, 25f, 25f, 40f))
     }
 }
