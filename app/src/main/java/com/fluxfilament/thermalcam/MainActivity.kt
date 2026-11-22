@@ -2858,11 +2858,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         // slider moves in between.
         val blend = blend
         val band = renderer.isotherm
-        val composed = if (renderer.fusion && band != null) {
-            snapshotCompositor.composeFusion(frame, renderer.maskCopy(frame, thermal, band)) ?: thermal
+        val fused = if (renderer.fusion && band != null) {
+            snapshotCompositor.composeFusion(frame, renderer.maskCopy(frame, thermal, band))
         } else {
-            snapshotCompositor.compose(frame, thermal, blend) ?: thermal
+            null
         }
+        val composed = fused ?: snapshotCompositor.compose(frame, thermal, blend) ?: thermal
 
         val card = SnapshotCard.render(
             this,
@@ -2876,6 +2877,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 planck = planck,
                 geometry = geometry,
                 blend = blend,
+                fused = fused != null,
                 rangeFixed = rangeFixed,
                 takenAt = takenAt,
                 extremes = if (showExtremes) extremeLabels(frame) else emptyList(),

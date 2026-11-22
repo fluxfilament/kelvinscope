@@ -49,6 +49,8 @@ class CardScene(
     val planck: Planck,
     val geometry: SledInfo?,
     val blend: Blend,
+    /** Heat on the photo: the picture follows the isotherm, not [blend]. */
+    val fused: Boolean = false,
     val rangeFixed: Boolean,
     val takenAt: Date,
     /** Max/Min markers, when they were on screen; empty otherwise. */
@@ -375,7 +377,9 @@ object SnapshotCard {
         tokens += context.getString(
             R.string.emissivity_chip, String.format(locale, "%.2f", scene.planck.emissivity),
         )
-        tokens += when {
+        // A fused card says so in its overlay note; "IR only" beside it would contradict
+        // the picture.
+        if (!scene.fused) tokens += when {
             scene.blend.isThermal -> context.getString(R.string.card_blend_thermal)
             scene.blend.isVisibleOnly -> context.getString(R.string.card_blend_visible)
             else -> context.getString(R.string.card_blend_mix, scene.blend.visiblePercent)
