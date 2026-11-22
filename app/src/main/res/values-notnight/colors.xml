@@ -19,4 +19,5 @@
     <color name="ff_code_bg">#1C2429</color>
     <color name="ff_on_accent">#FFFFFF</color>
     <color name="ff_scrim">#66262220</color>
+    <color name="ff_hint_bg">#D92A231B</color>
 </resources>

@@ -26,4 +26,6 @@
     <color name="ff_scrim">#80140B07</color>
     <!-- Text laid over the picture's well, which stays dark in both themes. -->
     <color name="ff_on_well">#EFE7D8</color>
+    <!-- The well at 85 %: the hint stays readable over any frame left behind. -->
+    <color name="ff_hint_bg">#D90E0B07</color>
 </resources>
