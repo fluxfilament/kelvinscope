@@ -335,4 +335,6 @@
     <string name="isotherm_show_green">En verde</string>
     <string name="isotherm_show_fusion">Calor en foto</string>
     <string name="card_fusion">FOTO + CALOR, %1$s</string>
+    <string name="state_no_access">[SIN ACCESO]</string>
+    <string name="state_stopped">[DETENIDO]</string>
 </resources>

@@ -170,6 +170,9 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
          */
         const val ROTATION_HYSTERESIS = 60
 
+        /** MIN/MAX readouts while the frame behind them is no longer live. */
+        const val STALE_ALPHA = 0.4f
+
         /** How close to a preset counts as being on it. */
         const val PRESET_TOLERANCE = 0.025
 
@@ -989,7 +992,12 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
                 colour = R.color.ff_accent
             }
             !camera.isRunning() -> {
-                state = R.string.state_no_camera
+                state = when (emptyDiagnosis()) {
+                    EmptyDiagnosis.NO_PERMISSION -> R.string.state_no_access
+                    EmptyDiagnosis.STOPPED -> R.string.state_stopped
+                    EmptyDiagnosis.WAITING -> R.string.state_waiting
+                    else -> R.string.state_no_camera
+                }
                 stamp = R.drawable.bg_stamp_quiet
                 colour = R.color.ff_muted
             }
@@ -2070,20 +2078,29 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         return ((degrees + 45) / 90 % 4) * 90
     }
 
-    /** Says why the picture is empty, or hides itself once frames come in. */
-    private fun refreshEmptyHint() {
-        if (review != null) {
-            emptyHint.visibility = View.GONE
-            return
-        }
+    private fun emptyDiagnosis(): EmptyDiagnosis {
         val device = findFlirDevice()
-        val diagnosis = EmptyDiagnosis.of(
+        return EmptyDiagnosis.of(
             devicePresent = device != null,
             hasPermission = device != null && usbManager.hasPermission(device),
             running = camera.isRunning(),
             haveGeometry = geometry != null,
             stoppedWithReason = stoppedWithReason,
         )
+    }
+
+    /**
+     * Says why the picture is empty, or hides itself once frames come in. A frame
+     * left from before is veiled, and the range readouts faded, while it shows.
+     */
+    private fun refreshEmptyHint() {
+        if (review != null) {
+            emptyHint.visibility = View.GONE
+            showStale(false)
+            return
+        }
+        val diagnosis = emptyDiagnosis()
+        showStale(diagnosis != EmptyDiagnosis.NONE)
         val text = when (diagnosis) {
             EmptyDiagnosis.NONE -> null
             EmptyDiagnosis.NOT_PLUGGED -> R.string.empty_not_plugged
@@ -2094,6 +2111,13 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         emptyHint.visibility = if (text == null) View.GONE else View.VISIBLE
         emptyHint.isClickable = diagnosis == EmptyDiagnosis.NO_PERMISSION
         if (text != null) emptyHint.setText(text)
+    }
+
+    private fun showStale(stale: Boolean) {
+        thermalView.stale = stale
+        val alpha = if (stale) STALE_ALPHA else 1f
+        rangeLowValue.alpha = alpha
+        rangeHighValue.alpha = alpha
     }
 
     private fun findFlirDevice(): UsbDevice? =

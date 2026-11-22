@@ -95,6 +95,20 @@ class ThermalView @JvmOverloads constructor(
     var extremes: List<ExtremeLabel> = emptyList()
 
     /**
+     * The picture is the last one from before the camera went away or stopped. It
+     * stays on screen, labels and all, but under a dark veil, so its readings are
+     * not taken for live ones.
+     */
+    var stale: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidate()
+        }
+
+    private val stalePaint = Paint().apply { color = context.getColor(R.color.ff_stale_veil) }
+
+    /**
      * How far the phone itself is turned, in degrees clockwise from upright.
      *
      * The spot labels are turned back by this much so they stay the right way up for
@@ -229,6 +243,7 @@ class ThermalView @JvmOverloads constructor(
         trend?.let { drawTrend(canvas, it) }
         for (mark in extremes) drawExtreme(canvas, bmp, mark)
         for (spot in spots) drawSpot(canvas, bmp, spot)
+        if (stale) canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), stalePaint)
     }
 
     private fun drawExtreme(canvas: Canvas, bmp: Bitmap, mark: ExtremeLabel) {

@@ -335,4 +335,6 @@
     <string name="isotherm_show_green">Em verde</string>
     <string name="isotherm_show_fusion">Calor na foto</string>
     <string name="card_fusion">FOTO + CALOR, %1$s</string>
+    <string name="state_no_access">[SEM ACESSO]</string>
+    <string name="state_stopped">[PARADO]</string>
 </resources>

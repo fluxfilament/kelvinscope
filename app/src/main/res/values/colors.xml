@@ -28,4 +28,6 @@
     <color name="ff_on_well">#EFE7D8</color>
     <!-- The well at 85 %: the hint stays readable over any frame left behind. -->
     <color name="ff_hint_bg">#D90E0B07</color>
+    <!-- Over a frame left from before the camera went: the well at 70 %. -->
+    <color name="ff_stale_veil">#B30E0B07</color>
 </resources>

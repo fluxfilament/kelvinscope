@@ -333,4 +333,6 @@
     <string name="isotherm_show_green">Grün färben</string>
     <string name="isotherm_show_fusion">Wärme auf Foto</string>
     <string name="card_fusion">FOTO + WÄRME, %1$s</string>
+    <string name="state_no_access">[KEIN ZUGRIFF]</string>
+    <string name="state_stopped">[GESTOPPT]</string>
 </resources>

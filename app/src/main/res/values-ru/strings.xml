@@ -335,4 +335,6 @@
     <string name="isotherm_show_green">Зелёным</string>
     <string name="isotherm_show_fusion">Тепло на фото</string>
     <string name="card_fusion">ФОТО + ТЕПЛО, %1$s</string>
+    <string name="state_no_access">[НЕТ ДОСТУПА]</string>
+    <string name="state_stopped">[ОСТАНОВЛЕНО]</string>
 </resources>
