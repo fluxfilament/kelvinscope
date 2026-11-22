@@ -20,6 +20,7 @@ versions follow [Semantic Versioning](https://semver.org/).
   prompt: a haptic tick, which needs none, could not be felt.
 - Measuring line: Max, average and Min along a segment you drag, with a
   profile graph of the temperature along it under the picture; also on cards.
+  The readings sit beside the line on a dark plate, never struck through.
 - Condensation and mould risk: from the room's air temperature and relative
   humidity, surfaces at or below the dew point (100 %) or where the air at
   them reaches 80 % (mould) are painted blue, as building thermography does.
@@ -39,7 +40,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   or colder it is than spot 1, on screen and on cards.
 - Measurement areas: up to three rectangles on the picture, each with Max,
   Min and the average inside; drag to move, drag the corner dot to resize.
-  Also drawn on snapshot cards.
+  The readings go above the frame (below it at the picture's top edge), on a
+  dark plate, so a spot placed inside does not write over them. Also drawn on
+  snapshot cards.
 - A strip of palettes over the scale bar on the main screen, one tap to
   switch.
 - Thermal fusion: the isotherm's band can be shown as heat over the visible
@@ -60,15 +63,26 @@ versions follow [Semantic Versioning](https://semver.org/).
   of the camera, and spots, areas, markers, palettes and emissivity all work
   on it; the shutter saves a new card from it. Back returns to the camera.
 - When the picture is empty, the app says why: no camera, no USB access
-  (tap to ask again), waiting for frames, or the stream stopped.
+  (tap to ask again), waiting for frames, or the stream stopped. The last
+  picture stays behind the message dimmed, so it is not taken for a live one,
+  and the status bar names the reason too.
 - Importing camera constants from a FLIR JPEG also shows FLIR's own overlay
   alignment from it (`Real2IR`, `OffsetX`, `OffsetY`); `tools/fff_parse.py`
   prints the same ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
 - A light theme, in the cream of the same palette, chosen in Settings:
   dark (still the default), light, or following the system.
-- German, Spanish, French and Portuguese (Brazilian) translations, offered
-  in the system's per-app language setting as well. Machine-assisted and not
-  yet reviewed by native speakers.
+- German, Spanish, French and Portuguese (Brazilian) translations.
+  Machine-assisted and not yet reviewed by native speakers.
+- Language in Settings, under the theme: the phone's own or any of the six,
+  each named in itself. On Android 13 and later it is the same setting as the
+  system's per-app language.
+- Shift, on the Field of view screen: lines the layers up across Align, for
+  a camera whose two sensors do not sit level. Fixed for the camera, so it is
+  not on the main screen; Reset clears it with the field of view. The
+  comparison line can be turned to lie across, and turns by itself to show
+  the axis of the slider being moved
+  ([#1](https://github.com/fluxfilament/kelvinscope/issues/1)).
+- The settings that turn something on or off show it with a switch.
 - F-Droid metadata in `fastlane/`, in all six languages.
 
 ### Changed
@@ -77,6 +91,11 @@ versions follow [Semantic Versioning](https://semver.org/).
   system fonts.
 
 ### Fixed
+- A frame that carries something other than sensor counts is dropped instead
+  of shown. One with text in it once stretched a time-lapse's common scale so
+  far that the whole GIF came out black.
+- The calibration screen named the references a correction was fitted on in
+  the language of the day it was applied; they now follow the interface.
 - The Field of view screen gives the visible camera's own resolution, not the
   half-size it is decoded at for the overlay.
 - The Field of view screen gave the resolutions as 80×60 and 1440×1080
