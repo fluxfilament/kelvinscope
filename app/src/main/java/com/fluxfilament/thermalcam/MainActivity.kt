@@ -47,6 +47,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.Space
 import android.widget.TextView
 import android.widget.Toast
@@ -2604,6 +2605,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
         val log = spotLog
         spotLogSummary.text = if (log == null) getString(R.string.spot_log_off)
         else resources.getQuantityString(R.plurals.spot_log_on, log.rows, log.rows)
+        findViewById<Switch>(R.id.spotLogSwitch).isChecked = log != null
     }
 
     private fun toggleSpotLog() {
@@ -2761,6 +2763,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun refreshExtremesSummary() {
         extremesSummary.text = getString(if (showExtremes) R.string.extremes_on else R.string.extremes_off)
+        findViewById<Switch>(R.id.extremesSwitch).isChecked = showExtremes
     }
 
     private fun extremeLabels(frame: ThermalFrame): List<ExtremeLabel> {
@@ -2796,6 +2799,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun refreshLineSummary() {
         lineSummary.text = getString(if (showLine) R.string.line_on else R.string.line_off)
+        findViewById<Switch>(R.id.lineSwitch).isChecked = showLine
     }
 
     /** The line's readings and profile, worked out with the frame in hand. */
@@ -2822,6 +2826,7 @@ class MainActivity : Activity(), FlirOneCamera.Listener {
 
     private fun refreshDeltaSummary() {
         deltaSummary.text = getString(if (showDelta) R.string.delta_on else R.string.delta_off)
+        findViewById<Switch>(R.id.deltaSwitch).isChecked = showDelta
     }
 
     // --- snapshots ----------------------------------------------------------------
